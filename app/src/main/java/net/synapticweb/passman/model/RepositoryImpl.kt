@@ -1,10 +1,12 @@
-package net.synapticweb.swpassman.model
+package net.synapticweb.passman.model
 
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import net.sqlcipher.database.SupportFactory
+import javax.inject.Singleton
 
+@Singleton
 class RepositoryImpl : Repository {
     private lateinit var database : SecretsDatabase
 

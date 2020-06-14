@@ -1,4 +1,4 @@
-package net.synapticweb.swpassman
+package net.synapticweb.passman
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package net.synapticweb.swpassman.model
+package net.synapticweb.passman.model
 
 import android.content.Context
 import androidx.lifecycle.LiveData
