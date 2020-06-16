@@ -6,5 +6,17 @@
     <fragment
         android:id="@+id/secretsListFragment"
         android:name="net.synapticweb.passman.secretslist.SecretsListFragment"
-        android:label="SecretsListFragment" />
+        android:label="SecretsListFragment" >
+        <action
+            android:id="@+id/action_secretsListFragment_to_authenticateFragment"
+            app:destination="@id/authenticateFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/authenticateFragment"
+        android:name="net.synapticweb.passman.authenticate.AuthenticateFragment"
+        android:label="AskPassFragment" >
+        <action
+            android:id="@+id/action_authenticateFragment_to_secretsListFragment"
+            app:destination="@id/secretsListFragment" />
+    </fragment>
 </navigation>

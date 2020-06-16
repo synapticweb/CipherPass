@@ -1,14 +1,11 @@
 package net.synapticweb.passman.model
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 
 interface Repository {
-    fun initialize(context: Context, passphrase : ByteArray)
+    fun isInitialized() : Boolean
 
     fun closeDb()
-
-    fun isInitialized() : Boolean
 
     suspend fun insertSecret(secret : Secret) : Long
 
@@ -18,5 +15,5 @@ interface Repository {
 
     suspend fun getSecret(key : Long) : Secret
 
-    fun getAllSecrets() : LiveData<List<Secret>>
+    fun getAllSecrets() : LiveData<List<Secret>?>
 }

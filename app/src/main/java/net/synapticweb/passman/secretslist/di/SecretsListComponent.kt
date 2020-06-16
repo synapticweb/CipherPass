@@ -4,7 +4,7 @@ import dagger.Subcomponent
 import net.synapticweb.passman.di.FragmentScope
 import net.synapticweb.passman.secretslist.SecretsListFragment
 
-@Subcomponent(modules = [ViewModelModule::class])
+@Subcomponent(modules = [ViewModelFactoryModule::class])
 @FragmentScope
 interface SecretsListComponent {
     @Subcomponent.Factory

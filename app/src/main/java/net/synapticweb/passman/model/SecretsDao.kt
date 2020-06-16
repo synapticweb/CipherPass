@@ -1,6 +1,7 @@
 package net.synapticweb.passman.model
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 
 @Dao

@@ -3,16 +3,10 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/secrets_list"
-         />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/insert_data"
-        android:text="insert data" />
+        android:id="@+id/enter_pass"
+        android:text="Enter pass" />
 
 </LinearLayout>
