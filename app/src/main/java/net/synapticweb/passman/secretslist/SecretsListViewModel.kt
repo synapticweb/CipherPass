@@ -6,9 +6,10 @@ import net.synapticweb.passman.Authorizer
 import net.synapticweb.passman.Event
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.model.Secret
+import javax.inject.Inject
 
 
-class SecretsListViewModel (private val repository: Repository) : ViewModel() {
+class SecretsListViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     //Dacă repository nu este inițializat getAllSecrets întoarce LiveData<null>, ceea ce îi permite observerului
     //din fragment să apeleze fragmentul de autentificare.
@@ -37,11 +38,3 @@ class SecretsListViewModel (private val repository: Repository) : ViewModel() {
         repository.closeDb()
     }
 }
-
-@Suppress("UNCHECKED_CAST")
-class SecretsListViewModelFactory(private val repository: Repository) :
-    ViewModelProvider.NewInstanceFactory()
-    {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T  =
-            (SecretsListViewModel(repository) as T)
-    }

@@ -7,7 +7,7 @@ import dagger.Component
 import net.synapticweb.passman.secretslist.di.SecretsListComponent
 import javax.inject.Singleton
 
-@Component(modules = [AppSubcomponents::class, RepositoryModule::class])
+@Component(modules = [AppSubcomponents::class, RepositoryModule::class, ViewModelBuilderModule::class])
 @Singleton
 interface AppComponent {
     @Component.Factory

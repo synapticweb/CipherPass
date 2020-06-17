@@ -6,12 +6,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import net.sqlcipher.database.SupportFactory
 import java.lang.IllegalStateException
+import javax.inject.Inject
 import javax.inject.Singleton
 
 const val DATABASE_FILE_NAME = "passman.db"
 
 @Singleton
-class RepositoryImpl(context : Context, passphrase: ByteArray?) : Repository {
+class RepositoryImpl @Inject constructor(context : Context, passphrase: ByteArray?) : Repository {
     private var database : SecretsDatabase? = null
 
     init {
