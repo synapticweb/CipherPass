@@ -16,7 +16,6 @@ import net.synapticweb.passman.R
 import javax.inject.Inject
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import net.synapticweb.passman.Authorizer
 import net.synapticweb.passman.EventObserver
 
 class SecretsListFragment : Fragment() {
@@ -32,9 +31,14 @@ class SecretsListFragment : Fragment() {
         app.appComponent.secretsListComponent().create().inject(this)
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.setSleepTime()
+    }
+
     override fun onResume() {
         super.onResume()
-        viewModel.checkAuthorized()
+        viewModel.checkIfAuthorized()
     }
 
     override fun onCreateView(

@@ -3,9 +3,11 @@ package net.synapticweb.passman.model
 import androidx.lifecycle.LiveData
 
 interface Repository {
-    fun isInitialized() : Boolean
+    fun isUnlocked() : Boolean
 
-    fun closeDb()
+    fun lock()
+
+    fun unlock(passphrase : ByteArray) : Boolean
 
     suspend fun insertSecret(secret : Secret) : Long
 

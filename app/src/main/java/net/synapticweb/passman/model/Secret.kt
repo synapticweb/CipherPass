@@ -14,6 +14,9 @@ class Secret {
     @PrimaryKey(autoGenerate = true)
     var id : Long = 0L
 
+    @ColumnInfo(name = "account_name")
+    var accountName : String = ""
+
     @ColumnInfo(name = "account_id")
     var accountId : String = ""
 

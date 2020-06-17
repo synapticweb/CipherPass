@@ -1,15 +1,18 @@
 package net.synapticweb.passman.secretslist
 
+import android.app.Application
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import net.synapticweb.passman.Authorizer
 import net.synapticweb.passman.Event
+import net.synapticweb.passman.PmApp
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.model.Secret
 import javax.inject.Inject
 
 
-class SecretsListViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
+class SecretsListViewModel @Inject constructor(
+    private val repository: Repository, application: Application) : AndroidViewModel(application) {
 
     //Dacă repository nu este inițializat getAllSecrets întoarce LiveData<null>, ceea ce îi permite observerului
     //din fragment să apeleze fragmentul de autentificare.
@@ -20,7 +23,7 @@ class SecretsListViewModel @Inject constructor(private val repository: Repositor
     val unauthorized : LiveData<Event<Boolean>> = _unauthorized
 
     fun insertSecret() {
-        if(!repository.isInitialized())
+        if(!repository.isUnlocked())
             return
         val secret = Secret("vasile_id", "vasile_pass")
         viewModelScope.launch {
@@ -28,13 +31,15 @@ class SecretsListViewModel @Inject constructor(private val repository: Repositor
         }
     }
 
-    fun checkAuthorized() {
-        if(Authorizer.timeOutExpired())
-            _unauthorized.value = Event(true)
+    fun setSleepTime() {
+        getApplication<PmApp>().sleepTime = System.currentTimeMillis()
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        repository.closeDb()
+    fun checkIfAuthorized() {
+        if(System.currentTimeMillis() - getApplication<PmApp>().sleepTime > 30000) {
+            repository.lock()
+            _unauthorized.value = Event(true)
+        }
     }
+
 }

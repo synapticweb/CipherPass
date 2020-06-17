@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import dagger.BindsInstance
 import dagger.Component
+import net.synapticweb.passman.authenticate.di.AuthenticateComponent
 import net.synapticweb.passman.secretslist.di.SecretsListComponent
 import javax.inject.Singleton
 
@@ -16,4 +17,5 @@ interface AppComponent {
     }
 
     fun secretsListComponent() : SecretsListComponent.Factory
+    fun authenticateComponent() : AuthenticateComponent.Factory
 }

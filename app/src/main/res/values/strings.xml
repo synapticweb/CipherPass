@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">SW Password Manager</string>
+    <string name="app_name">CryptoPass</string>
+    <string name="pass_notset_caption">Please set a passphrase to encrypt the database. The passphrase should be at least 6 characters long. Choose a random sequence of characters, not a dictionary word and do not write it down. If you lose it, you won\'t be able to recover your data. </string>
+    <string name="pass_not_set_send_pass">Set passphrase</string>
+    <string name="pass_set_send_pass">Unlock database</string>
+    <string name="passphrase_hint">Passphrase</string>
+    <string name="pass_incorect">The passphrase you entered is not valid.</string>
 </resources>
