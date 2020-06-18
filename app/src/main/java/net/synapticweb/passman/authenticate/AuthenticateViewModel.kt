@@ -13,6 +13,17 @@ const val PASSPHRASE_SET = "passphrase_set"
 class AuthenticateViewModel @Inject constructor(
     private val repository: Repository, application: Application) : AndroidViewModel(application) {
 
+    private val _passSet = MutableLiveData(run {
+        val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
+        settings.getBoolean(PASSPHRASE_SET, false)
+    })
+    val passSet : LiveData<Boolean> = _passSet
+
+    val password = MutableLiveData("")
+    val rePassword = MutableLiveData("")
+
+    fun passMatch() : Boolean = password.value.equals(rePassword.value)
+
     fun unlockRepo(passphrase : String) : Boolean {
         return repository.unlock(passphrase.toByteArray())
     }
@@ -24,10 +35,4 @@ class AuthenticateViewModel @Inject constructor(
         editor.apply()
         editor.commit()
     }
-
-    private val _passSet = MutableLiveData(run {
-        val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
-        settings.getBoolean(PASSPHRASE_SET, false)
-    })
-    val passSet : LiveData<Boolean> = _passSet
 }

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import net.synapticweb.passman.PmApp
@@ -32,21 +33,39 @@ class AuthenticateFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val fragment = this
         val viewDataBinding = AuthenticateFragmentBinding.inflate(inflater, container, false).apply {
             viewModel = viewModelFrg
+            lifecycleOwner = fragment
         }
 
         val sendPass = viewDataBinding.sendPass
         val pass = viewDataBinding.passphrase
-        sendPass.setOnClickListener {
-            if(viewModelFrg.unlockRepo(pass.text.toString())) {
+
+        val passSetListener = {
+            if(viewModelFrg.unlockRepo(pass.text.toString()))
                 findNavController().navigate(AuthenticateFragmentDirections.
                     actionAuthenticateFragmentToSecretsListFragment())
-                viewModelFrg.setPassSet()
-            }
             else
                 viewDataBinding.errorMessage.visibility = View.VISIBLE
         }
+
+        val passNotSetListener = {
+            if(viewModelFrg.passMatch()) {
+                viewModelFrg.unlockRepo(pass.text.toString()) //test: totdeauna trebuie să întoarcă true
+                viewModelFrg.setPassSet()
+                findNavController().navigate(AuthenticateFragmentDirections.
+                    actionAuthenticateFragmentToSecretsListFragment())
+            }
+            else
+                viewDataBinding.errorPassNomatch.visibility = View.VISIBLE
+        }
+
+        viewModelFrg.passSet.observe(viewLifecycleOwner, Observer { passSet ->
+            sendPass.setOnClickListener {
+                if(passSet) passSetListener() else passNotSetListener()
+            }
+        })
 
         return viewDataBinding.root
     }

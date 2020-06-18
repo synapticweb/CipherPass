@@ -15,7 +15,7 @@ class RepositoryImpl @Inject constructor(private val context: Context) : Reposit
     private var database : SecretsDatabase? = null
 
     override fun unlock(passphrase: ByteArray) : Boolean {
-        val factory = SupportFactory(passphrase)
+        val factory = SupportFactory(passphrase, null, false)
         database = Room.databaseBuilder(
             context,
             SecretsDatabase::class.java,
