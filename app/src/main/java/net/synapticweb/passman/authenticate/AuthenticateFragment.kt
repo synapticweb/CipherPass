@@ -2,17 +2,22 @@ package net.synapticweb.passman.authenticate
 
 import android.content.Context
 import android.os.Bundle
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.Fragment
+import net.synapticweb.passman.LockStateViewModel
 import net.synapticweb.passman.PmApp
 import net.synapticweb.passman.databinding.AuthenticateFragmentBinding
+import net.synapticweb.passman.handleBackPressed
 import javax.inject.Inject
 
 class AuthenticateFragment : Fragment() {
@@ -20,6 +25,7 @@ class AuthenticateFragment : Fragment() {
     lateinit var viewModelFactory : ViewModelProvider.Factory
 
     private val viewModelFrg by viewModels<AuthenticateViewModel> { viewModelFactory }
+    private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -39,11 +45,23 @@ class AuthenticateFragment : Fragment() {
             lifecycleOwner = fragment
         }
 
-        val sendPass = viewDataBinding.sendPass
-        val pass = viewDataBinding.passphrase
+        val passphrase = viewDataBinding.passphrase
+        val rePassphrase = viewDataBinding.passphraseRetype
+
+        //https://medium.com/@droidbyme/show-hide-password-in-edittext-in-android-c4c3db44f734
+        viewDataBinding.passLayout.setEndIconOnClickListener {
+            if(passphrase.transformationMethod is PasswordTransformationMethod) {
+                passphrase.transformationMethod = HideReturnsTransformationMethod.getInstance()
+                rePassphrase.transformationMethod = HideReturnsTransformationMethod.getInstance()
+            }
+            else {
+                passphrase.transformationMethod = PasswordTransformationMethod.getInstance()
+                rePassphrase.transformationMethod = PasswordTransformationMethod.getInstance()
+            }
+        }
 
         val passSetListener = {
-            if(viewModelFrg.unlockRepo(pass.text.toString()))
+            if(lockState.unlockRepo(passphrase.text.toString()))
                 findNavController().navigate(AuthenticateFragmentDirections.
                     actionAuthenticateFragmentToSecretsListFragment())
             else
@@ -52,7 +70,7 @@ class AuthenticateFragment : Fragment() {
 
         val passNotSetListener = {
             if(viewModelFrg.passMatch()) {
-                viewModelFrg.unlockRepo(pass.text.toString()) //test: totdeauna trebuie să întoarcă true
+                lockState.unlockRepo(passphrase.text.toString()) //test: totdeauna trebuie să întoarcă true
                 viewModelFrg.setPassSet()
                 findNavController().navigate(AuthenticateFragmentDirections.
                     actionAuthenticateFragmentToSecretsListFragment())
@@ -62,10 +80,12 @@ class AuthenticateFragment : Fragment() {
         }
 
         viewModelFrg.passSet.observe(viewLifecycleOwner, Observer { passSet ->
-            sendPass.setOnClickListener {
+            viewDataBinding.sendPass.setOnClickListener {
                 if(passSet) passSetListener() else passNotSetListener()
             }
         })
+
+        handleBackPressed(lockState)
 
         return viewDataBinding.root
     }

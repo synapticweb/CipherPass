@@ -4,11 +4,12 @@ import android.app.Application
 import android.content.Context
 import dagger.BindsInstance
 import dagger.Component
+import net.synapticweb.passman.MainActivity
 import net.synapticweb.passman.authenticate.di.AuthenticateComponent
 import net.synapticweb.passman.secretslist.di.SecretsListComponent
 import javax.inject.Singleton
 
-@Component(modules = [AppSubcomponents::class, RepositoryModule::class, ViewModelBuilderModule::class])
+@Component(modules = [AppSubcomponents::class, AppModule::class, ViewModelBuilderModule::class])
 @Singleton
 interface AppComponent {
     @Component.Factory
@@ -16,6 +17,7 @@ interface AppComponent {
         fun create(@BindsInstance context: Context, @BindsInstance application : Application): AppComponent
     }
 
+    fun inject(activity : MainActivity)
     fun secretsListComponent() : SecretsListComponent.Factory
     fun authenticateComponent() : AuthenticateComponent.Factory
 }

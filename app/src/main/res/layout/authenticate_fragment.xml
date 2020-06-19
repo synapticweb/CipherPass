@@ -34,6 +34,8 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:id="@+id/pass_layout"
+                android:hint="@string/passphrase_hint"
                 app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -43,34 +45,27 @@
                 android:layout_marginEnd="40dp"
                 android:inputType="textPassword"
                 android:layout_gravity="start"
-                android:hint="@string/passphrase_hint"
                 android:text="@={viewModel.password}"
                 android:id="@+id/passphrase"
                 android:layout_marginBottom="10dp"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
+
+            <EditText
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:passwordToggleEnabled="true"
-                android:visibility="@{viewModel.passSet ? View.GONE : View.VISIBLE}">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginEnd="40dp"
-                    android:inputType="textPassword"
-                    android:layout_gravity="start"
-                    android:hint="@string/passphrase_retype_hint"
-                    android:id="@+id/passphrase_retype"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:text="@={viewModel.rePassword}"
-                    android:visibility="@{viewModel.passSet ? View.GONE : View.VISIBLE}"/>
-
-            </com.google.android.material.textfield.TextInputLayout>
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:inputType="textPassword"
+                android:layout_gravity="start"
+                android:hint="@string/passphrase_retype_hint"
+                android:id="@+id/passphrase_retype"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="@={viewModel.rePassword}"
+                android:visibility="@{viewModel.passSet ? View.GONE : View.VISIBLE}"
+                android:autofillHints="@string/passphrase_retype_hint" />
 
             <TextView
                 android:layout_width="wrap_content"

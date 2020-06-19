@@ -24,10 +24,6 @@ class AuthenticateViewModel @Inject constructor(
 
     fun passMatch() : Boolean = password.value.equals(rePassword.value)
 
-    fun unlockRepo(passphrase : String) : Boolean {
-        return repository.unlock(passphrase.toByteArray())
-    }
-
     fun setPassSet() {
         val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
         val editor = settings.edit()
