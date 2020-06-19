@@ -13,8 +13,8 @@ class SecretsListViewModel @Inject constructor(private val repository: Repositor
 
     //Dacă repository nu este inițializat getAllSecrets întoarce LiveData<null>, ceea ce îi permite observerului
     //din fragment să apeleze fragmentul de autentificare.
-    private val _secrets : LiveData<List<Secret>?> = repository.getAllSecrets()
-    val secrets : LiveData<List<Secret>?> = _secrets
+    private val _secrets : LiveData<List<Secret>> = repository.getAllSecrets()
+    val secrets : LiveData<List<Secret>> = _secrets
 
     fun insertSecret() {
         if(!repository.isUnlocked())

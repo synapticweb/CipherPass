@@ -61,9 +61,8 @@ class RepositoryImpl @Inject constructor(private val context: Context) : Reposit
         return database.secretsDao.get(key)
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun getAllSecrets(): LiveData<List<Secret>?> {
-        val database = database ?: return MutableLiveData(null)
-        return database.secretsDao.getAllSecrets() as LiveData<List<Secret>?>
+    override fun getAllSecrets(): LiveData<List<Secret>> {
+        val database = database ?: throw IllegalStateException("Database locked")
+        return database.secretsDao.getAllSecrets()
     }
 }

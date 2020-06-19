@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_graph"
-    app:startDestination="@id/secretsListFragment">
+    app:startDestination="@id/authenticateFragment">
+
+    <fragment
+        android:id="@+id/authenticateFragment"
+        android:name="net.synapticweb.passman.authenticate.AuthenticateFragment"
+        android:label="AskPassFragment" >
+        <action
+            android:id="@+id/action_authenticateFragment_to_secretsListFragment"
+            app:destination="@id/secretsListFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/secretsListFragment"
@@ -10,13 +19,5 @@
         <action
             android:id="@+id/action_secretsListFragment_to_authenticateFragment"
             app:destination="@id/authenticateFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/authenticateFragment"
-        android:name="net.synapticweb.passman.authenticate.AuthenticateFragment"
-        android:label="AskPassFragment" >
-        <action
-            android:id="@+id/action_authenticateFragment_to_secretsListFragment"
-            app:destination="@id/secretsListFragment" />
     </fragment>
 </navigation>

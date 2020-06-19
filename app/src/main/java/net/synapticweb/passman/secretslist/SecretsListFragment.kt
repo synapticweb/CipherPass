@@ -44,10 +44,6 @@ class SecretsListFragment : Fragment() {
 
         viewModel.secrets.observe(viewLifecycleOwner, Observer {
             when  {
-                it == null -> findNavController().
-                    navigate(SecretsListFragmentDirections.
-                    actionSecretsListFragmentToAuthenticateFragment())
-
                 it.isEmpty() -> rootView.findViewById<TextView>(R.id.secrets_list)?.text = "Empty list"
 
                 else -> {

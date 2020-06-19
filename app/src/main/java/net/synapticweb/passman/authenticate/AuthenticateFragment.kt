@@ -7,6 +7,7 @@ import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.fragment.app.activityViewModels
@@ -82,6 +83,8 @@ class AuthenticateFragment : Fragment() {
         viewModelFrg.passSet.observe(viewLifecycleOwner, Observer { passSet ->
             viewDataBinding.sendPass.setOnClickListener {
                 if(passSet) passSetListener() else passNotSetListener()
+                val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
             }
         })
 
