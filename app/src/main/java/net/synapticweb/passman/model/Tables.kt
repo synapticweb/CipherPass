@@ -32,3 +32,14 @@ class Secret {
     @ColumnInfo(name = "insertion_date")
     var insertionDate : Long = System.currentTimeMillis()
 }
+
+@Entity(tableName = "hash")
+class Hash(
+    @ColumnInfo(name = "hash") var hash: String,
+    @ColumnInfo(name = "salt") var salt: String
+) {
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = true)
+    var id : Long = 0L
+
+}

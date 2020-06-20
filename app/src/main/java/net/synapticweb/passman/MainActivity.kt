@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var lockState : LockStateViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        (application as PmApp).appComponent.inject(this)
+        (application as CryptoPassApp).appComponent.inject(this)
         lockState = ViewModelProvider(this, viewModelFactory).get(LockStateViewModel::class.java)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)

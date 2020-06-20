@@ -27,7 +27,7 @@ class SecretsListFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val parentActivity : AppCompatActivity = context as AppCompatActivity
-        val app : PmApp = parentActivity.application as PmApp
+        val app : CryptoPassApp = parentActivity.application as CryptoPassApp
         app.appComponent.secretsListComponent().create().inject(this)
     }
 

@@ -16,7 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.Fragment
 import net.synapticweb.passman.LockStateViewModel
-import net.synapticweb.passman.PmApp
+import net.synapticweb.passman.CryptoPassApp
 import net.synapticweb.passman.databinding.AuthenticateFragmentBinding
 import net.synapticweb.passman.handleBackPressed
 import javax.inject.Inject
@@ -31,7 +31,7 @@ class AuthenticateFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val parentActivity : AppCompatActivity = context as AppCompatActivity
-        val app : PmApp = parentActivity.application as PmApp
+        val app : CryptoPassApp = parentActivity.application as CryptoPassApp
         app.appComponent.authenticateComponent().create().inject(this)
     }
 
@@ -73,6 +73,7 @@ class AuthenticateFragment : Fragment() {
             if(viewModelFrg.passMatch()) {
                 lockState.unlockRepo(passphrase.text.toString()) //test: totdeauna trebuie să întoarcă true
                 viewModelFrg.setPassSet()
+                viewModelFrg.createPassHash(passphrase.text.toString())
                 findNavController().navigate(AuthenticateFragmentDirections.
                     actionAuthenticateFragmentToSecretsListFragment())
             }
