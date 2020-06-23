@@ -3,6 +3,10 @@ package net.synapticweb.passman
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
 
 fun Fragment.handleBackPressed(lockState: LockStateViewModel) {
     requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
@@ -19,7 +23,7 @@ fun Fragment.handleBackPressed(lockState: LockStateViewModel) {
 }
 
 //https://www.baeldung.com/java-byte-arrays-hex-strings
-fun byteArrayToHexStr(bytes: ByteArray): String {
+fun byteArrayToHexStr(bytes: ByteArray) : String {
     val builder = StringBuilder()
     for(byte in bytes) {
         val hexDigits = CharArray(2)
@@ -40,6 +44,7 @@ fun toDigit(hexChar : Char) : Int {
 
 fun hexStrToByteArray(inputStr : String) : ByteArray {
     val ba = ByteArray(inputStr.length / 2)
+    //construct sugerat de ide. Explicat aici: https://kotlinlang.org/docs/tutorials/kotlin-for-py/loops.html
     for((baIndex, i) in (inputStr.indices step 2).withIndex()) {
         val firstDigit = toDigit(inputStr[i])
         val secondDigit = toDigit(inputStr[i + 1])
@@ -47,4 +52,10 @@ fun hexStrToByteArray(inputStr : String) : ByteArray {
     }
 
     return ba
+}
+
+ suspend fun createHash(passphrase: String, salt : ByteArray) : ByteArray {
+    val spec = PBEKeySpec(passphrase.toCharArray(), salt, 65536, 128)
+    val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+    return factory.generateSecret(spec).encoded
 }

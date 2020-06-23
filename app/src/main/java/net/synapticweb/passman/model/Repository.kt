@@ -7,7 +7,7 @@ interface Repository {
 
     fun lock()
 
-    fun unlock(passphrase : ByteArray) : Boolean
+    suspend fun unlock(passphrase : ByteArray) : Boolean
 
     suspend fun insertSecret(secret : Secret) : Long
 

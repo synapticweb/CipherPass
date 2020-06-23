@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="applock"
+        android:title="@string/applock_key_title"
+        android:entries="@array/applock_entries"
+        android:entryValues="@array/applock_values"
+        android:defaultValue="passwd">
+
+    </ListPreference>
+</androidx.preference.PreferenceScreen>

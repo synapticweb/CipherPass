@@ -4,6 +4,10 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import net.synapticweb.passman.model.Repository
 import javax.inject.Inject
 
@@ -17,7 +21,9 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     val unauthorized : LiveData<Event<Boolean>> = _unauthorized
 
     fun unlockRepo(passphrase : String) : Boolean {
-        return repository.unlock(passphrase.toByteArray())
+        return runBlocking(Dispatchers.Default) { //TODO: Greșit!
+           repository.unlock(passphrase.toByteArray())
+        }
     }
 
     fun setSleepTime() {

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="applock_entries">
+        <item>@string/applock_key_passwd</item>
+        <item>@string/applock_key_system</item>
+        <item>@string/applock_key_none</item>
+    </string-array>
+
+    <string-array name="applock_values">
+        <item>passwd</item>
+        <item>system</item>
+        <item>none</item>
+    </string-array>
+</resources>

@@ -2,9 +2,7 @@ package net.synapticweb.passman.secretslist
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -41,7 +39,6 @@ class SecretsListFragment : Fragment() {
         val insert = rootView.findViewById<Button>(R.id.insert_data)
         insert.setOnClickListener { viewModel.insertSecret() }
 
-
         viewModel.secrets.observe(viewLifecycleOwner, Observer {
             when  {
                 it.isEmpty() -> rootView.findViewById<TextView>(R.id.secrets_list)?.text = "Empty list"
@@ -62,7 +59,23 @@ class SecretsListFragment : Fragment() {
         })
 
         handleBackPressed(lockState)
+        setHasOptionsMenu(true)
 
         return rootView
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.secrets_list_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.show_settings -> {
+                findNavController().navigate(SecretsListFragmentDirections.
+                    actionSecretsListFragmentToSettingsFragment())
+                true
+            }
+            else -> false
+        }
     }
 }

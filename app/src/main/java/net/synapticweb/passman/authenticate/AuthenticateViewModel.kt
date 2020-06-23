@@ -9,6 +9,7 @@ import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import net.synapticweb.passman.PASSPHRASE_SET_KEY
 import net.synapticweb.passman.byteArrayToHexStr
+import net.synapticweb.passman.createHash
 import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.model.Repository
 import java.security.SecureRandom
@@ -39,26 +40,19 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
         editor.commit()
     }
 
-    private suspend fun createHash(passphrase: String, salt : ByteArray) : ByteArray {
-        val spec = PBEKeySpec(passphrase.toCharArray(), salt, 65536, 128)
-        val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
 
-        var hash = ByteArray(16)
-            withContext(Dispatchers.Default) {
-                hash = factory.generateSecret(spec).encoded
-            }
-        return hash
-    }
-
-    fun createPassHash(passphrase : String) = runBlocking {
+ fun createPassHash(passphrase : String)  {
         val random = SecureRandom()
         val salt = ByteArray(16)
         random.nextBytes(salt)
 
-        val hash = byteArrayToHexStr(createHash(passphrase, salt))
-
-        viewModelScope. launch {
-            repository.insertHash(Hash(hash, byteArrayToHexStr(salt)))
+        viewModelScope .launch {
+            val hash = withContext(Dispatchers.Default) {
+                byteArrayToHexStr(createHash(passphrase, salt))
+            }
+            withContext(Dispatchers.IO) {
+                repository.insertHash(Hash(hash, byteArrayToHexStr(salt)))
+            }
         }
     }
 }

@@ -12,7 +12,7 @@ import javax.inject.Inject
 class RepositoryImpl @Inject constructor(private val context: Context) : Repository {
     private var database : CryptoPassDatabase? = null
 
-    override fun unlock(passphrase: ByteArray) : Boolean {
+    override suspend fun unlock(passphrase: ByteArray) : Boolean {
         val factory = SupportFactory(passphrase, null, false)
         database = Room.databaseBuilder(
             context,

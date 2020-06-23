@@ -6,7 +6,7 @@
     <fragment
         android:id="@+id/authenticateFragment"
         android:name="net.synapticweb.passman.authenticate.AuthenticateFragment"
-        android:label="AskPassFragment" >
+        android:label="@string/app_name" >
         <action
             android:id="@+id/action_authenticateFragment_to_secretsListFragment"
             app:destination="@id/secretsListFragment" />
@@ -15,9 +15,37 @@
     <fragment
         android:id="@+id/secretsListFragment"
         android:name="net.synapticweb.passman.secretslist.SecretsListFragment"
-        android:label="SecretsListFragment" >
+        android:label="@string/app_name" >
         <action
             android:id="@+id/action_secretsListFragment_to_authenticateFragment"
             app:destination="@id/authenticateFragment" />
+        <action
+            android:id="@+id/action_secretsListFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="net.synapticweb.passman.settings.SettingsFragment"
+        android:label="SettingsFragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_secretsListFragment"
+            app:destination="@id/secretsListFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_authenticateFragment"
+            app:destination="@id/authenticateFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_systemLockFragment"
+            app:destination="@id/systemLockFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/systemLockFragment"
+        android:name="net.synapticweb.passman.settings.SystemLockFragment"
+        android:label="SystemLockFragment" >
+        <action
+            android:id="@+id/action_systemLockFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:popUpTo="@id/settingsFragment"
+            app:popUpToInclusive="true"
+            />
     </fragment>
 </navigation>

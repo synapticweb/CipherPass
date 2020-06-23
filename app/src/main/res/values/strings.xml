@@ -8,4 +8,17 @@
     <string name="passphrase_retype_hint">Retype passphrase</string>
     <string name="pass_no_match">The passphrases entered do not match.</string>
     <string name="one_more_backpress">Press the back button one more time to exit.</string>
+    <string name="applock_key_title">Lock type</string>
+    <string name="applock_key_passwd">Passphrase</string>
+    <string name="applock_key_system">System provided lock</string>
+    <string name="applock_key_none">No lock</string>
+    <string name="settings_menu_item">Settings</string>
+    <string name="settings_insert_pass_title">Passphrase required</string>
+    <string name="settings_insert_pass_message">Please insert your passphrase:</string>
+    <string name="system_lock_next">Next</string>
+    <string name="system_lock_finish">Finish</string>
+    <string name="system_lock_soft_warning">Using the system provided lock requires that credentials are stored on the device. This device is only able to provide software backed storage for credentials, which is less secure than hardware backed storage. Continue?</string>
+    <string name="system_lock_file_write_fail">There was an error processing your request.</string>
+    <string name="system_lock_not_available">Only available on Android 6 and newer.</string>
+    <string name="system_lock_device_not_secure">You need to secure your device with a password, pin or pattern.</string>
 </resources>
