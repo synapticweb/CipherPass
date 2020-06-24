@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
+import kotlin.system.exitProcess
 
 fun Fragment.handleBackPressed(lockState: LockStateViewModel) {
     requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
@@ -16,8 +17,6 @@ fun Fragment.handleBackPressed(lockState: LockStateViewModel) {
                 .show()
             return@addCallback
         }
-        lockState.pressedOnce = false
-        lockState.lockRepo()
         requireActivity().finish()
     }
 }
@@ -54,7 +53,7 @@ fun hexStrToByteArray(inputStr : String) : ByteArray {
     return ba
 }
 
- suspend fun createHash(passphrase: String, salt : ByteArray) : ByteArray {
+fun createHash(passphrase: String, salt : ByteArray) : ByteArray {
     val spec = PBEKeySpec(passphrase.toCharArray(), salt, 65536, 128)
     val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
     return factory.generateSecret(spec).encoded

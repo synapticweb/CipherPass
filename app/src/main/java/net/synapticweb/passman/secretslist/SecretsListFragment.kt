@@ -54,6 +54,7 @@ class SecretsListFragment : Fragment() {
         })
 
         lockState.unauthorized.observe(viewLifecycleOwner, EventObserver {
+            if(it)
             findNavController().navigate(SecretsListFragmentDirections.
                     actionSecretsListFragmentToAuthenticateFragment())
         })

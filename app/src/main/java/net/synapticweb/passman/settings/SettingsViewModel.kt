@@ -15,11 +15,4 @@ import net.synapticweb.passman.model.Repository
 import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(private val repository: Repository, application: Application) :
-    AndroidViewModel(application) {
-
-    suspend fun validatePass(passphrase : String) : Boolean {
-        val oldHash = repository.getHash()
-        val newHash =  byteArrayToHexStr(createHash(passphrase, hexStrToByteArray(oldHash.salt)))
-        return newHash.equals(oldHash.hash)
-    }
-}
+    AndroidViewModel(application)

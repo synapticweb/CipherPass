@@ -7,18 +7,16 @@ import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.Fragment
-import net.synapticweb.passman.LockStateViewModel
-import net.synapticweb.passman.CryptoPassApp
+import androidx.lifecycle.Observer
+import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.AuthenticateFragmentBinding
-import net.synapticweb.passman.handleBackPressed
 import javax.inject.Inject
 
 class AuthenticateFragment : Fragment() {
@@ -44,6 +42,7 @@ class AuthenticateFragment : Fragment() {
         val viewDataBinding = AuthenticateFragmentBinding.inflate(inflater, container, false).apply {
             viewModel = viewModelFrg
             lifecycleOwner = fragment
+            lockStateViewModel = lockState
         }
 
         val passphrase = viewDataBinding.passphrase
@@ -61,36 +60,33 @@ class AuthenticateFragment : Fragment() {
             }
         }
 
-        val passSetListener = {
-            if(lockState.unlockRepo(passphrase.text.toString()))
-                findNavController().navigate(AuthenticateFragmentDirections.
-                    actionAuthenticateFragmentToSecretsListFragment())
-            else
-                viewDataBinding.errorMessage.visibility = View.VISIBLE
+        viewDataBinding.sendPass.setOnClickListener {
+            if(!viewModelFrg.isPassSet() && !viewModelFrg.passMatch()) {
+                viewDataBinding.passLayout.error = getString(R.string.pass_no_match)
+                return@setOnClickListener
+            }
+            lockState.unlockRepo(passphrase.text.toString())
         }
 
-        val passNotSetListener = {
-            if(viewModelFrg.passMatch()) {
-                lockState.unlockRepo(passphrase.text.toString()) //test: totdeauna trebuie să întoarcă true
-                viewModelFrg.setPassSet()
-                viewModelFrg.createPassHash(passphrase.text.toString())
-                findNavController().navigate(AuthenticateFragmentDirections.
-                    actionAuthenticateFragmentToSecretsListFragment())
+        lockState.unlockSuccess.observe(viewLifecycleOwner, EventObserver {
+            if(it) {
+                if(!viewModelFrg.isPassSet()) {
+                    viewModelFrg.setPassSet()
+                    viewModelFrg.createPassHash(passphrase.text.toString())
+                }
+                findNavController().navigate(
+                    AuthenticateFragmentDirections.actionAuthenticateFragmentToSecretsListFragment()
+                )
             }
             else
-                viewDataBinding.errorPassNomatch.visibility = View.VISIBLE
-        }
-
-        viewModelFrg.passSet.observe(viewLifecycleOwner, Observer { passSet ->
-            viewDataBinding.sendPass.setOnClickListener {
-                if(passSet) passSetListener() else passNotSetListener()
-                val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
-            }
+                viewDataBinding.passLayout.error = getString(R.string.pass_incorect)
         })
 
-        handleBackPressed(lockState)
+        passphrase.addTextChangedListener {
+            viewDataBinding.passLayout.error = null
+        }
 
+        handleBackPressed(lockState)
         return viewDataBinding.root
     }
 }

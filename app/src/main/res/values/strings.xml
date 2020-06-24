@@ -20,5 +20,5 @@
     <string name="system_lock_soft_warning">Using the system provided lock requires that credentials are stored on the device. This device is only able to provide software backed storage for credentials, which is less secure than hardware backed storage. Continue?</string>
     <string name="system_lock_file_write_fail">There was an error processing your request.</string>
     <string name="system_lock_not_available">Only available on Android 6 and newer.</string>
-    <string name="system_lock_device_not_secure">You need to secure your device with a password, pin or pattern.</string>
+    <string name="system_lock_device_not_secure">To use this feature, you have to secure your device with a password, pin or pattern.</string>
 </resources>

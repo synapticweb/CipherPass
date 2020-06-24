@@ -20,15 +20,14 @@ import javax.inject.Inject
 
 
 class AuthenticateViewModel @Inject constructor(private val repository: Repository, application: Application) : AndroidViewModel(application) {
-
-    private val _passSet = MutableLiveData(run {
-        val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
-        settings.getBoolean(PASSPHRASE_SET_KEY, false)
-    })
-    val passSet : LiveData<Boolean> = _passSet
-
     val password = MutableLiveData("")
     val rePassword = MutableLiveData("")
+    val passSet  = MutableLiveData(isPassSet())
+
+    fun isPassSet() : Boolean {
+        val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
+        return settings.getBoolean(PASSPHRASE_SET_KEY, false)
+    }
 
     fun passMatch() : Boolean = password.value.equals(rePassword.value)
 

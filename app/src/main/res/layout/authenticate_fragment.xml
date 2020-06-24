@@ -9,6 +9,9 @@
         <variable
             name="viewModel"
             type="net.synapticweb.passman.authenticate.AuthenticateViewModel" />
+        <variable
+            name="lockStateViewModel"
+            type="net.synapticweb.passman.LockStateViewModel" />
     </data>
 
     <RelativeLayout
@@ -36,13 +39,13 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/pass_layout"
                 android:hint="@string/passphrase_hint"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
                 app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
-                android:layout_marginEnd="40dp"
                 android:inputType="textPassword"
                 android:layout_gravity="start"
                 android:text="@={viewModel.password}"
@@ -67,27 +70,16 @@
                 android:visibility="@{viewModel.passSet ? View.GONE : View.VISIBLE}"
                 android:autofillHints="@string/passphrase_retype_hint" />
 
-            <TextView
+            <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/error_message"
-                android:textColor="@android:color/holo_red_dark"
-                android:visibility="gone"
-                android:layout_marginStart="40dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:text="@string/pass_incorect"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/error_pass_nomatch"
-                android:textColor="@android:color/holo_red_dark"
-                android:visibility="gone"
-                android:layout_marginStart="40dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:text="@string/pass_no_match"/>
+                android:minHeight="50dp"
+                android:maxWidth="50dp"
+                android:layout_margin="15dp"
+                android:indeterminate="true"
+                android:layout_gravity="center_horizontal"
+                android:visibility="@{lockStateViewModel.working ? View.VISIBLE : View.GONE}"
+                android:id="@+id/progress" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -95,6 +87,7 @@
                 android:id="@+id/send_pass"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
+                android:enabled="@{lockStateViewModel.working ? false : true}"
                 android:text="@{viewModel.passSet ? @string/pass_set_send_pass : @string/pass_not_set_send_pass}"
                 />
 

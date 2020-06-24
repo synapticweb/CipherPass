@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import net.synapticweb.passman.*
@@ -16,7 +17,6 @@ import javax.inject.Inject
 class SystemLockViewModel @Inject constructor(private val repository: Repository, application: Application) :
     AndroidViewModel(application) {
 
-    val job = Job()
     val working = MutableLiveData<Boolean>()
     val errorPassNoMatch = MutableLiveData<Boolean>()
     val storageSoft = MutableLiveData<Boolean>()
@@ -24,13 +24,11 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
     val finish = MutableLiveData<Boolean>()
     lateinit var passSaved : String
 
-    private val uiScope = CoroutineScope(Dispatchers.Main + job)
-
     fun encryptPassAndSetPref(passphrase: String? = null) {
         val toEncrypt = passphrase ?: passSaved
         val encrypted = CryptoPassCipher.encrypt(toEncrypt)
         val path = getApplication<CryptoPassApp>().filesDir.absolutePath + "/" + ENCRYPTED_PASS_FILENAME
-        uiScope .launch {
+        viewModelScope .launch {    //rulează pe threadul main
             withContext(Dispatchers.IO) {
                 try {
                     val writer = BufferedWriter(FileWriter(path))
@@ -61,12 +59,12 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
     }
 
     fun validatePass(passphrase: String) {
-         uiScope .launch {
+         viewModelScope .launch {
             working.value = true
             val result = withContext(Dispatchers.Default) {
                 val oldHash = repository.getHash()
                 val newHash = byteArrayToHexStr(createHash(passphrase, hexStrToByteArray(oldHash.salt)))
-                newHash.equals(oldHash.hash)
+                newHash == oldHash.hash
             }
             working.value = false
              if(!result) {
@@ -82,10 +80,5 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
 
              encryptPassAndSetPref(passphrase)
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        job.cancel()
     }
 }
