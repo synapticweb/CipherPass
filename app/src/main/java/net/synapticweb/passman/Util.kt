@@ -3,16 +3,15 @@ package net.synapticweb.passman
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
-import kotlin.system.exitProcess
+
 
 fun Fragment.handleBackPressed(lockState: LockStateViewModel) {
     requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-        if(!lockState.pressedOnce) {
-            lockState.pressedOnce = true
+        val currentTime = System.currentTimeMillis()
+        if(currentTime - lockState.lastBackPress > 3000) {
+            lockState.lastBackPress = currentTime
             Toast.makeText(requireContext(), getText(R.string.one_more_backpress), Toast.LENGTH_SHORT)
                 .show()
             return@addCallback
@@ -58,3 +57,9 @@ fun createHash(passphrase: String, salt : ByteArray) : ByteArray {
     val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
     return factory.generateSecret(spec).encoded
 }
+
+@Target(
+    AnnotationTarget.FUNCTION
+)
+@Retention(AnnotationRetention.SOURCE)
+annotation class ShouldTest

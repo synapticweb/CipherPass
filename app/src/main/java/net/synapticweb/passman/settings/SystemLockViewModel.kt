@@ -22,8 +22,9 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
     val storageSoft = MutableLiveData<Boolean>()
     val errorFileWriteFail = MutableLiveData<Boolean>()
     val finish = MutableLiveData<Boolean>()
-    lateinit var passSaved : String
+    private lateinit var passSaved : String
 
+    @ShouldTest
     fun encryptPassAndSetPref(passphrase: String? = null) {
         val toEncrypt = passphrase ?: passSaved
         val encrypted = CryptoPassCipher.encrypt(toEncrypt)
@@ -58,6 +59,7 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
         editor.commit()
     }
 
+    @ShouldTest
     fun validatePass(passphrase: String) {
          viewModelScope .launch {
             working.value = true

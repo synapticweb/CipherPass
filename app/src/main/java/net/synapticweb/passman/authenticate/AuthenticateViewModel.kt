@@ -2,20 +2,17 @@ package net.synapticweb.passman.authenticate
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import net.synapticweb.passman.PASSPHRASE_SET_KEY
+import net.synapticweb.passman.ShouldTest
 import net.synapticweb.passman.byteArrayToHexStr
 import net.synapticweb.passman.createHash
 import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.model.Repository
 import java.security.SecureRandom
-import javax.crypto.SecretKey
-import javax.crypto.SecretKeyFactory
-import javax.crypto.spec.PBEKeySpec
 import javax.inject.Inject
 
 
@@ -39,7 +36,7 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
         editor.commit()
     }
 
-
+@ShouldTest
  fun createPassHash(passphrase : String)  {
         val random = SecureRandom()
         val salt = ByteArray(16)

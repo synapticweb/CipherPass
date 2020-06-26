@@ -1,16 +1,15 @@
 package net.synapticweb.passman
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import net.synapticweb.passman.model.Repository
 import javax.inject.Inject
 
 class LockStateViewModel @Inject constructor(private val repository: Repository, application: Application)
-    : AndroidViewModel(application) {
+    : AndroidViewModel(application), LifecycleObserver {
 
-    var pressedOnce : Boolean = false
+    var lastBackPress : Long = 0L
     var sleepTime : Long = 0L
 
     val unauthorized = MutableLiveData<Event<Boolean>>()
@@ -24,7 +23,7 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     fun unlockRepo(passphrase : String) {
         uiScope .launch {
             working.value = true
-            val result =  withContext(Dispatchers.Default) {
+            val result = withContext(Dispatchers.Default) {
                 repository.unlock(passphrase.toByteArray())
             }
             working.value = false
@@ -32,11 +31,13 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
         }
     }
 
-    fun setSleepTime() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun onActivityPause() {
         sleepTime = System.currentTimeMillis()
     }
 
-    fun checkIfAuthorized() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun onActivityResume() {
         if(sleepTime == 0L) //nu verificăm dacă a trecut prin authenticate și nu a fost încă minimizată activitatea
             return
         if(System.currentTimeMillis() - sleepTime > 10000) {
@@ -45,11 +46,10 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
         }
     }
 
-
     override fun onCleared() {
         super.onCleared()
         repository.lock()
-        pressedOnce = false
+        lastBackPress = 0
         sleepTime = 0
     }
 }

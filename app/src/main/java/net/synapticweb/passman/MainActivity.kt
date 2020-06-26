@@ -3,7 +3,6 @@ package net.synapticweb.passman
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -27,22 +26,13 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration = AppBarConfiguration(setOf(R.id.authenticateFragment, R.id.secretsListFragment))
         setupActionBarWithNavController(navController, appBarConfiguration)
+        lifecycle.addObserver(lockState)
     }
 
     override fun onSupportNavigateUp() : Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        lockState.setSleepTime()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        lockState.checkIfAuthorized()
     }
 
 }
