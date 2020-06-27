@@ -17,6 +17,7 @@ import javax.inject.Inject
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.passman.*
+import net.synapticweb.passman.util.EventObserver
 
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -37,10 +38,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        lockState.unauthorized.observe(viewLifecycleOwner, EventObserver {
-            findNavController().navigate(SettingsFragmentDirections.
-                actionSettingsFragmentToAuthenticateFragment())
-        })
+        lockState.unauthorized.observe(viewLifecycleOwner,
+            EventObserver {
+                findNavController().navigate(
+                    SettingsFragmentDirections.actionSettingsFragmentToAuthenticateFragment()
+                )
+            })
 
         return super.onCreateView(inflater, container, savedInstanceState)
     }

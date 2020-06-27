@@ -7,11 +7,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import net.synapticweb.passman.PASSPHRASE_SET_KEY
-import net.synapticweb.passman.ShouldTest
-import net.synapticweb.passman.byteArrayToHexStr
-import net.synapticweb.passman.createHash
+import net.synapticweb.passman.util.ShouldTest
+import net.synapticweb.passman.util.byteArrayToHexStr
+import net.synapticweb.passman.util.createHash
 import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.model.Repository
+import net.synapticweb.passman.util.wrapEspressoIdlingResource
 import java.security.SecureRandom
 import javax.inject.Inject
 
@@ -37,17 +38,27 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
     }
 
 @ShouldTest
- fun createPassHash(passphrase : String)  {
-        val random = SecureRandom()
-        val salt = ByteArray(16)
-        random.nextBytes(salt)
+ fun createPassHash(passphrase : String) {
+    val random = SecureRandom()
+    val salt = ByteArray(16)
+    random.nextBytes(salt)
 
-        viewModelScope .launch {
+        viewModelScope.launch {
             val hash = withContext(Dispatchers.Default) {
-                byteArrayToHexStr(createHash(passphrase, salt))
+                byteArrayToHexStr(
+                    createHash(
+                        passphrase,
+                        salt
+                    )
+                )
             }
             withContext(Dispatchers.IO) {
-                repository.insertHash(Hash(hash, byteArrayToHexStr(salt)))
+                repository.insertHash(
+                    Hash(
+                        hash,
+                        byteArrayToHexStr(salt)
+                    )
+                )
             }
         }
     }

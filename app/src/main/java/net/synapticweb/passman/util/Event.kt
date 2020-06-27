@@ -1,4 +1,4 @@
-package net.synapticweb.passman
+package net.synapticweb.passman.util
 
 import androidx.lifecycle.Observer
 

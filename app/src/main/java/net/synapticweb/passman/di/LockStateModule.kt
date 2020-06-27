@@ -5,17 +5,10 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 import net.synapticweb.passman.LockStateViewModel
-import net.synapticweb.passman.authenticate.AuthenticateViewModel
-import net.synapticweb.passman.model.Repository
-import net.synapticweb.passman.model.RepositoryImpl
 import javax.inject.Singleton
 
 @Module
-abstract class AppModule {
-    @Singleton
-    @Binds
-    abstract fun bindRepository(repo : RepositoryImpl) : Repository
-
+abstract class LockStateModule {
     @Binds
     @IntoMap
     @Singleton

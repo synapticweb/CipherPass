@@ -14,9 +14,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.AuthenticateFragmentBinding
+import net.synapticweb.passman.util.EventObserver
+import net.synapticweb.passman.util.handleBackPressed
 import javax.inject.Inject
 
 class AuthenticateFragment : Fragment() {
@@ -68,19 +69,19 @@ class AuthenticateFragment : Fragment() {
             lockState.unlockRepo(passphrase.text.toString())
         }
 
-        lockState.unlockSuccess.observe(viewLifecycleOwner, EventObserver {
-            if(it) {
-                if(!viewModelFrg.isPassSet()) {
-                    viewModelFrg.setPassSet()
-                    viewModelFrg.createPassHash(passphrase.text.toString())
-                }
-                findNavController().navigate(
-                    AuthenticateFragmentDirections.actionAuthenticateFragmentToSecretsListFragment()
-                )
-            }
-            else
-                viewDataBinding.passLayout.error = getString(R.string.pass_incorect)
-        })
+        lockState.unlockSuccess.observe(viewLifecycleOwner,
+            EventObserver {
+                if (it) {
+                    if (!viewModelFrg.isPassSet()) {
+                        viewModelFrg.setPassSet()
+                        viewModelFrg.createPassHash(passphrase.text.toString())
+                    }
+                    findNavController().navigate(
+                        AuthenticateFragmentDirections.actionAuthenticateFragmentToSecretsListFragment()
+                    )
+                } else
+                    viewDataBinding.passLayout.error = getString(R.string.pass_incorect)
+            })
 
         passphrase.addTextChangedListener {
             viewDataBinding.passLayout.error = null

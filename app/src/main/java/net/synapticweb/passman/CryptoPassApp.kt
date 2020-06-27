@@ -4,8 +4,12 @@ import android.app.Application
 import net.synapticweb.passman.di.AppComponent
 import net.synapticweb.passman.di.DaggerAppComponent
 
-class CryptoPassApp : Application() {
+open class CryptoPassApp : Application() {
     val appComponent : AppComponent by lazy {
-        DaggerAppComponent.factory().create(applicationContext, this)
+       initializeComponent()
+    }
+
+    open fun initializeComponent() : AppComponent {
+        return DaggerAppComponent.factory().create(applicationContext, this)
     }
 }

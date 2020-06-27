@@ -14,6 +14,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import net.synapticweb.passman.*
+import net.synapticweb.passman.util.EventObserver
+import net.synapticweb.passman.util.handleBackPressed
 
 class SecretsListFragment : Fragment() {
     @Inject
@@ -53,11 +55,13 @@ class SecretsListFragment : Fragment() {
             }
         })
 
-        lockState.unauthorized.observe(viewLifecycleOwner, EventObserver {
-            if(it)
-            findNavController().navigate(SecretsListFragmentDirections.
-                    actionSecretsListFragmentToAuthenticateFragment())
-        })
+        lockState.unauthorized.observe(viewLifecycleOwner,
+            EventObserver {
+                if (it)
+                    findNavController().navigate(
+                        SecretsListFragmentDirections.actionSecretsListFragmentToAuthenticateFragment()
+                    )
+            })
 
         handleBackPressed(lockState)
         setHasOptionsMenu(true)

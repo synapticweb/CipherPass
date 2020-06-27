@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import net.synapticweb.passman.model.Repository
+import net.synapticweb.passman.util.Event
+import net.synapticweb.passman.util.wrapEspressoIdlingResource
 import javax.inject.Inject
 
 class LockStateViewModel @Inject constructor(private val repository: Repository, application: Application)
@@ -21,13 +23,15 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     private val uiScope = CoroutineScope(Dispatchers.Main + Job())
 
     fun unlockRepo(passphrase : String) {
-        uiScope .launch {
-            working.value = true
-            val result = withContext(Dispatchers.Default) {
-                repository.unlock(passphrase.toByteArray())
+        wrapEspressoIdlingResource {
+            uiScope.launch {
+                working.value = true
+                val result = withContext(Dispatchers.Default) {
+                    repository.unlock(passphrase.toByteArray())
+                }
+                working.value = false
+                unlockSuccess.value = Event(result)
             }
-            working.value = false
-            unlockSuccess.value = Event(result)
         }
     }
 

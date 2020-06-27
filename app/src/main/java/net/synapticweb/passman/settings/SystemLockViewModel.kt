@@ -9,6 +9,7 @@ import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import net.synapticweb.passman.*
 import net.synapticweb.passman.model.Repository
+import net.synapticweb.passman.util.*
 import java.io.BufferedWriter
 import java.io.FileWriter
 import java.io.IOException
@@ -65,7 +66,12 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
             working.value = true
             val result = withContext(Dispatchers.Default) {
                 val oldHash = repository.getHash()
-                val newHash = byteArrayToHexStr(createHash(passphrase, hexStrToByteArray(oldHash.salt)))
+                val newHash = byteArrayToHexStr(
+                    createHash(
+                        passphrase,
+                        hexStrToByteArray(oldHash.salt)
+                    )
+                )
                 newHash == oldHash.hash
             }
             working.value = false

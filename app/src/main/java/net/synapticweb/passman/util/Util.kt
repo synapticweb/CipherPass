@@ -1,8 +1,10 @@
-package net.synapticweb.passman
+package net.synapticweb.passman.util
 
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import net.synapticweb.passman.LockStateViewModel
+import net.synapticweb.passman.R
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 

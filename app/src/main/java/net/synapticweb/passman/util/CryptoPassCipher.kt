@@ -1,4 +1,4 @@
-package net.synapticweb.passman
+package net.synapticweb.passman.util
 
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
@@ -36,20 +36,28 @@ class CryptoPassCipher {
 
 
         private fun getSecretKey(): SecretKey {
-            if (!keyStore.containsAlias(SYM_KEY_ALIAS))
+            if (!keyStore.containsAlias(
+                    SYM_KEY_ALIAS
+                ))
                 createSecretKey()
-            return (keyStore.getEntry(SYM_KEY_ALIAS, null) as KeyStore.SecretKeyEntry).secretKey
+            return (keyStore.getEntry(
+                SYM_KEY_ALIAS, null) as KeyStore.SecretKeyEntry).secretKey
         }
 
         fun isStorageHardwareBacked(): Boolean {
-            val key = getSecretKey()
-            val keyFactory = SecretKeyFactory.getInstance(key.algorithm, SYM_PROVIDER)
+            val key =
+                getSecretKey()
+            val keyFactory = SecretKeyFactory.getInstance(key.algorithm,
+                SYM_PROVIDER
+            )
             val keyInfo = keyFactory.getKeySpec(key, KeyInfo::class.java) as KeyInfo
             return keyInfo.isInsideSecureHardware
         }
 
         private fun createSecretKey() {
-            val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, SYM_PROVIDER)
+            val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES,
+                SYM_PROVIDER
+            )
             keyGenerator.init(
                 KeyGenParameterSpec.Builder(
                     SYM_KEY_ALIAS,
@@ -65,7 +73,9 @@ class CryptoPassCipher {
 
         fun encrypt(strToEncrypt: String): String {
             val cipher = Cipher.getInstance(SYM_TRANSFORMATION)
-            cipher.init(Cipher.ENCRYPT_MODE, getSecretKey())
+            cipher.init(Cipher.ENCRYPT_MODE,
+                getSecretKey()
+            )
             val ivString = Base64.encodeToString(cipher.iv, Base64.DEFAULT)
 
             val bytes = cipher.doFinal(strToEncrypt.toByteArray())
@@ -82,7 +92,8 @@ class CryptoPassCipher {
             val cipher = Cipher.getInstance(SYM_TRANSFORMATION)
 
             val spec = GCMParameterSpec(128, Base64.decode(ivString, Base64.DEFAULT))
-            cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), spec)
+            cipher.init(Cipher.DECRYPT_MODE,
+                getSecretKey(), spec)
 
             val bytes = Base64.decode(encodedString, Base64.DEFAULT)
             return String(cipher.doFinal(bytes))
