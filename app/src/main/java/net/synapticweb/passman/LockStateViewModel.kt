@@ -2,6 +2,7 @@ package net.synapticweb.passman
 
 import android.app.Application
 import androidx.lifecycle.*
+import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.Event
@@ -22,32 +23,46 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     //back. Cînd repornesc aplicația blocul launch din unlockRepo nu se mai execută.
     private val uiScope = CoroutineScope(Dispatchers.Main + Job())
 
-    fun unlockRepo(passphrase : String) {
+    fun unlockRepo(passphrase : String, updateFragment : Boolean) {
             uiScope.launch {
-                working.value = true
+                if(updateFragment) working.value = true
                 val result = withContext(Dispatchers.Default) {
                     wrapEspressoIdlingResource {
                         repository.unlock(passphrase.toByteArray())
                     }
                 }
-                working.value = false
-                unlockSuccess.value = Event(result)
+                if(updateFragment) {
+                    working.value = false
+                    unlockSuccess.value = Event(result)
+                }
             }
 
     }
 
+    fun lockRepo() {
+        repository.lock()
+    }
+
+    private fun shouldManagePauseResume() : Boolean {
+        val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
+        return settings.getString(APPLOCK_KEY, APPLOCK_PASSWD_VALUE) != APPLOCK_NOLOCK_VALUE
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun onActivityPause() {
-        sleepTime = System.currentTimeMillis()
+        if(shouldManagePauseResume())
+            sleepTime = System.currentTimeMillis()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onActivityResume() {
-        if(sleepTime == 0L) //nu verificăm dacă a trecut prin authenticate și nu a fost încă minimizată activitatea
-            return
-        if(System.currentTimeMillis() - sleepTime > 10000) {
-            repository.lock()
-            unauthorized.value = Event(true)
+        if(shouldManagePauseResume()) {
+            if (sleepTime == 0L) //nu verificăm dacă a trecut prin authenticate și nu a fost încă minimizată activitatea
+                return
+            if (System.currentTimeMillis() - sleepTime > 10000) {
+                repository.lock()
+                unauthorized.value = Event(true)
+            }
         }
     }
 

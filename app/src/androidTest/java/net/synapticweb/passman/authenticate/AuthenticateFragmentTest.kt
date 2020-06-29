@@ -69,7 +69,7 @@ class AuthenticateFragmentTest {
        val hashObj : Hash = runBlocking {
            //delay este necesar deoarece în momentul în care se apasă pe butonul send se apelează
            //createPassHash care rulează asincron.
-           delay(500)
+           delay(600)
            testRule.repository.getHash()
         }
 

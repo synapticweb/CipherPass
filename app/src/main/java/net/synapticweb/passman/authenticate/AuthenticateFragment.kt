@@ -1,6 +1,9 @@
 package net.synapticweb.passman.authenticate
 
+import android.app.Activity
+import android.app.KeyguardManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
@@ -27,6 +30,8 @@ class AuthenticateFragment : Fragment() {
     private val viewModelFrg by viewModels<AuthenticateViewModel> { viewModelFactory }
     private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
 
+    private lateinit var viewDataBinding : AuthenticateFragmentBinding
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val parentActivity : AppCompatActivity = context as AppCompatActivity
@@ -40,11 +45,38 @@ class AuthenticateFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val fragment = this
-        val viewDataBinding = AuthenticateFragmentBinding.inflate(inflater, container, false).apply {
+        viewDataBinding = AuthenticateFragmentBinding.inflate(inflater, container, false).apply {
             viewModel = viewModelFrg
             lifecycleOwner = fragment
             lockStateViewModel = lockState
         }
+
+        viewModelFrg.getPasswd.observe(viewLifecycleOwner, EventObserver {
+            if (it == NOPASSWD_RETURNED)
+                setupSendPass()
+            else {
+                if (viewModelFrg.getApplockPref() == APPLOCK_SYSTEM_VALUE) {
+                    val keyMan =
+                        requireActivity().getSystemService(Context.KEYGUARD_SERVICE) as
+                                KeyguardManager
+                    val authIntent =
+                        keyMan.createConfirmDeviceCredentialIntent("Auth", "Authentication required")
+                    authIntent?.also { intent ->
+                        lockState.unlockRepo(it, false)
+                        startActivityForResult(intent, LOCK_ACTIVITY_CODE)
+                    }
+                        ?: setupSendPass() //de pus snackbar
+                }
+                else {
+                    viewDataBinding.passLayout.visibility = View.GONE
+                    viewDataBinding.sendPass.visibility = View.GONE
+                    lockState.unlockRepo(it, true)
+                }
+        }
+
+        })
+
+        viewModelFrg.getPassphrase()
 
         val passphrase = viewDataBinding.passphrase
         val rePassphrase = viewDataBinding.passphraseRetype
@@ -59,18 +91,6 @@ class AuthenticateFragment : Fragment() {
                 passphrase.transformationMethod = PasswordTransformationMethod.getInstance()
                 rePassphrase.transformationMethod = PasswordTransformationMethod.getInstance()
             }
-        }
-
-        viewDataBinding.sendPass.setOnClickListener {
-            if(viewModelFrg.passEmpty()) {
-                viewDataBinding.passLayout.error = getString(R.string.pass_empty)
-                return@setOnClickListener
-            }
-            if(!viewModelFrg.isPassSet() && !viewModelFrg.passMatch()) {
-                viewDataBinding.passLayout.error = getString(R.string.pass_no_match)
-                return@setOnClickListener
-            }
-            lockState.unlockRepo(passphrase.text.toString())
         }
 
         lockState.unlockSuccess.observe(viewLifecycleOwner,
@@ -93,5 +113,30 @@ class AuthenticateFragment : Fragment() {
 
         handleBackPressed(lockState)
         return viewDataBinding.root
+    }
+
+    private fun setupSendPass() {
+        viewDataBinding.sendPass.setOnClickListener {
+            if(viewModelFrg.passEmpty()) {
+                viewDataBinding.passLayout.error = getString(R.string.pass_empty)
+                return@setOnClickListener
+            }
+            if(!viewModelFrg.isPassSet() && !viewModelFrg.passMatch()) {
+                viewDataBinding.passLayout.error = getString(R.string.pass_no_match)
+                return@setOnClickListener
+            }
+            lockState.unlockRepo(viewDataBinding.passphrase.text.toString(), true)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == LOCK_ACTIVITY_CODE && resultCode == Activity.RESULT_OK) {
+            findNavController().navigate(
+                AuthenticateFragmentDirections.actionAuthenticateFragmentToSecretsListFragment())
+        }
+        else if(requestCode == LOCK_ACTIVITY_CODE && resultCode == Activity.RESULT_CANCELED) {
+            lockState.lockRepo()
+            setupSendPass()
+        }
     }
 }

@@ -10,13 +10,19 @@ import net.synapticweb.passman.*
 import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.*
+import java.io.DataInputStream
+import java.io.File
+import java.io.FileInputStream
 import javax.inject.Inject
 
 
-class AuthenticateViewModel @Inject constructor(private val repository: Repository, application: Application) : AndroidViewModel(application) {
-    val password = MutableLiveData("")
-    val rePassword = MutableLiveData("")
+class AuthenticateViewModel @Inject constructor(private val repository: Repository,
+                                                private val cipher: CPCipher,
+                                                application: Application) : AndroidViewModel(application) {
+    val password = MutableLiveData<String>()
+    val rePassword = MutableLiveData<String>()
     val passSet  = MutableLiveData(isPassSet())
+    val getPasswd = MutableLiveData<Event<String>>()
 
     fun isPassSet() : Boolean {
         val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
@@ -33,6 +39,34 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
         editor.putBoolean(PASSPHRASE_SET_KEY, true)
         editor.apply()
         editor.commit()
+    }
+
+    fun getApplockPref() : String {
+        val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
+        return settings.getString(APPLOCK_KEY, APPLOCK_PASSWD_VALUE) ?: APPLOCK_PASSWD_VALUE
+    }
+
+  fun getPassphrase()  {
+        val encFile = File(getApplication<CryptoPassApp>().filesDir.absolutePath + "/"
+                + cipher.getEncryptedFilePath())
+        if(getApplockPref() == APPLOCK_PASSWD_VALUE || !encFile.exists()) {
+            getPasswd.value = Event(NOPASSWD_RETURNED)
+            return
+        }
+
+        viewModelScope .launch {
+            lateinit var encrypted : String //de pus try?
+            withContext(Dispatchers.IO) {
+                val reader = DataInputStream(FileInputStream(encFile))
+                val nBytesToRead: Int = reader.available()
+                if (nBytesToRead > 0) {
+                    val bytes = ByteArray(nBytesToRead)
+                    reader.read(bytes)
+                    encrypted = String(bytes)
+                }
+            }
+            getPasswd.value = Event(cipher.decrypt(encrypted))
+        }
     }
 
 @ShouldTest

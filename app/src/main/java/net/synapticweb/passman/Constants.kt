@@ -11,3 +11,6 @@ const val APPLOCK_KEY = "applock"
 const val APPLOCK_PASSWD_VALUE = "passwd"
 const val APPLOCK_SYSTEM_VALUE = "system"
 const val APPLOCK_NOLOCK_VALUE = "none"
+
+const val NOPASSWD_RETURNED = "no_passwd_returned"
+const val LOCK_ACTIVITY_CODE = 0
