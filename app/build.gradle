@@ -15,7 +15,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "net.synapticweb.passman.CustomTestRunner"
+        testInstrumentationRunner "net.synapticweb.passman.util.CustomTestRunner"
     }
 
     buildTypes {
@@ -96,4 +96,5 @@ dependencies {
 //    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
     //pentru instanttaskexecutorrule:
 //    androidTestImplementation "androidx.arch.core:core-testing:$archTestingVersion"
+    androidTestImplementation "org.mockito:mockito-android:3.3.3"
 }

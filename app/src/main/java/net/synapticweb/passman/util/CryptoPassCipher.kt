@@ -1,22 +1,28 @@
 package net.synapticweb.passman.util
 
+import android.content.Context
 import android.os.Build
+import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyInfo
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.annotation.RequiresApi
-import java.security.KeyStore
-import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
-import javax.crypto.SecretKeyFactory
+import net.synapticweb.passman.ENCRYPTED_PASS_FILENAME
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.math.BigInteger
+import java.nio.charset.Charset
+import java.security.*
+import java.util.*
+import javax.crypto.*
 import javax.crypto.spec.GCMParameterSpec
+import javax.security.auth.x500.X500Principal
 
-const val SYM_KEY_ALIAS : String = "cryptopass"
-const val SYM_TRANSFORMATION = "AES/GCM/NoPadding"
-const val IV_SEPARATOR = "]"
-const val SYM_PROVIDER = "AndroidKeyStore"
+const val ASYM_KEY_ALIAS : String = "passkey"
+const val ASYM_ALGORITHM : String = "RSA"
+const val ASYM_TRANSFORMATION = "RSA/ECB/PKCS1Padding"
+const val ASYM_PROVIDER = "AndroidKeyStore"
 
 
 //Criptare simetrică: https://medium.com/@josiassena/using-the-android-keystore-system-to-store-sensitive-information-3a56175a454b
@@ -25,78 +31,83 @@ const val SYM_PROVIDER = "AndroidKeyStore"
 //https://source.android.com/security/keystore
 //IV + o serie de articole despre criptare în Android:
 //https://proandroiddev.com/secure-data-in-android-initialization-vector-6ca1c659762c
-@RequiresApi(Build.VERSION_CODES.M)
-class CryptoPassCipher {
-    companion object {
-        private var keyStore: KeyStore = KeyStore.getInstance(SYM_PROVIDER)
+open class CryptoPassCipher(private val context : Context) : CPCipher {
+        private var keyStore: KeyStore = KeyStore.getInstance(ASYM_PROVIDER)
 
         init {
             keyStore.load(null)
         }
 
+    private fun createKeyPair() {
+        val keyGenerator = KeyPairGenerator.getInstance(ASYM_ALGORITHM, ASYM_PROVIDER)
+        val start = Calendar.getInstance()
+        val end = Calendar.getInstance()
+        end.add(Calendar.YEAR, 1)
+        val spec = KeyPairGeneratorSpec.Builder(context)
+            .setAlias(ASYM_KEY_ALIAS)
+            .setSubject(X500Principal("CN=Sample Name, O=Android Authority"))
+            .setSerialNumber(BigInteger.ONE)
+            .setStartDate(start.time)
+            .setEndDate(end.time)
+            .build()
 
-        private fun getSecretKey(): SecretKey {
-            if (!keyStore.containsAlias(
-                    SYM_KEY_ALIAS
-                ))
-                createSecretKey()
-            return (keyStore.getEntry(
-                SYM_KEY_ALIAS, null) as KeyStore.SecretKeyEntry).secretKey
-        }
-
-        fun isStorageHardwareBacked(): Boolean {
-            val key =
-                getSecretKey()
-            val keyFactory = SecretKeyFactory.getInstance(key.algorithm,
-                SYM_PROVIDER
-            )
-            val keyInfo = keyFactory.getKeySpec(key, KeyInfo::class.java) as KeyInfo
-            return keyInfo.isInsideSecureHardware
-        }
-
-        private fun createSecretKey() {
-            val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES,
-                SYM_PROVIDER
-            )
-            keyGenerator.init(
-                KeyGenParameterSpec.Builder(
-                    SYM_KEY_ALIAS,
-                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-                )
-                    .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                    .build()
-            )
-
-            keyGenerator.generateKey()
-        }
-
-        fun encrypt(strToEncrypt: String): String {
-            val cipher = Cipher.getInstance(SYM_TRANSFORMATION)
-            cipher.init(Cipher.ENCRYPT_MODE,
-                getSecretKey()
-            )
-            val ivString = Base64.encodeToString(cipher.iv, Base64.DEFAULT)
-
-            val bytes = cipher.doFinal(strToEncrypt.toByteArray())
-            var result = Base64.encodeToString(bytes, Base64.DEFAULT)
-            result += (IV_SEPARATOR + ivString)
-
-            return result
-        }
-
-        fun decrypt(strToDecrypt: String): String {
-            val split = strToDecrypt.split(IV_SEPARATOR.toRegex())
-            val encodedString = split[0]
-            val ivString = split[1]
-            val cipher = Cipher.getInstance(SYM_TRANSFORMATION)
-
-            val spec = GCMParameterSpec(128, Base64.decode(ivString, Base64.DEFAULT))
-            cipher.init(Cipher.DECRYPT_MODE,
-                getSecretKey(), spec)
-
-            val bytes = Base64.decode(encodedString, Base64.DEFAULT)
-            return String(cipher.doFinal(bytes))
-        }
+        keyGenerator.initialize(spec)
+        keyGenerator.generateKeyPair()
     }
+
+    private fun getPublicKey() : PublicKey {
+        if(!keyStore.containsAlias(ASYM_KEY_ALIAS))
+            createKeyPair()
+
+        return (keyStore.getEntry(ASYM_KEY_ALIAS, null) as KeyStore.PrivateKeyEntry).certificate.publicKey
+    }
+
+    private fun getPrivateKey() : PrivateKey {
+        if(!keyStore.containsAlias(ASYM_KEY_ALIAS))
+            createKeyPair()
+        return (keyStore.getEntry(ASYM_KEY_ALIAS, null) as KeyStore.PrivateKeyEntry).privateKey
+    }
+
+    override fun isStorageHardwareBacked(): Boolean {
+        if(Build.VERSION.SDK_INT < 23)
+            return false
+        val key = getPrivateKey()
+        val keyFactory = KeyFactory.getInstance(key.algorithm, ASYM_PROVIDER)
+        val keyInfo = keyFactory.getKeySpec(key, KeyInfo::class.java)
+
+        return keyInfo.isInsideSecureHardware
+    }
+
+    override fun decrypt(strToDecrypt : String) : String {
+        val cipher = Cipher.getInstance(ASYM_TRANSFORMATION)
+        cipher.init(Cipher.DECRYPT_MODE, getPrivateKey())
+        val cipherInputStream = CipherInputStream(
+            ByteArrayInputStream(Base64.decode(strToDecrypt, Base64.DEFAULT)), cipher)
+        val values = arrayListOf<Byte>()
+        var nextByte : Int
+
+        while (cipherInputStream.read().also { nextByte = it } != -1) {
+            values.add(nextByte.toByte())
+        }
+
+        val bytes = ByteArray(values.size)
+        for (i in bytes.indices) {
+            bytes[i] = values[i]
+        }
+
+        return String(bytes, 0, bytes.size, Charset.forName("UTF-8"))
+    }
+
+    override fun encrypt(strToEncrypt : String) : String {
+        val cipher = Cipher.getInstance(ASYM_TRANSFORMATION)
+        cipher.init(Cipher.ENCRYPT_MODE, getPublicKey())
+        val outputStream = ByteArrayOutputStream()
+        val cipherOutputStream = CipherOutputStream(outputStream, cipher)
+        cipherOutputStream.write(strToEncrypt.toByteArray(Charset.forName("UTF-8")))
+        cipherOutputStream.close()
+        val vals = outputStream.toByteArray()
+        return Base64.encodeToString(vals, Base64.DEFAULT)
+    }
+
+    override fun getEncryptedFilePath(): String = ENCRYPTED_PASS_FILENAME
 }

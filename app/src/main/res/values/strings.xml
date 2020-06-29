@@ -7,6 +7,7 @@
     <string name="pass_incorect">The passphrase you entered is not valid.</string>
     <string name="passphrase_retype_hint">Retype passphrase</string>
     <string name="pass_no_match">The passphrases entered do not match.</string>
+    <string name="pass_empty">Passphrase cannot be empty</string>
     <string name="one_more_backpress">Press the back button one more time to exit.</string>
     <string name="applock_key_title">Lock type</string>
     <string name="applock_key_passwd">Passphrase</string>

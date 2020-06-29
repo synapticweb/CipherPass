@@ -6,15 +6,18 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import net.synapticweb.passman.*
+import net.synapticweb.passman.util.CryptoPassTestRule
+import net.synapticweb.passman.MainActivity
+import net.synapticweb.passman.PASSPHRASE_SET_KEY
+import net.synapticweb.passman.R
 import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.util.*
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Test
-import kotlinx.coroutines.delay
 import org.junit.Rule
+import org.junit.Test
 
 
 class AuthenticateFragmentTest {
@@ -27,13 +30,24 @@ class AuthenticateFragmentTest {
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
 
         onView(withId(R.id.passphrase)).perform(typeText("test"), closeSoftKeyboard())
-        onView(withId(R.id.passphrase_retype)).perform(typeText("test1"), closeSoftKeyboard())
+        onView(withId(R.id.passphrase_retype)).perform(typeText("test2"), closeSoftKeyboard())
         onView(withId(R.id.send_pass)).perform(click())
 
         onView(withId(R.id.pass_layout)).check(
             matches(hasTextInputLayoutErrorText(testRule.application.getString(R.string.pass_no_match))))
 
         assertThat(testRule.repository.isUnlocked(), `is`(false))
+    }
+
+    @Test
+    fun dbNotInitialized_EmptyPasswd_Error() {
+        val activityScenario = launch(MainActivity::class.java)
+        testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        onView(withId(R.id.send_pass)).perform(click())
+
+        onView(withId(R.id.pass_layout)).check(
+            matches(hasTextInputLayoutErrorText(testRule.application.getString(R.string.pass_empty))))
     }
 
 
@@ -82,6 +96,23 @@ class AuthenticateFragmentTest {
 
         assertThat(testRule.repository.isUnlocked(), `is`(false))
     }
+
+    @Test
+    fun appRunnedOnce_emptyPasswd_Error() {
+        testRule.setBoolean(PASSPHRASE_SET_KEY, true)
+
+        val activityScenario = launch(MainActivity::class.java)
+        testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        onView(withId(R.id.send_pass)).perform(click())
+
+        onView(withId(R.id.pass_layout)).check(
+            matches(hasTextInputLayoutErrorText(testRule.application.getString(R.string.pass_empty))))
+
+        assertThat(testRule.repository.isUnlocked(), `is`(false))
+    }
+
+
 
     @Test
     fun dbInitialized_goodPasswd_Authenticate() {

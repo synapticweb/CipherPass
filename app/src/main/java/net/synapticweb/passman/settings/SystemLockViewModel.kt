@@ -15,7 +15,9 @@ import java.io.FileWriter
 import java.io.IOException
 import javax.inject.Inject
 
-class SystemLockViewModel @Inject constructor(private val repository: Repository, application: Application) :
+class SystemLockViewModel @Inject constructor(private val repository: Repository,
+                                              private val cipher : CPCipher,
+                                              application: Application) :
     AndroidViewModel(application) {
 
     val working = MutableLiveData<Boolean>()
@@ -28,14 +30,16 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
     @ShouldTest
     fun encryptPassAndSetPref(passphrase: String? = null) {
         val toEncrypt = passphrase ?: passSaved
-        val encrypted = CryptoPassCipher.encrypt(toEncrypt)
-        val path = getApplication<CryptoPassApp>().filesDir.absolutePath + "/" + ENCRYPTED_PASS_FILENAME
+        val encrypted = cipher.encrypt(toEncrypt)
+        val path = getApplication<CryptoPassApp>().filesDir.absolutePath + "/" + cipher.getEncryptedFilePath()
         viewModelScope .launch {    //rulează pe threadul main
             withContext(Dispatchers.IO) {
                 try {
-                    val writer = BufferedWriter(FileWriter(path))
-                    writer.write(encrypted)
-                    writer.close()
+                    wrapEspressoIdlingResource {
+                        val writer = BufferedWriter(FileWriter(path))
+                        writer.write(encrypted)
+                        writer.close()
+                    }
                     setPref()
                 }
                 catch (exc : IOException) {
@@ -62,31 +66,33 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
 
     @ShouldTest
     fun validatePass(passphrase: String) {
-         viewModelScope .launch {
-            working.value = true
-            val result = withContext(Dispatchers.Default) {
-                val oldHash = repository.getHash()
-                val newHash = byteArrayToHexStr(
-                    createHash(
-                        passphrase,
-                        hexStrToByteArray(oldHash.salt)
-                    )
-                )
-                newHash == oldHash.hash
+            viewModelScope.launch {
+                working.value = true
+                val result = withContext(Dispatchers.Default) {
+                    wrapEspressoIdlingResource {
+                        val oldHash = repository.getHash()
+                        val newHash = byteArrayToHexStr(
+                            createHash(
+                                passphrase,
+                                hexStrToByteArray(oldHash.salt)
+                            )
+                        )
+                        newHash == oldHash.hash
+                    }
+                }
+                working.value = false
+                if (!result) {
+                    errorPassNoMatch.value = true
+                    return@launch
+                }
+
+                if (!cipher.isStorageHardwareBacked()) {
+                    storageSoft.value = true
+                    passSaved = passphrase
+                    return@launch
+                }
+
+                encryptPassAndSetPref(passphrase)
             }
-            working.value = false
-             if(!result) {
-                 errorPassNoMatch.value = true
-                 return@launch
-             }
-
-             if(!CryptoPassCipher.isStorageHardwareBacked()) {
-                 storageSoft.value = true
-                 passSaved = passphrase
-                 return@launch
-             }
-
-             encryptPassAndSetPref(passphrase)
         }
-    }
 }

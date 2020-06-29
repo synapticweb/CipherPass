@@ -11,6 +11,7 @@ import net.synapticweb.passman.settings.di.SettingsComponent
 import javax.inject.Singleton
 
 @Component(modules = [AppSubcomponents::class, RepositoryModule::class, LockStateModule::class,
+    CipherModule::class,
     ViewModelBuilderModule::class])
 @Singleton
 interface AppComponent {

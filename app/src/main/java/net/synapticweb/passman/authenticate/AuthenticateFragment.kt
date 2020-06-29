@@ -62,6 +62,10 @@ class AuthenticateFragment : Fragment() {
         }
 
         viewDataBinding.sendPass.setOnClickListener {
+            if(viewModelFrg.passEmpty()) {
+                viewDataBinding.passLayout.error = getString(R.string.pass_empty)
+                return@setOnClickListener
+            }
             if(!viewModelFrg.isPassSet() && !viewModelFrg.passMatch()) {
                 viewDataBinding.passLayout.error = getString(R.string.pass_no_match)
                 return@setOnClickListener

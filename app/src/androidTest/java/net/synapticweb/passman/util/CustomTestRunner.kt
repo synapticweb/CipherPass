@@ -1,8 +1,9 @@
-package net.synapticweb.passman
+package net.synapticweb.passman.util
 
 import android.app.Application
 import android.content.Context
 import androidx.test.runner.AndroidJUnitRunner
+import net.synapticweb.passman.TestCryptoPassApp
 
 class CustomTestRunner : AndroidJUnitRunner() {
 

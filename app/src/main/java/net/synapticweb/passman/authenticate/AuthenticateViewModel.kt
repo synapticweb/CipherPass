@@ -6,14 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
-import net.synapticweb.passman.PASSPHRASE_SET_KEY
-import net.synapticweb.passman.util.ShouldTest
-import net.synapticweb.passman.util.byteArrayToHexStr
-import net.synapticweb.passman.util.createHash
+import net.synapticweb.passman.*
 import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.model.Repository
-import net.synapticweb.passman.util.wrapEspressoIdlingResource
-import java.security.SecureRandom
+import net.synapticweb.passman.util.*
 import javax.inject.Inject
 
 
@@ -27,7 +23,9 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
         return settings.getBoolean(PASSPHRASE_SET_KEY, false)
     }
 
-    fun passMatch() : Boolean = password.value.equals(rePassword.value)
+    fun passMatch() : Boolean = password.value == rePassword.value
+
+    fun passEmpty() : Boolean = password.value?.isEmpty() ?: true
 
     fun setPassSet() {
         val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
@@ -39,9 +37,7 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
 
 @ShouldTest
  fun createPassHash(passphrase : String) {
-    val random = SecureRandom()
-    val salt = ByteArray(16)
-    random.nextBytes(salt)
+    val salt = createSalt()
 
         viewModelScope.launch {
             val hash = withContext(Dispatchers.Default) {

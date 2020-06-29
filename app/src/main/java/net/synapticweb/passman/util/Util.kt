@@ -5,6 +5,7 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import net.synapticweb.passman.LockStateViewModel
 import net.synapticweb.passman.R
+import java.security.SecureRandom
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 
@@ -58,6 +59,13 @@ fun createHash(passphrase: String, salt : ByteArray) : ByteArray {
     val spec = PBEKeySpec(passphrase.toCharArray(), salt, 65536, 128)
     val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
     return factory.generateSecret(spec).encoded
+}
+
+fun createSalt() : ByteArray {
+    val random = SecureRandom()
+    val salt = ByteArray(16)
+    random.nextBytes(salt)
+    return salt
 }
 
 @Target(
