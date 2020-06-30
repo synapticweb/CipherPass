@@ -26,6 +26,7 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
     val errorFileWriteFail = MutableLiveData<Boolean>()
     val finish = MutableLiveData<Boolean>()
     private lateinit var passSaved : String
+    lateinit var prefValue : String
 
     @ShouldTest
     fun encryptPassAndSetPref(passphrase: String? = null) {
@@ -59,7 +60,7 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
     private fun setPref() {
         val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
         val editor = settings.edit()
-        editor.putString("applock", "system")
+        editor.putString(APPLOCK_KEY, prefValue)
         editor.apply()
         editor.commit()
     }

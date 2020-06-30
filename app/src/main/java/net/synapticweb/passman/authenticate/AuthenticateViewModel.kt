@@ -49,7 +49,7 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
   fun getPassphrase()  {
         val encFile = File(getApplication<CryptoPassApp>().filesDir.absolutePath + "/"
                 + cipher.getEncryptedFilePath())
-        if(getApplockPref() == APPLOCK_PASSWD_VALUE || !encFile.exists()) {
+        if(!encFile.exists()) {
             getPasswd.value = Event(NOPASSWD_RETURNED)
             return
         }

@@ -47,5 +47,8 @@
             app:popUpTo="@id/settingsFragment"
             app:popUpToInclusive="true"
             />
+        <argument
+            android:name="prefEntryValue"
+            app:argType="string" />
     </fragment>
 </navigation>

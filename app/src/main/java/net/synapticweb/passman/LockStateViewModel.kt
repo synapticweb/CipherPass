@@ -22,19 +22,19 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     //nu pot să folosesc viewModelScope pentru că îi anulează job-ul automat în onClear, cînd apăs de 2 ori
     //back. Cînd repornesc aplicația blocul launch din unlockRepo nu se mai execută.
     private val uiScope = CoroutineScope(Dispatchers.Main + Job())
+    var startedUnlockActivity = false
 
-    fun unlockRepo(passphrase : String, updateFragment : Boolean) {
+    fun unlockRepo(passphrase : String) {
             uiScope.launch {
-                if(updateFragment) working.value = true
+                working.value = true
                 val result = withContext(Dispatchers.Default) {
                     wrapEspressoIdlingResource {
                         repository.unlock(passphrase.toByteArray())
                     }
                 }
-                if(updateFragment) {
-                    working.value = false
-                    unlockSuccess.value = Event(result)
-                }
+
+                working.value = false
+                unlockSuccess.value = Event(result)
             }
 
     }
@@ -44,6 +44,9 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     }
 
     private fun shouldManagePauseResume() : Boolean {
+        if(startedUnlockActivity) {
+            return false
+        }
         val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
         return settings.getString(APPLOCK_KEY, APPLOCK_PASSWD_VALUE) != APPLOCK_NOLOCK_VALUE
     }
@@ -64,6 +67,11 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
                 unauthorized.value = Event(true)
             }
         }
+        //acest flag este setat în AuthenticateFragment în momentul cînd pornește activitatea unlock
+        //cu scopul de a împiedica MainActivity să declașenze ciclul de login cînd activitatea
+        //unlock se termină. Îl resetez aici pentru că dacă o fac în onActivityResult, onResume vine
+        //după resetare și verificarea are loc, chiar dacă nu e cazul.
+        startedUnlockActivity = false
     }
 
     override fun onCleared() {

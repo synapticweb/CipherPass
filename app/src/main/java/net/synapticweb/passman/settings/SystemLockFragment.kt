@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.passman.CryptoPassApp
 import net.synapticweb.passman.R
@@ -23,6 +24,8 @@ class SystemLockFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory : ViewModelProvider.Factory
     private val viewModelFrg by viewModels<SystemLockViewModel> {viewModelFactory}
+
+    private val args : SystemLockFragmentArgs by navArgs()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -37,11 +40,12 @@ class SystemLockFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val fragment = this
+        viewModelFrg.prefValue = args.prefEntryValue
+
         val viewDataBinding = SystemLockFragmentBinding.inflate(inflater, container, false).apply {
             viewModel = viewModelFrg
             lifecycleOwner = fragment
         }
-
 
         viewModelFrg.errorPassNoMatch.observe(viewLifecycleOwner, Observer {
             if(it)

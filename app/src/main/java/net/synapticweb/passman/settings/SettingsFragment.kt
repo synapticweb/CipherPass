@@ -15,6 +15,7 @@ import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import javax.inject.Inject
 import androidx.fragment.app.viewModels
+import androidx.preference.Preference
 import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.passman.*
 import net.synapticweb.passman.util.EventObserver
@@ -48,6 +49,54 @@ class SettingsFragment : PreferenceFragmentCompat() {
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
+    private fun onPassphraseSelect(appLock: Preference, summaryEntry : String) :Boolean {
+        viewModel.deletePasswdFile()
+        appLock.summary = summaryEntry
+        return true
+    }
+
+    private fun onSystemLockSelect(appLock: Preference, summaryEntry : String) : Boolean {
+        val keygm = requireContext().getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        if(Build.VERSION.SDK_INT < 23) {
+            Snackbar.make(
+                requireView(), getString(R.string.system_lock_not_available),
+                Snackbar.LENGTH_LONG
+            ).show()
+            return false
+        }
+
+        if(!keygm.isDeviceSecure) {
+            Snackbar.make(
+                requireView(), getString(R.string.system_lock_device_not_secure),
+                Snackbar.LENGTH_LONG
+            ).show()
+            return false
+        }
+
+        return if(!viewModel.hasPasswdFile()) {
+            findNavController().navigate(
+                SettingsFragmentDirections.actionSettingsFragmentToSystemLockFragment(
+                    APPLOCK_SYSTEM_VALUE))
+            false
+        } else {
+            appLock.summary = summaryEntry
+            true
+        }
+    }
+
+    private fun onNolockSelect(appLock: Preference, summaryEntry : String) : Boolean {
+      return  if(!viewModel.hasPasswdFile()) {
+            findNavController().navigate(
+                SettingsFragmentDirections.
+                actionSettingsFragmentToSystemLockFragment(APPLOCK_NOLOCK_VALUE))
+            false
+        }
+        else {
+          appLock.summary = summaryEntry
+          true
+        }
+    }
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences)
         val appLock = findPreference<ListPreference>("applock")
@@ -55,32 +104,18 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val appLockEntries = requireActivity().resources.getStringArray(R.array.applock_entries)
         val appLockValues = requireActivity().resources.getStringArray(R.array.applock_values)
-        appLock?.setOnPreferenceChangeListener { _, newValue ->
-            val keygm = requireContext().getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            when(newValue){
-                appLockValues[0] ->  {appLock.summary = appLockEntries[0]; true}
 
-                appLockValues[1] -> {
-                    if(Build.VERSION.SDK_INT < 23)
-                        Snackbar.make(requireView(), getString(R.string.system_lock_not_available),
-                            Snackbar.LENGTH_LONG).show()
-                    else if(!keygm.isDeviceSecure)
-                        Snackbar.make(requireView(), getString(R.string.system_lock_device_not_secure),
-                            Snackbar.LENGTH_LONG).show()
-                    else
-                        findNavController().
-                            navigate(SettingsFragmentDirections.
-                            actionSettingsFragmentToSystemLockFragment())
+        appLock?.setOnPreferenceChangeListener { preference, newValue ->
+        //returning true sets the preference, false does not set.
+            when(newValue) {
+                appLockValues[0] ->  onPassphraseSelect(preference, appLockEntries[0])
 
-                    false
-                }
+                appLockValues[1] -> onSystemLockSelect(preference, appLockEntries[1])
 
-                appLockValues[2] -> {appLock.summary = appLockEntries[2]; true}
+                appLockValues[2] -> onNolockSelect(preference, appLockEntries[2])
 
                 else -> false
             }
-
         }
-
     }
 }
