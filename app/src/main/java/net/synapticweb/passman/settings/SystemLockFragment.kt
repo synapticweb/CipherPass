@@ -46,6 +46,7 @@ class SystemLockFragment : Fragment() {
         val viewDataBinding = SystemLockFragmentBinding.inflate(inflater, container, false).apply {
             viewModel = viewModelFrg
             lifecycleOwner = fragment
+            arguments = args
         }
 
         viewModelFrg.errorPassNoMatch.observe(viewLifecycleOwner, Observer {

@@ -5,7 +5,6 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
@@ -19,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.AuthenticateFragmentBinding
 import net.synapticweb.passman.util.EventObserver
@@ -66,7 +66,13 @@ class AuthenticateFragment : Fragment() {
                 authIntent?.also { intent ->
                     lockState.startedUnlockActivity = true
                     startActivityForResult(intent, LOCK_ACTIVITY_CODE)
-                }   ?: setupSendPass()
+                }
+                    ?: run {
+                        setupSendPass()
+                        //necesar pentru că încă nu s-a încheiat onCreateView()
+                        Snackbar.make(requireActivity().findViewById(android.R.id.content), getString(R.string.system_lock_unavailable),
+                            Snackbar.LENGTH_LONG).show()
+                    }
             }
             APPLOCK_NOLOCK_VALUE -> {
                 viewDataBinding.passLayout.visibility = View.GONE
@@ -102,6 +108,7 @@ class AuthenticateFragment : Fragment() {
                         passphrase.text ?.let { editable ->
                             viewModelFrg.createPassHash(editableToCharArray(editable))
                             editable.clear()
+                            rePassphrase.text.clear()
                         }
                     }
                     findNavController().navigate(

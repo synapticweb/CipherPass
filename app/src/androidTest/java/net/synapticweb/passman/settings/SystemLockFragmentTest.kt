@@ -8,6 +8,8 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import kotlinx.coroutines.runBlocking
+import net.synapticweb.passman.APPLOCK_KEY
+import net.synapticweb.passman.APPLOCK_SYSTEM_VALUE
 import net.synapticweb.passman.R
 import net.synapticweb.passman.TEST_ENCRYPTED_PASS_FILENAME
 import net.synapticweb.passman.di.TestAppComponent
@@ -32,12 +34,12 @@ class SystemLockFragmentTest {
     @get:Rule
     val testRule = CryptoPassTestRule()
 
-    lateinit var cipher : TestCryptoPassCipher
+    private lateinit var cipher : TestCryptoPassCipher
 
     private fun setDb() = runBlocking {
         testRule.repository.unlock(PASS.toByteArray())
         val salt = createSalt()
-        val hashStr = byteArrayToHexStr(createHash(PASS, salt))
+        val hashStr = byteArrayToHexStr(createHash(PASS.toCharArray(), salt, false))
         val hash = Hash(hashStr, byteArrayToHexStr(salt))
         testRule.repository.insertHash(hash)
     }
@@ -49,7 +51,8 @@ class SystemLockFragmentTest {
 
     @Test
     fun emptyPass_Error() {
-        val fragmentScenario = launchFragmentInContainer<SystemLockFragment>(null, R.style.AppTheme)
+        val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
+        val fragmentScenario = launchFragmentInContainer<SystemLockFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
         onView(withId(R.id.action_button)).perform(click())
 
@@ -60,7 +63,8 @@ class SystemLockFragmentTest {
     @Test
     fun badPass_Error() {
         setDb()
-        val fragmentScenario = launchFragmentInContainer<SystemLockFragment>(null, R.style.AppTheme)
+        val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
+        val fragmentScenario = launchFragmentInContainer<SystemLockFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
         onView(withId(R.id.passphrase)).perform(typeText("test1"), closeSoftKeyboard())
@@ -76,7 +80,8 @@ class SystemLockFragmentTest {
         cipher.hasHardwareStorage = true
         //https://stackoverflow.com/a/59027482
         val mockNav = mock(NavController::class.java)
-        val fragmentScenario = launchFragmentInContainer(null, R.style.AppTheme) {
+        val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
             SystemLockFragment().also { fragment ->
                 fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
                     if(viewLifeCycleOwner != null)
@@ -101,19 +106,17 @@ class SystemLockFragmentTest {
 
         assertThat(encFile.exists(), `is`(true))
 
-        lateinit var encrypted : String
+
         val reader = DataInputStream(FileInputStream(encFile))
         val nBytesToRead: Int = reader.available()
-        if (nBytesToRead > 0) {
-            val bytes = ByteArray(nBytesToRead)
-            reader.read(bytes)
-            encrypted = String(bytes)
-        }
+        val encrypted = ByteArray(nBytesToRead)
+        if (nBytesToRead > 0)
+            reader.read(encrypted)
 
-        assertThat(PASS, `is`(cipher.decrypt(encrypted)))
+        assertThat(PASS, `is`(String(cipher.decrypt(encrypted))))
         encFile.delete()
 
-        assertThat(testRule.getString("applock"), `is`("system"))
+        assertThat(testRule.getString(APPLOCK_KEY), `is`(APPLOCK_SYSTEM_VALUE))
     }
 
     private fun checkSecondScreen() {
@@ -129,7 +132,8 @@ class SystemLockFragmentTest {
         cipher.hasHardwareStorage = false
 
         val mockNav = mock(NavController::class.java)
-        val fragmentScenario = launchFragmentInContainer(null, R.style.AppTheme) {
+        val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
             SystemLockFragment().also { fragment ->
                 fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
                     if(viewLifeCycleOwner != null)
@@ -158,7 +162,8 @@ class SystemLockFragmentTest {
         cipher.hasHardwareStorage = false
 
         val mockNav = mock(NavController::class.java)
-        val fragmentScenario = launchFragmentInContainer(null, R.style.AppTheme) {
+        val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
             SystemLockFragment().also { fragment ->
                 fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
                     if(viewLifeCycleOwner != null)
@@ -182,6 +187,6 @@ class SystemLockFragmentTest {
                 TEST_ENCRYPTED_PASS_FILENAME)
 
         assertThat(encFile.exists(), `is`(false))
-        assertNull(testRule.getString("applock"))
+        assertNull(testRule.getString(APPLOCK_KEY))
     }
 }

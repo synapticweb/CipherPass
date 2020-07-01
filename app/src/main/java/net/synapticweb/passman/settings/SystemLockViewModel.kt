@@ -84,8 +84,10 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
 
             if (!cipher.isStorageHardwareBacked())
                 storageSoft.value = true
-            else
+            else {
                 finish.value = true
+                setPref()
+            }
         }
     }
 

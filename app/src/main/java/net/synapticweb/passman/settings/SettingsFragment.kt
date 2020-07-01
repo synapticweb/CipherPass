@@ -57,15 +57,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun onSystemLockSelect(appLock: Preference, summaryEntry : String) : Boolean {
         val keygm = requireContext().getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-        if(Build.VERSION.SDK_INT < 23) {
-            Snackbar.make(
-                requireView(), getString(R.string.system_lock_not_available),
-                Snackbar.LENGTH_LONG
-            ).show()
-            return false
-        }
-
-        if(!keygm.isDeviceSecure) {
+        val isDeviceSecure = if(Build.VERSION.SDK_INT < 23)
+                                keygm.isKeyguardSecure
+                             else
+                                keygm.isDeviceSecure
+        if(!isDeviceSecure) {
             Snackbar.make(
                 requireView(), getString(R.string.system_lock_device_not_secure),
                 Snackbar.LENGTH_LONG

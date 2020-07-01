@@ -73,7 +73,7 @@ class AuthenticateFragmentTest {
            testRule.repository.getHash()
         }
 
-        val currentHash = byteArrayToHexStr(createHash("test", hexStrToByteArray(hashObj.salt)))
+        val currentHash = byteArrayToHexStr(createHash("test".toCharArray(), hexStrToByteArray(hashObj.salt), false))
         assertThat(currentHash, `is`(hashObj.hash))
     }
 
