@@ -10,9 +10,8 @@ import kotlinx.coroutines.*
 import net.synapticweb.passman.*
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.*
-import java.io.BufferedWriter
-import java.io.FileWriter
-import java.io.IOException
+import java.io.*
+import java.util.*
 import javax.inject.Inject
 
 class SystemLockViewModel @Inject constructor(private val repository: Repository,
@@ -25,34 +24,29 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
     val storageSoft = MutableLiveData<Boolean>()
     val errorFileWriteFail = MutableLiveData<Boolean>()
     val finish = MutableLiveData<Boolean>()
-    private lateinit var passSaved : String
-    lateinit var prefValue : String
+    lateinit var prefValue: String
 
     @ShouldTest
-    fun encryptPassAndSetPref(passphrase: String? = null) {
-        val toEncrypt = passphrase ?: passSaved
-        val encrypted = cipher.encrypt(toEncrypt)
-        val path = getApplication<CryptoPassApp>().filesDir.absolutePath + "/" + cipher.getEncryptedFilePath()
-        viewModelScope .launch {    //rulează pe threadul main
+    fun encryptPass(passphrase: CharArray) {
+        val encrypted = cipher.encrypt(charArrayToByteArray(passphrase))
+        Arrays.fill(passphrase, 0.toChar())
+        val path =
+            getApplication<CryptoPassApp>().filesDir.absolutePath + "/" + cipher.getEncryptedFilePath()
+        viewModelScope.launch {    //rulează pe threadul main
             withContext(Dispatchers.IO) {
                 try {
                     wrapEspressoIdlingResource {
-                        val writer = BufferedWriter(FileWriter(path))
-                        writer.write(encrypted)
-                        writer.close()
+                        val stream = FileOutputStream(path)
+                        stream.write(encrypted)
+                        stream.close()
                     }
-                    setPref()
-                }
-                catch (exc : IOException) {
+                } catch (exc: IOException) {
                     Log.e(APP_TAG, "Error writing the encrypted password: " + exc.message)
                     withContext(Dispatchers.Main) {
                         errorFileWriteFail.value = true
                     }
                     return@withContext
                 } //TODO: de pus real logging
-                withContext(Dispatchers.Main) {
-                    finish.value = true
-                }
             }
         }
     }
@@ -66,34 +60,45 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
     }
 
     @ShouldTest
-    fun validatePass(passphrase: String) {
-            viewModelScope.launch {
-                working.value = true
-                val result = withContext(Dispatchers.Default) {
-                    wrapEspressoIdlingResource {
-                        val oldHash = repository.getHash()
-                        val newHash = byteArrayToHexStr(
-                            createHash(
-                                passphrase,
-                                hexStrToByteArray(oldHash.salt)
-                            )
+    fun validatePass(passphrase: CharArray) {
+        viewModelScope.launch {
+            working.value = true
+            val result = withContext(Dispatchers.Default) {
+                wrapEspressoIdlingResource {
+                    val oldHash = repository.getHash()
+                    val newHash = byteArrayToHexStr(
+                        createHash(
+                            passphrase, hexStrToByteArray(oldHash.salt), false
                         )
-                        newHash == oldHash.hash
-                    }
+                    )
+                    newHash == oldHash.hash
                 }
-                working.value = false
-                if (!result) {
-                    errorPassNoMatch.value = true
-                    return@launch
-                }
-
-                if (!cipher.isStorageHardwareBacked()) {
-                    storageSoft.value = true
-                    passSaved = passphrase
-                    return@launch
-                }
-
-                encryptPassAndSetPref(passphrase)
             }
+            working.value = false
+            if (!result) {
+                errorPassNoMatch.value = true
+                return@launch
+            }
+
+            encryptPass(passphrase)
+
+            if (!cipher.isStorageHardwareBacked())
+                storageSoft.value = true
+            else
+                finish.value = true
         }
+    }
+
+    fun onStorageSoftAccept() {
+        setPref()
+        finish.value = true
+    }
+
+    fun onStorageSoftRenounce() {
+        val encFile = File(getApplication<CryptoPassApp>().filesDir.absolutePath + "/" +
+                cipher.getEncryptedFilePath())
+        if(encFile.exists())
+            encFile.delete()
+        finish.value = true
+    }
 }

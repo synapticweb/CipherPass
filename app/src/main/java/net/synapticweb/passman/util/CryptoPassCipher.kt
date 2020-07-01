@@ -78,11 +78,10 @@ open class CryptoPassCipher(private val context : Context) : CPCipher {
         return keyInfo.isInsideSecureHardware
     }
 
-    override fun decrypt(strToDecrypt : String) : String {
+    override fun decrypt(input : ByteArray) : ByteArray {
         val cipher = Cipher.getInstance(ASYM_TRANSFORMATION)
         cipher.init(Cipher.DECRYPT_MODE, getPrivateKey())
-        val cipherInputStream = CipherInputStream(
-            ByteArrayInputStream(Base64.decode(strToDecrypt, Base64.DEFAULT)), cipher)
+        val cipherInputStream = CipherInputStream(ByteArrayInputStream(input), cipher)
         val values = arrayListOf<Byte>()
         var nextByte : Int
 
@@ -95,18 +94,19 @@ open class CryptoPassCipher(private val context : Context) : CPCipher {
             bytes[i] = values[i]
         }
 
-        return String(bytes, 0, bytes.size, Charset.forName("UTF-8"))
+        return bytes
     }
 
-    override fun encrypt(strToEncrypt : String) : String {
+    override fun encrypt(input : ByteArray) : ByteArray {
         val cipher = Cipher.getInstance(ASYM_TRANSFORMATION)
         cipher.init(Cipher.ENCRYPT_MODE, getPublicKey())
         val outputStream = ByteArrayOutputStream()
         val cipherOutputStream = CipherOutputStream(outputStream, cipher)
-        cipherOutputStream.write(strToEncrypt.toByteArray(Charset.forName("UTF-8")))
+        cipherOutputStream.write(input)
         cipherOutputStream.close()
-        val vals = outputStream.toByteArray()
-        return Base64.encodeToString(vals, Base64.DEFAULT)
+        Arrays.fill(input, 0.toByte())
+
+        return outputStream.toByteArray()
     }
 
     override fun getEncryptedFilePath(): String = ENCRYPTED_PASS_FILENAME

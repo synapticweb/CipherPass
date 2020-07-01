@@ -17,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.passman.CryptoPassApp
 import net.synapticweb.passman.R
 import net.synapticweb.passman.databinding.SystemLockFragmentBinding
+import net.synapticweb.passman.util.editableToCharArray
 
 import javax.inject.Inject
 
@@ -56,13 +57,12 @@ class SystemLockFragment : Fragment() {
             viewDataBinding.cancelButton.visibility = View.VISIBLE
             viewDataBinding.softStorageWarning.visibility = View.VISIBLE
             viewDataBinding.cancelButton.setOnClickListener {
-                findNavController().
-                navigate(SystemLockFragmentDirections.actionSystemLockFragmentToSettingsFragment())
+                viewModelFrg.onStorageSoftRenounce()
             }
             viewDataBinding.actionButton.text = getString(android.R.string.yes)
             viewDataBinding.passLayout.visibility = View.GONE
             viewDataBinding.actionButton.setOnClickListener {
-                viewModelFrg.encryptPassAndSetPref()
+                viewModelFrg.onStorageSoftAccept()
             }
         })
 
@@ -85,7 +85,9 @@ class SystemLockFragment : Fragment() {
                 viewDataBinding.passLayout.error = getString(R.string.pass_empty)
                 return@setOnClickListener
             }
-            viewModelFrg.validatePass(viewDataBinding.passphrase.text.toString())
+            viewDataBinding.passphrase.text?.let {
+                viewModelFrg.validatePass(editableToCharArray(it))
+            }
         }
 
         return viewDataBinding.root

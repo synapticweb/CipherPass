@@ -24,24 +24,20 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     private val uiScope = CoroutineScope(Dispatchers.Main + Job())
     var startedUnlockActivity = false
 
-    fun unlockRepo(passphrase : String) {
+    fun unlockRepo(passphrase : ByteArray) {
             uiScope.launch {
                 working.value = true
                 val result = withContext(Dispatchers.Default) {
                     wrapEspressoIdlingResource {
-                        repository.unlock(passphrase.toByteArray())
+                        repository.unlock(passphrase)
                     }
                 }
-
                 working.value = false
                 unlockSuccess.value = Event(result)
             }
 
     }
 
-    fun lockRepo() {
-        repository.lock()
-    }
 
     private fun shouldManagePauseResume() : Boolean {
         if(startedUnlockActivity) {

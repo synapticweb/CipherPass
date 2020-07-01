@@ -13,6 +13,7 @@ import net.synapticweb.passman.util.*
 import java.io.DataInputStream
 import java.io.File
 import java.io.FileInputStream
+import java.util.*
 import javax.inject.Inject
 
 
@@ -22,7 +23,7 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
     val password = MutableLiveData<String>()
     val rePassword = MutableLiveData<String>()
     val passSet  = MutableLiveData(isPassSet())
-    val getPasswd = MutableLiveData<Event<String>>()
+    val passwd = MutableLiveData<ByteArray>()
 
     fun isPassSet() : Boolean {
         val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
@@ -49,37 +50,29 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
   fun getPassphrase()  {
         val encFile = File(getApplication<CryptoPassApp>().filesDir.absolutePath + "/"
                 + cipher.getEncryptedFilePath())
-        if(!encFile.exists()) {
-            getPasswd.value = Event(NOPASSWD_RETURNED)
-            return
-        }
 
         viewModelScope .launch {
-            lateinit var encrypted : String //de pus try?
-            withContext(Dispatchers.IO) {
+            val encrypted : ByteArray = withContext(Dispatchers.IO) {
                 val reader = DataInputStream(FileInputStream(encFile))
                 val nBytesToRead: Int = reader.available()
-                if (nBytesToRead > 0) {
-                    val bytes = ByteArray(nBytesToRead)
+                val bytes = ByteArray(nBytesToRead)
+                if (nBytesToRead > 0)
                     reader.read(bytes)
-                    encrypted = String(bytes)
-                }
+
+                bytes
             }
-            getPasswd.value = Event(cipher.decrypt(encrypted))
+            passwd.value = cipher.decrypt(encrypted)
         }
     }
 
 @ShouldTest
- fun createPassHash(passphrase : String) {
+ fun createPassHash(passphrase : CharArray) {
     val salt = createSalt()
 
         viewModelScope.launch {
             val hash = withContext(Dispatchers.Default) {
                 byteArrayToHexStr(
-                    createHash(
-                        passphrase,
-                        salt
-                    )
+                    createHash(passphrase, salt, true)
                 )
             }
             withContext(Dispatchers.IO) {
@@ -90,6 +83,7 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
                     )
                 )
             }
+            Arrays.fill(salt, 0.toByte())
         }
     }
 }

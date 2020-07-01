@@ -1,11 +1,16 @@
 package net.synapticweb.passman.util
 
+import android.text.Editable
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import net.synapticweb.passman.LockStateViewModel
 import net.synapticweb.passman.R
+import java.nio.ByteBuffer
+import java.nio.CharBuffer
+import java.nio.charset.Charset
 import java.security.SecureRandom
+import java.util.*
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 
@@ -55,10 +60,13 @@ fun hexStrToByteArray(inputStr : String) : ByteArray {
     return ba
 }
 
-fun createHash(passphrase: String, salt : ByteArray) : ByteArray {
-    val spec = PBEKeySpec(passphrase.toCharArray(), salt, 65536, 128)
+fun createHash(passphrase: CharArray, salt : ByteArray, erasePassphrase : Boolean) : ByteArray {
+    val spec = PBEKeySpec(passphrase, salt, 65536, 128)
     val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
-    return factory.generateSecret(spec).encoded
+    val hash = factory.generateSecret(spec).encoded
+    if(erasePassphrase)
+        Arrays.fill(passphrase, 0.toChar())
+    return hash
 }
 
 fun createSalt() : ByteArray {
@@ -66,6 +74,40 @@ fun createSalt() : ByteArray {
     val salt = ByteArray(16)
     random.nextBytes(salt)
     return salt
+}
+
+//https://stackoverflow.com/a/9670279
+fun editableToByteArray(input : Editable): ByteArray {
+    val chars = CharArray(input.length)
+    input.getChars(0, input.length, chars, 0)
+
+    val charBuffer: CharBuffer = CharBuffer.wrap(chars)
+    val byteBuffer: ByteBuffer = Charset.forName("UTF-8").encode(charBuffer)
+    val bytes: ByteArray = Arrays.copyOfRange(
+        byteBuffer.array(),
+        byteBuffer.position(), byteBuffer.limit()
+    )
+    Arrays.fill(byteBuffer.array(), 0.toByte())
+    Arrays.fill(chars, 0.toChar())
+    return bytes
+}
+
+fun editableToCharArray(input : Editable) : CharArray {
+    val chars = CharArray(input.length)
+    input.getChars(0, input.length, chars, 0)
+    return chars
+}
+
+fun charArrayToByteArray(chars : CharArray) : ByteArray {
+    val charBuffer: CharBuffer = CharBuffer.wrap(chars)
+    val byteBuffer: ByteBuffer = Charset.forName("UTF-8").encode(charBuffer)
+    val bytes: ByteArray = Arrays.copyOfRange(
+        byteBuffer.array(),
+        byteBuffer.position(), byteBuffer.limit()
+    )
+    Arrays.fill(byteBuffer.array(), 0.toByte())
+    Arrays.fill(chars, 0.toChar()) //de văzut dacă e bine să șterg
+    return bytes
 }
 
 @Target(
