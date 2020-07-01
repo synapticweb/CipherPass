@@ -102,6 +102,11 @@ class AuthenticateFragment : Fragment() {
 
         lockState.unlockSuccess.observe(viewLifecycleOwner,
             EventObserver {
+                //acest flag este setat în AuthenticateFragment în momentul cînd pornește activitatea unlock
+                //cu scopul de a împiedica MainActivity să declașenze ciclul de login cînd activitatea
+                //unlock se termină. Îl resetez aici pentru că dacă o fac în onActivityResult, onResume vine
+                //după resetare și verificarea are loc, chiar dacă nu e cazul.
+                lockState.startedUnlockActivity = false
                 if (it) {
                     if (!viewModelFrg.isPassSet()) {
                         viewModelFrg.setPassSet()

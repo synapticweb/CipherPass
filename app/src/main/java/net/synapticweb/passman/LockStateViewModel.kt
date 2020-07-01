@@ -13,7 +13,7 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     : AndroidViewModel(application), LifecycleObserver {
 
     var lastBackPress : Long = 0L
-    var sleepTime : Long = 0L
+    private var sleepTime : Long = 0L
 
     val unauthorized = MutableLiveData<Event<Boolean>>()
 
@@ -63,11 +63,6 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
                 unauthorized.value = Event(true)
             }
         }
-        //acest flag este setat în AuthenticateFragment în momentul cînd pornește activitatea unlock
-        //cu scopul de a împiedica MainActivity să declașenze ciclul de login cînd activitatea
-        //unlock se termină. Îl resetez aici pentru că dacă o fac în onActivityResult, onResume vine
-        //după resetare și verificarea are loc, chiar dacă nu e cazul.
-        startedUnlockActivity = false
     }
 
     override fun onCleared() {
