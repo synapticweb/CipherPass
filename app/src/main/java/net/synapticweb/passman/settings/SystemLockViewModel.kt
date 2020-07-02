@@ -28,6 +28,7 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
 
     @ShouldTest
     fun encryptPass(passphrase: CharArray) {
+        //byte array-ul rezultat e șters în encrypt()
         val encrypted = cipher.encrypt(charArrayToByteArray(passphrase))
         Arrays.fill(passphrase, 0.toChar())
         val path =
@@ -68,6 +69,7 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
                     val oldHash = repository.getHash()
                     val newHash = byteArrayToHexStr(
                         createHash(
+                            //parola va fi necesară în encryptPass, deci avem false în ultimul parametru:
                             passphrase, hexStrToByteArray(oldHash.salt), false
                         )
                     )

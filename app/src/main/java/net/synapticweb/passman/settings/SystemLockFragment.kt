@@ -87,7 +87,9 @@ class SystemLockFragment : Fragment() {
                 return@setOnClickListener
             }
             viewDataBinding.passphrase.text?.let {
+                //char array-ul rezultat e șters în encryptPass()
                 viewModelFrg.validatePass(editableToCharArray(it))
+                it.clear()
             }
         }
 

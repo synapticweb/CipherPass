@@ -72,6 +72,7 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
         viewModelScope.launch {
             val hash = withContext(Dispatchers.Default) {
                 byteArrayToHexStr(
+                    //e ultima funcție care folosește parola, deci avem true la ultimul parametru.
                     createHash(passphrase, salt, true)
                 )
             }

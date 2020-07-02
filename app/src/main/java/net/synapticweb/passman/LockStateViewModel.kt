@@ -22,6 +22,11 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     //nu pot să folosesc viewModelScope pentru că îi anulează job-ul automat în onClear, cînd apăs de 2 ori
     //back. Cînd repornesc aplicația blocul launch din unlockRepo nu se mai execută.
     private val uiScope = CoroutineScope(Dispatchers.Main + Job())
+    //flag care arată că a fost pornită activitatea sistem de autentificare, deci onPause și onResume
+    //nu ar trebui să mai memoreze și să verifice timestampuri. Este setat înainte de
+    //startActivityForResult în onCreateView și după setare urmează un onResume. Nu poate fi resetat
+    //în onActivityResult pentru că după aceea urmează un al doilea onResume.
+    //Am ales să îl resetez în observerul pentru unlockSuccess.
     var startedUnlockActivity = false
 
     fun unlockRepo(passphrase : ByteArray) {

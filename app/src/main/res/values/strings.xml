@@ -24,4 +24,5 @@
     <string name="system_lock_not_available">Only available on Android 6 and newer.</string>
     <string name="system_lock_device_not_secure">To use this feature, you have to secure your device with a password, pin or pattern.</string>
     <string name="system_lock_unavailable">The system provided lock functionality is unavailable.</string>
+    <string name="auth_subtitle">Authentication required</string>
 </resources>

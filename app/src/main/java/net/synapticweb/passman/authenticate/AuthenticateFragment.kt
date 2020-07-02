@@ -62,7 +62,7 @@ class AuthenticateFragment : Fragment() {
                     requireActivity().getSystemService(Context.KEYGUARD_SERVICE) as
                             KeyguardManager
                 val authIntent =
-                    keyMan.createConfirmDeviceCredentialIntent("Auth", "Authentication required")
+                    keyMan.createConfirmDeviceCredentialIntent(getString(R.string.app_name), getString(R.string.auth_subtitle))
                 authIntent?.also { intent ->
                     lockState.startedUnlockActivity = true
                     startActivityForResult(intent, LOCK_ACTIVITY_CODE)
@@ -102,15 +102,12 @@ class AuthenticateFragment : Fragment() {
 
         lockState.unlockSuccess.observe(viewLifecycleOwner,
             EventObserver {
-                //acest flag este setat în AuthenticateFragment în momentul cînd pornește activitatea unlock
-                //cu scopul de a împiedica MainActivity să declașenze ciclul de login cînd activitatea
-                //unlock se termină. Îl resetez aici pentru că dacă o fac în onActivityResult, onResume vine
-                //după resetare și verificarea are loc, chiar dacă nu e cazul.
                 lockState.startedUnlockActivity = false
                 if (it) {
                     if (!viewModelFrg.isPassSet()) {
                         viewModelFrg.setPassSet()
                         passphrase.text ?.let { editable ->
+                            //char array-ul rezultat e șters în createHash()
                             viewModelFrg.createPassHash(editableToCharArray(editable))
                             editable.clear()
                             rePassphrase.text.clear()
@@ -143,7 +140,7 @@ class AuthenticateFragment : Fragment() {
             }
 
             viewDataBinding.passphrase.text?. let {
-                lockState.unlockRepo(editableToByteArray(it))
+                lockState.unlockRepo(editableToByteArray(it)) //the byte array is cleared in repository.unlock()
              }
         }
     }
