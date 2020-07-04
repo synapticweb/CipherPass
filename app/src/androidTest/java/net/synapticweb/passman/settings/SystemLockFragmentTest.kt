@@ -7,13 +7,8 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import kotlinx.coroutines.runBlocking
-import net.synapticweb.passman.APPLOCK_KEY
-import net.synapticweb.passman.APPLOCK_SYSTEM_VALUE
-import net.synapticweb.passman.R
-import net.synapticweb.passman.TEST_ENCRYPTED_PASS_FILENAME
+import net.synapticweb.passman.*
 import net.synapticweb.passman.di.TestAppComponent
-import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.util.*
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
@@ -28,21 +23,11 @@ import java.io.DataInputStream
 import java.io.File
 import java.io.FileInputStream
 
-const val PASS = "test"
-
 class SystemLockFragmentTest {
     @get:Rule
     val testRule = CryptoPassTestRule()
 
     private lateinit var cipher : TestCryptoPassCipher
-
-    private fun setDb() = runBlocking {
-        testRule.repository.unlock(PASS.toByteArray())
-        val salt = createSalt()
-        val hashStr = byteArrayToHexStr(createHash(PASS.toCharArray(), salt))
-        val hash = Hash(hashStr, byteArrayToHexStr(salt))
-        testRule.repository.insertHash(hash)
-    }
 
     @Before
     fun init() {
@@ -62,7 +47,7 @@ class SystemLockFragmentTest {
 
     @Test
     fun badPass_Error() {
-        setDb()
+        testRule.setDb()
         val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
         val fragmentScenario = launchFragmentInContainer<SystemLockFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
@@ -76,7 +61,7 @@ class SystemLockFragmentTest {
 
     @Test
     fun goodPass_hardwareStorage_goSettings() {
-        setDb()
+        testRule.setDb()
         cipher.hasHardwareStorage = true
         //https://stackoverflow.com/a/59027482
         val mockNav = mock(NavController::class.java)
@@ -91,7 +76,7 @@ class SystemLockFragmentTest {
         }
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withId(R.id.passphrase)).perform(typeText(PASS), closeSoftKeyboard())
+        onView(withId(R.id.passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
         onView(withId(R.id.action_button)).perform(click())
 
         verify(mockNav).navigate(SystemLockFragmentDirections.
@@ -113,7 +98,7 @@ class SystemLockFragmentTest {
         if (nBytesToRead > 0)
             reader.read(encrypted)
 
-        assertThat(PASS, `is`(String(cipher.decrypt(encrypted))))
+        assertThat(TEST_PASS, `is`(String(cipher.decrypt(encrypted))))
         encFile.delete()
 
         assertThat(testRule.getString(APPLOCK_KEY), `is`(APPLOCK_SYSTEM_VALUE))
@@ -128,7 +113,7 @@ class SystemLockFragmentTest {
 
     @Test
     fun goodPass_softwareStorage_secondScreen_ok_goSettings() {
-        setDb()
+        testRule.setDb()
         cipher.hasHardwareStorage = false
 
         val mockNav = mock(NavController::class.java)
@@ -143,7 +128,7 @@ class SystemLockFragmentTest {
         }
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withId(R.id.passphrase)).perform(typeText(PASS), closeSoftKeyboard())
+        onView(withId(R.id.passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
         onView(withId(R.id.action_button)).perform(click())
 
         checkSecondScreen()
@@ -158,7 +143,7 @@ class SystemLockFragmentTest {
 
     @Test
     fun goodPass_softwareStorage_secondScreen_cancel_goSettings() {
-        setDb()
+        testRule.setDb()
         cipher.hasHardwareStorage = false
 
         val mockNav = mock(NavController::class.java)
@@ -173,7 +158,7 @@ class SystemLockFragmentTest {
         }
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withId(R.id.passphrase)).perform(typeText(PASS), closeSoftKeyboard())
+        onView(withId(R.id.passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
         onView(withId(R.id.action_button)).perform(click())
 
         checkSecondScreen()

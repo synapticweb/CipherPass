@@ -50,16 +50,23 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:layout_gravity="start"
-        android:hint="@string/new_pass_retype_hint"
-        android:id="@+id/new_passphrase_retype"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:autofillHints="@string/passphrase_retype_hint" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/new_pass_retype_layout"
+            android:hint="@string/passphrase_retype_hint"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:layout_gravity="start"
+                android:id="@+id/new_passphrase_retype"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <ProgressBar
             android:layout_width="wrap_content"

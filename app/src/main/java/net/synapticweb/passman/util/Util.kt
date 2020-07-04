@@ -68,6 +68,7 @@ fun hexStrToByteArray(inputStr : String) : ByteArray {
     return ba
 }
 
+//https://www.baeldung.com/java-password-hashing
 fun createHash(passphrase: CharArray, salt : ByteArray) : ByteArray {
     val spec = PBEKeySpec(passphrase, salt, 65536, 128)
     val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")

@@ -46,14 +46,14 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
         viewModelScope.launch {
             changePassWorking.value = true
 
-            if(!repository.isPassValid(actualPass, true)) {
-                changePassInvalid.value = Event(true)
+            if(!newPass.contentEquals(reNewPass)) {
+                changePassNoMatch.value = Event(true)
                 changePassWorking.value = false
                 return@launch
             }
 
-            if(!newPass.contentEquals(reNewPass)) {
-                changePassNoMatch.value = Event(true)
+            if(!repository.isPassValid(actualPass, true)) {
+                changePassInvalid.value = Event(true)
                 changePassWorking.value = false
                 return@launch
             }

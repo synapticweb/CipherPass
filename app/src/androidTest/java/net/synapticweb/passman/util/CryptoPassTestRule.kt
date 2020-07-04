@@ -4,12 +4,17 @@ import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.IdlingRegistry
+import kotlinx.coroutines.runBlocking
 import net.synapticweb.passman.CryptoPassApp
 import net.synapticweb.passman.TEST_DATABASE_NAME
+import net.synapticweb.passman.TEST_ENCRYPTED_PASS_FILENAME
+import net.synapticweb.passman.TEST_PASS
 import net.synapticweb.passman.di.TestAppComponent
+import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.model.Repository
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
+import java.io.File
 
 class CryptoPassTestRule : TestWatcher() {
     private val settings : SharedPreferences = PreferenceManager.
@@ -19,7 +24,16 @@ class CryptoPassTestRule : TestWatcher() {
 
     lateinit var repository: Repository
     val application: CryptoPassApp = ApplicationProvider.getApplicationContext()
+    val encFile : File = File(application.filesDir.absolutePath + "/" + TEST_ENCRYPTED_PASS_FILENAME)
 
+
+    fun setDb() = runBlocking {
+        repository.unlock(TEST_PASS.toByteArray())
+        val salt = createSalt()
+        val hashStr = byteArrayToHexStr(createHash(TEST_PASS.toCharArray(), salt))
+        val hash = Hash(hashStr, byteArrayToHexStr(salt))
+        repository.insertHash(hash)
+    }
 
     fun getBoolean(key: String): Boolean {
         return settings.getBoolean(key, false)
@@ -74,5 +88,8 @@ class CryptoPassTestRule : TestWatcher() {
         val dbFile = application.getDatabasePath(TEST_DATABASE_NAME)
         if(dbFile.exists())
             dbFile.delete()
+
+        if(encFile.exists())
+            encFile.delete()
     }
 }

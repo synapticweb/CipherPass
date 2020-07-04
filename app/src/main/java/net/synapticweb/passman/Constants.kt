@@ -15,3 +15,4 @@ const val APPLOCK_NOLOCK_VALUE = "none"
 const val LOCK_ACTIVITY_CODE = 0
 
 const val CHANGE_PASS_KEY = "changepass"
+const val TEST_PASS = "test"

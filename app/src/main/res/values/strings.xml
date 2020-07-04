@@ -31,4 +31,5 @@
     <string name="new_pass_retype_hint">Retype new passphrase</string>
     <string name="change_pass_ok">Successfully changed the password.</string>
     <string name="change_pass_error">Error while changing password.</string>
+    <string name="act_pass_empty">Actual password cannot be empty.</string>
 </resources>

@@ -1,5 +1,6 @@
 package net.synapticweb.passman.settings
 
+import android.app.Activity
 import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
@@ -8,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -39,7 +39,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        val parentActivity : AppCompatActivity = context as AppCompatActivity
+        val parentActivity : Activity = context as Activity
         val app : CryptoPassApp = parentActivity.application as CryptoPassApp
         app.appComponent.settingsComponent().create().inject(this)
     }
@@ -125,17 +125,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
             positiveButton(android.R.string.ok) {
                 if(binding.actualPassphrase.text!!.isEmpty()) {
-                    binding.passLayout.error = "Actual password cannot be empty."
+                    binding.passLayout.error = getString(R.string.act_pass_empty)
                     return@positiveButton
                 }
                 if(binding.newPassphrase.text!!.isEmpty()) {
-                    binding.newPassLayout.error = "Password cannot be empty."
+                    binding.newPassLayout.error = getString(R.string.pass_empty)
                     return@positiveButton
                 }
 
                 val actPassCharArray = editableToCharArray(binding.actualPassphrase.text!!)
                 val newPassCharArray = editableToCharArray(binding.newPassphrase.text!!)
-                val reNewPassCharArray = editableToCharArray(binding.newPassphraseRetype.text)
+                val reNewPassCharArray = editableToCharArray(binding.newPassphraseRetype.text!!)
                 viewModelFrg.changePass(actPassCharArray, newPassCharArray, reNewPassCharArray)
             }
 
@@ -144,6 +144,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
 
             binding.newPassphrase.addTextChangedListener {
+                binding.newPassLayout.error = null
+            }
+
+            binding.newPassphraseRetype.addTextChangedListener {
                 binding.newPassLayout.error = null
             }
 
