@@ -31,5 +31,5 @@ interface CryptoPassDao {
     suspend fun deleteHash(hash : Hash) : Int
 
     @Query("SELECT * FROM `hash` WHERE `id`=1")
-    suspend fun getHash() : Hash
+    suspend fun getHash() : Hash?
 }

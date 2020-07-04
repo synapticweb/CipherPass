@@ -8,4 +8,8 @@
         android:defaultValue="passwd">
 
     </ListPreference>
+
+    <Preference
+        android:key="changepass"
+        android:title="@string/change_pass"/>
 </androidx.preference.PreferenceScreen>

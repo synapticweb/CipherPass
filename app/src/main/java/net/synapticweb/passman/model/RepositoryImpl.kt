@@ -3,8 +3,13 @@ package net.synapticweb.passman.model
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import net.sqlcipher.database.SQLiteDatabase
+import net.sqlcipher.database.SQLiteException
 import net.sqlcipher.database.SupportFactory
 import net.synapticweb.passman.DATABASE_FILE_NAME
+import net.synapticweb.passman.util.*
 import java.lang.Exception
 import java.lang.IllegalStateException
 import javax.inject.Inject
@@ -31,6 +36,47 @@ class RepositoryImpl @Inject constructor(
         catch (e : Exception) {return false}
 
         return true
+    }
+
+    override suspend fun isPassValid(passphrase: CharArray, erasePass : Boolean) : Boolean {
+       return withContext(Dispatchers.Default) {
+           wrapEspressoIdlingResource {
+               val oldHash = getHash()
+               val newHash = byteArrayToHexStr(
+                   createHash(
+                       //parola va fi necesară în encryptPass, deci avem false în ultimul parametru:
+                       passphrase, hexStrToByteArray(oldHash!!.salt) )
+               )
+               newHash == oldHash.hash
+           }
+       }
+    }
+
+    override suspend fun createPassHash(passphrase: CharArray) {
+        val salt = createSalt()
+        val hash = withContext(Dispatchers.Default) {
+            byteArrayToHexStr(
+                createHash(passphrase, salt)
+            )
+        }
+
+        withContext(Dispatchers.IO) {
+            putHash(
+                hash,
+                byteArrayToHexStr(salt)
+            )
+        }
+    }
+
+    override suspend fun reKey(passphrase: CharArray) : Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                (database.openHelper.writableDatabase as SQLiteDatabase).changePassword(passphrase)
+            } catch (exc: SQLiteException) {
+                return@withContext false
+            }
+            true
+        }
     }
 
     override fun isUnlocked(): Boolean {
@@ -69,7 +115,18 @@ class RepositoryImpl @Inject constructor(
         return database.dao.insertHash(hash)
     }
 
-    override suspend fun getHash(): Hash {
+    override suspend fun getHash(): Hash? {
         return database.dao.getHash()
+    }
+
+    override suspend fun putHash(hash: String, salt: String) {
+        val currentHash = getHash()
+        currentHash?. let {
+            it.hash = hash
+            it.salt = salt
+            database.dao.updateHash(it)
+        } ?: run {
+            insertHash(Hash(hash, salt))
+        }
     }
 }

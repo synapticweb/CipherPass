@@ -5,8 +5,6 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.method.HideReturnsTransformationMethod
-import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,10 +19,7 @@ import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.AuthenticateFragmentBinding
-import net.synapticweb.passman.util.EventObserver
-import net.synapticweb.passman.util.editableToByteArray
-import net.synapticweb.passman.util.editableToCharArray
-import net.synapticweb.passman.util.handleBackPressed
+import net.synapticweb.passman.util.*
 import javax.inject.Inject
 
 class AuthenticateFragment : Fragment() {
@@ -85,34 +80,23 @@ class AuthenticateFragment : Fragment() {
             lockState.unlockRepo(it)
         })
 
-        val passphrase = viewDataBinding.passphrase
-        val rePassphrase = viewDataBinding.passphraseRetype
-
-        //https://medium.com/@droidbyme/show-hide-password-in-edittext-in-android-c4c3db44f734
-        viewDataBinding.passLayout.setEndIconOnClickListener {
-            if(passphrase.transformationMethod is PasswordTransformationMethod) {
-                passphrase.transformationMethod = HideReturnsTransformationMethod.getInstance()
-                rePassphrase.transformationMethod = HideReturnsTransformationMethod.getInstance()
-            }
-            else {
-                passphrase.transformationMethod = PasswordTransformationMethod.getInstance()
-                rePassphrase.transformationMethod = PasswordTransformationMethod.getInstance()
-            }
-        }
+        setupPasswordFields(viewDataBinding.passLayout, arrayOf(viewDataBinding.passphrase,
+            viewDataBinding.passphraseRetype))
 
         lockState.unlockSuccess.observe(viewLifecycleOwner,
             EventObserver {
                 lockState.startedUnlockActivity = false
                 if (it) {
-                    if (!viewModelFrg.isPassSet()) {
-                        viewModelFrg.setPassSet()
-                        passphrase.text ?.let { editable ->
+                        viewDataBinding.passphrase.text ?.let { editable ->
                             //char array-ul rezultat e șters în createHash()
-                            viewModelFrg.createPassHash(editableToCharArray(editable))
+                            viewModelFrg.checkFirstRun(editableToCharArray(editable))
                             editable.clear()
-                            rePassphrase.text.clear()
                         }
+
+                    viewDataBinding.passphraseRetype.text?. apply {
+                        clear()
                     }
+
                     findNavController().navigate(
                         AuthenticateFragmentDirections.actionAuthenticateFragmentToSecretsListFragment()
                     )
@@ -120,7 +104,7 @@ class AuthenticateFragment : Fragment() {
                     viewDataBinding.passLayout.error = getString(R.string.pass_incorect)
             })
 
-        passphrase.addTextChangedListener {
+        viewDataBinding.passphrase.addTextChangedListener {
             viewDataBinding.passLayout.error = null
         }
 

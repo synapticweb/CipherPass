@@ -39,7 +39,7 @@ class SystemLockFragmentTest {
     private fun setDb() = runBlocking {
         testRule.repository.unlock(PASS.toByteArray())
         val salt = createSalt()
-        val hashStr = byteArrayToHexStr(createHash(PASS.toCharArray(), salt, false))
+        val hashStr = byteArrayToHexStr(createHash(PASS.toCharArray(), salt))
         val hash = Hash(hashStr, byteArrayToHexStr(salt))
         testRule.repository.insertHash(hash)
     }

@@ -1,11 +1,19 @@
 package net.synapticweb.passman.util
 
 import android.text.Editable
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
+import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.synapticweb.passman.LockStateViewModel
 import net.synapticweb.passman.R
+import net.synapticweb.passman.model.Repository
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
 import java.nio.charset.Charset
@@ -60,13 +68,10 @@ fun hexStrToByteArray(inputStr : String) : ByteArray {
     return ba
 }
 
-fun createHash(passphrase: CharArray, salt : ByteArray, erasePassphrase : Boolean) : ByteArray {
+fun createHash(passphrase: CharArray, salt : ByteArray) : ByteArray {
     val spec = PBEKeySpec(passphrase, salt, 65536, 128)
     val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
-    val hash = factory.generateSecret(spec).encoded
-    if(erasePassphrase)
-        Arrays.fill(passphrase, 0.toChar())
-    return hash
+    return factory.generateSecret(spec).encoded
 }
 
 fun createSalt() : ByteArray {
@@ -106,8 +111,24 @@ fun charArrayToByteArray(chars : CharArray) : ByteArray {
         byteBuffer.position(), byteBuffer.limit()
     )
     Arrays.fill(byteBuffer.array(), 0.toByte())
-    Arrays.fill(chars, 0.toChar()) //de văzut dacă e bine să șterg
     return bytes
+}
+
+//https://medium.com/@droidbyme/show-hide-password-in-edittext-in-android-c4c3db44f734
+fun setupPasswordFields(layout : TextInputLayout,
+                        inputs : Array<EditText>) {
+    layout.setEndIconOnClickListener {
+        if (inputs[0].transformationMethod is PasswordTransformationMethod) {
+            for(element in inputs) {
+                element.transformationMethod = HideReturnsTransformationMethod.getInstance()
+            }
+        } else {
+            for(element in inputs) {
+                element.transformationMethod = PasswordTransformationMethod.getInstance()
+            }
+        }
+    }
+
 }
 
 @Target(

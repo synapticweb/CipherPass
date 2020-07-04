@@ -6,6 +6,7 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.passman.util.CryptoPassTestRule
@@ -66,14 +67,15 @@ class AuthenticateFragmentTest {
 
         assertThat(testRule.getBoolean(PASSPHRASE_SET_KEY), `is`(true))
 
-       val hashObj : Hash = runBlocking {
+       val hashObj : Hash? = runBlocking {
            //delay este necesar deoarece în momentul în care se apasă pe butonul send se apelează
            //createPassHash care rulează asincron.
            delay(600)
            testRule.repository.getHash()
         }
 
-        val currentHash = byteArrayToHexStr(createHash("test".toCharArray(), hexStrToByteArray(hashObj.salt), false))
+        assertNotNull(hashObj)
+        val currentHash = byteArrayToHexStr(createHash("test".toCharArray(), hexStrToByteArray(hashObj!!.salt)))
         assertThat(currentHash, `is`(hashObj.hash))
     }
 

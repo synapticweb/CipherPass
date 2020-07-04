@@ -34,7 +34,7 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
 
     fun passEmpty() : Boolean = password.value?.isEmpty() ?: true
 
-    fun setPassSet() {
+    private fun setPassSet() {
         val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
         val editor = settings.edit()
         editor.putBoolean(PASSPHRASE_SET_KEY, true)
@@ -65,26 +65,13 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
         }
     }
 
-@ShouldTest
- fun createPassHash(passphrase : CharArray) {
-    val salt = createSalt()
+    fun checkFirstRun(passphrase : CharArray) {
+        if(!isPassSet()) {
+            setPassSet()
 
-        viewModelScope.launch {
-            val hash = withContext(Dispatchers.Default) {
-                byteArrayToHexStr(
-                    //e ultima funcție care folosește parola, deci avem true la ultimul parametru.
-                    createHash(passphrase, salt, true)
-                )
+            viewModelScope.launch {
+                repository.createPassHash(passphrase)
             }
-            withContext(Dispatchers.IO) {
-                repository.insertHash(
-                    Hash(
-                        hash,
-                        byteArrayToHexStr(salt)
-                    )
-                )
-            }
-            Arrays.fill(salt, 0.toByte())
         }
     }
 }
