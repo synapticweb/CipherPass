@@ -26,11 +26,9 @@ suspend fun AndroidViewModel.encryptPassToDisk(passphrase: CharArray, cipher : C
             cipher.getEncryptedFilePath()
      return  withContext(Dispatchers.IO) {
             try {
-                wrapEspressoIdlingResource {
-                    val stream = FileOutputStream(path)
-                    stream.write(encrypted)
-                    stream.close()
-                }
+                val stream = FileOutputStream(path)
+                stream.write(encrypted)
+                stream.close()
             } catch (exc: IOException) {
                 Log.e(APP_TAG, "Error writing the encrypted password: " + exc.message)
                 return@withContext false

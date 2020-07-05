@@ -21,21 +21,24 @@ class RepositoryImpl @Inject constructor(
 
     override suspend fun unlock(passphrase: ByteArray) : Boolean {
         val factory = SupportFactory(passphrase)
-        database = Room.databaseBuilder(
+
+        return withContext(Dispatchers.IO) {
+            database = Room.databaseBuilder(
                 context,
                 CryptoPassDatabase::class.java,
                 fileName
             )
                 .openHelperFactory(factory)
                 .build()
-        //inițial am încercat să verific cu isOpen, dar întoarce false chiar dacă parola a fost
-        // corectă. După o interogare reușită isOpen întoarce true.
-        try {
-            database.query("SELECT COUNT(*) FROM `secrets`", null)
+            //inițial am încercat să verific cu isOpen, dar întoarce false chiar dacă parola a fost
+            // corectă. După o interogare reușită isOpen întoarce true.
+            try {
+                database.query("SELECT COUNT(*) FROM `secrets`", null)
+                true
+            } catch (e: Exception) {
+                false
+            }
         }
-        catch (e : Exception) {return false}
-
-        return true
     }
 
     override suspend fun isPassValid(passphrase: CharArray, erasePass : Boolean) : Boolean {
@@ -43,11 +46,9 @@ class RepositoryImpl @Inject constructor(
             .getString(HASH_TYPE_KEY, HASH_PBKDF2) ?: HASH_PBKDF2
 
        return withContext(Dispatchers.Default) {
-           wrapEspressoIdlingResource {
-               val oldHash = getHash()
-               val newHash = createHashString(passphrase, hexStrToByteArray(oldHash!!.salt), hashType)
-               newHash == oldHash.hash
-           }
+           val oldHash = getHash()
+           val newHash = createHashString(passphrase, hexStrToByteArray(oldHash!!.salt), hashType)
+           newHash == oldHash.hash
        }
     }
 

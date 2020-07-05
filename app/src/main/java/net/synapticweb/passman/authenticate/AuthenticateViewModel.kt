@@ -68,11 +68,9 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
     fun authenticate(passphrase: CharArray) {
         viewModelScope.launch {
             working.value = true
-            val unlockResult = withContext(Dispatchers.IO) {
-                wrapEspressoIdlingResource {
+            val unlockResult = wrapEspressoIdlingResource {
                     repository.unlock(charArrayToByteArray(passphrase))
                 }
-            }
 
             if(!unlockResult) {
                 authResult.value = Event(R.string.pass_incorect)
@@ -86,11 +84,9 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
                 return@launch
             }
 
-            val createHashResult = withContext(Dispatchers.Default) {
-                wrapEspressoIdlingResource {
+            val createHashResult = wrapEspressoIdlingResource {
                     repository.createPassHash(passphrase)
                 }
-            }
 
             if(!createHashResult) {
                 authResult.value = Event(R.string.error_setting_pass)

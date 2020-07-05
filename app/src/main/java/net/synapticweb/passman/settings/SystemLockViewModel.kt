@@ -36,14 +36,18 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
     fun validatePass(passphrase: CharArray) {
         viewModelScope.launch {
             working.value = true
-            val result = repository.isPassValid(passphrase, false)
+            val result = wrapEspressoIdlingResource {
+                repository.isPassValid(passphrase, false)
+            }
             working.value = false
             if (!result) {
                 errorPassNoMatch.value = true
                 return@launch
             }
 
-            val encryptionResult = encryptPassToDisk(passphrase, cipher, true)
+            val encryptionResult = wrapEspressoIdlingResource {
+                encryptPassToDisk(passphrase, cipher, true)
+            }
             if(!encryptionResult) {
                 errorFileWriteFail.value = true
                 return@launch

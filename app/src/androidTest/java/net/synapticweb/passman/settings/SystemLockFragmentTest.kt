@@ -145,6 +145,7 @@ class SystemLockFragmentTest {
     fun goodPass_softwareStorage_secondScreen_cancel_goSettings() {
         testRule.setDb()
         cipher.hasHardwareStorage = false
+        testRule.setString(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
 
         val mockNav = mock(NavController::class.java)
         val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
@@ -172,6 +173,6 @@ class SystemLockFragmentTest {
                 TEST_ENCRYPTED_PASS_FILENAME)
 
         assertThat(encFile.exists(), `is`(false))
-        assertNull(testRule.getString(APPLOCK_KEY))
+        assertThat(testRule.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
     }
 }

@@ -12,6 +12,7 @@ import net.synapticweb.passman.CryptoPassApp
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.CPCipher
 import net.synapticweb.passman.util.Event
+import net.synapticweb.passman.util.wrapEspressoIdlingResource
 import java.io.File
 import javax.inject.Inject
 
@@ -52,16 +53,22 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
                 return@launch
             }
 
-            if(!repository.isPassValid(actualPass, true) || !repository.createPassHash(newPass)) {
-                changePassInvalid.value = Event(true)
-                changePassWorking.value = false
-                return@launch
+            wrapEspressoIdlingResource {
+                if (!repository.isPassValid(actualPass, true) ||
+                    !repository.createPassHash(newPass)
+                ) {
+                    changePassInvalid.value = Event(true)
+                    changePassWorking.value = false
+                    return@launch
+                }
             }
 
-            if(weakAuthentication() && !encryptPassToDisk(newPass, cipher, false)) {
-                changePassFinish.value = Event(false)
-                changePassWorking.value = false
-                return@launch
+            wrapEspressoIdlingResource {
+                if (weakAuthentication() && !encryptPassToDisk(newPass, cipher, false)) {
+                    changePassFinish.value = Event(false)
+                    changePassWorking.value = false
+                    return@launch
+                }
             }
 
             changePassFinish.value = Event(repository.reKey(newPass))
