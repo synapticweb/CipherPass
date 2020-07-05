@@ -7,16 +7,14 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.synapticweb.passman.LockStateViewModel
-import net.synapticweb.passman.R
-import net.synapticweb.passman.model.Repository
+import net.synapticweb.passman.*
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
 import java.nio.charset.Charset
+import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.*
 import javax.crypto.SecretKeyFactory
@@ -69,10 +67,22 @@ fun hexStrToByteArray(inputStr : String) : ByteArray {
 }
 
 //https://www.baeldung.com/java-password-hashing
-fun createHash(passphrase: CharArray, salt : ByteArray) : ByteArray {
+fun createHashPBKDF2(passphrase: CharArray, salt : ByteArray) : ByteArray {
     val spec = PBEKeySpec(passphrase, salt, 65536, 128)
     val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
     return factory.generateSecret(spec).encoded
+}
+
+fun createHashMd5(passphrase: ByteArray, salt : ByteArray) : ByteArray {
+    val md: MessageDigest = MessageDigest.getInstance("MD5")
+    md.update(salt)
+    return md.digest(passphrase)
+}
+
+fun createHashSha(passphrase: ByteArray, salt : ByteArray) : ByteArray {
+    val md: MessageDigest = MessageDigest.getInstance("SHA-512")
+    md.update(salt)
+    return md.digest(passphrase)
 }
 
 fun createSalt() : ByteArray {
@@ -115,6 +125,15 @@ fun charArrayToByteArray(chars : CharArray) : ByteArray {
     return bytes
 }
 
+fun byteArrayToCharArray(bytes : ByteArray) : CharArray {
+    val byteBuffer = ByteBuffer.wrap(bytes)
+    val charBuffer = Charset.forName("UTF-8").decode(byteBuffer)
+    val chars = Arrays.copyOfRange(charBuffer.array(), charBuffer.position(), charBuffer.limit())
+    Arrays.fill(charBuffer.array(), 0.toChar())
+
+    return chars
+}
+
 //https://medium.com/@droidbyme/show-hide-password-in-edittext-in-android-c4c3db44f734
 fun setupPasswordFields(layout : TextInputLayout,
                         inputs : Array<EditText>) {
@@ -130,6 +149,23 @@ fun setupPasswordFields(layout : TextInputLayout,
         }
     }
 
+}
+
+suspend fun createHashString(passphrase: CharArray, salt : ByteArray, hashType : String) : String {
+    return withContext(Dispatchers.Default) {
+        when (hashType) {
+            HASH_MD5_VALUE -> byteArrayToHexStr(
+                createHashMd5(charArrayToByteArray(passphrase), salt)
+            )
+            HASH_SHA_VALUE -> byteArrayToHexStr(
+                createHashSha(charArrayToByteArray(passphrase), salt)
+            )
+            HASH_PBKDF2 -> byteArrayToHexStr(
+                createHashPBKDF2(passphrase, salt)
+            )
+            else -> throw java.lang.IllegalArgumentException()
+        }
+    }
 }
 
 @Target(

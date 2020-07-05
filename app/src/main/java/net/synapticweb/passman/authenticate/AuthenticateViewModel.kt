@@ -23,7 +23,7 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
     val password = MutableLiveData<String>()
     val rePassword = MutableLiveData<String>()
     val passSet  = MutableLiveData(isPassSet())
-    val passwd = MutableLiveData<ByteArray>()
+    val passwd = MutableLiveData<CharArray>()
 
     fun isPassSet() : Boolean {
         val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
@@ -61,7 +61,7 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
 
                 bytes
             }
-            passwd.value = cipher.decrypt(encrypted)
+            passwd.value = byteArrayToCharArray(cipher.decrypt(encrypted))
         }
     }
 

@@ -124,7 +124,7 @@ class AuthenticateFragment : Fragment() {
             }
 
             viewDataBinding.passphrase.text?. let {
-                lockState.unlockRepo(editableToByteArray(it)) //the byte array is cleared in repository.unlock()
+                lockState.unlockRepo(editableToCharArray(it)) //the byte array is cleared in repository.unlock()
              }
         }
     }

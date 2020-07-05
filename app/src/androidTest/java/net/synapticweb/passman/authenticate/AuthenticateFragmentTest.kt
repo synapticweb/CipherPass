@@ -9,6 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import net.synapticweb.passman.HASH_SHA_VALUE
 import net.synapticweb.passman.util.CryptoPassTestRule
 import net.synapticweb.passman.MainActivity
 import net.synapticweb.passman.PASSPHRASE_SET_KEY
@@ -75,8 +76,10 @@ class AuthenticateFragmentTest {
         }
 
         assertNotNull(hashObj)
-        val currentHash = byteArrayToHexStr(createHash("test".toCharArray(), hexStrToByteArray(hashObj!!.salt)))
-        assertThat(currentHash, `is`(hashObj.hash))
+        val currentHash = runBlocking {
+            createHashString("test".toCharArray(), hexStrToByteArray(hashObj!!.salt), HASH_SHA_VALUE)
+        }
+        assertThat(currentHash, `is`(hashObj!!.hash))
     }
 
     @Test

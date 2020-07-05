@@ -6,6 +6,7 @@ import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.Event
+import net.synapticweb.passman.util.charArrayToByteArray
 import net.synapticweb.passman.util.wrapEspressoIdlingResource
 import javax.inject.Inject
 
@@ -29,12 +30,12 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     //Am ales să îl resetez în observerul pentru unlockSuccess.
     var startedUnlockActivity = false
 
-    fun unlockRepo(passphrase : ByteArray) {
+    fun unlockRepo(passphrase : CharArray) {
             uiScope.launch {
                 working.value = true
                 val result = withContext(Dispatchers.Default) {
                     wrapEspressoIdlingResource {
-                        repository.unlock(passphrase)
+                        repository.unlock(charArrayToByteArray(passphrase))
                     }
                 }
                 working.value = false

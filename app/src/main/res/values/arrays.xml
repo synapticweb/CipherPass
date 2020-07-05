@@ -11,4 +11,17 @@
         <item>system</item>
         <item>none</item>
     </string-array>
+
+    <string-array name="hash_func_entries">
+        <item>@string/hash_func_md5</item>
+        <item>@string/hash_func_sha</item>
+        <item>@string/hash_func_PBKDF2</item>
+    </string-array>
+
+    <string-array name="hash_func_values">
+        <item>md5</item>
+        <item>sha</item>
+        <item>pbkdf2</item>
+    </string-array>
+
 </resources>

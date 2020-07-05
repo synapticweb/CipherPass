@@ -2,16 +2,16 @@ package net.synapticweb.passman.model
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import androidx.preference.PreferenceManager
 import androidx.room.Room
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteException
 import net.sqlcipher.database.SupportFactory
-import net.synapticweb.passman.DATABASE_FILE_NAME
+import net.synapticweb.passman.*
 import net.synapticweb.passman.util.*
 import java.lang.Exception
-import java.lang.IllegalStateException
 import javax.inject.Inject
 
 class RepositoryImpl @Inject constructor(
@@ -39,26 +39,24 @@ class RepositoryImpl @Inject constructor(
     }
 
     override suspend fun isPassValid(passphrase: CharArray, erasePass : Boolean) : Boolean {
+        val hashType = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(HASH_TYPE_KEY, HASH_SHA_VALUE) ?: HASH_SHA_VALUE
+
        return withContext(Dispatchers.Default) {
            wrapEspressoIdlingResource {
                val oldHash = getHash()
-               val newHash = byteArrayToHexStr(
-                   createHash(
-                       //parola va fi necesară în encryptPass, deci avem false în ultimul parametru:
-                       passphrase, hexStrToByteArray(oldHash!!.salt) )
-               )
+               val newHash = createHashString(passphrase, hexStrToByteArray(oldHash!!.salt), hashType)
                newHash == oldHash.hash
            }
        }
     }
 
+
     override suspend fun createPassHash(passphrase: CharArray) {
+        val hashType = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(HASH_TYPE_KEY, HASH_SHA_VALUE) ?: HASH_SHA_VALUE
         val salt = createSalt()
-        val hash = withContext(Dispatchers.Default) {
-            byteArrayToHexStr(
-                createHash(passphrase, salt)
-            )
-        }
+        val hash = createHashString(passphrase, salt, hashType)
 
         withContext(Dispatchers.IO) {
             putHash(

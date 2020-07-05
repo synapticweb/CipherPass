@@ -5,10 +5,7 @@ import androidx.preference.PreferenceManager
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.IdlingRegistry
 import kotlinx.coroutines.runBlocking
-import net.synapticweb.passman.CryptoPassApp
-import net.synapticweb.passman.TEST_DATABASE_NAME
-import net.synapticweb.passman.TEST_ENCRYPTED_PASS_FILENAME
-import net.synapticweb.passman.TEST_PASS
+import net.synapticweb.passman.*
 import net.synapticweb.passman.di.TestAppComponent
 import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.model.Repository
@@ -30,7 +27,7 @@ class CryptoPassTestRule : TestWatcher() {
     fun setDb() = runBlocking {
         repository.unlock(TEST_PASS.toByteArray())
         val salt = createSalt()
-        val hashStr = byteArrayToHexStr(createHash(TEST_PASS.toCharArray(), salt))
+        val hashStr = createHashString(TEST_PASS.toCharArray(), salt, HASH_SHA_VALUE)
         val hash = Hash(hashStr, byteArrayToHexStr(salt))
         repository.insertHash(hash)
     }

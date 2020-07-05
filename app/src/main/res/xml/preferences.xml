@@ -9,6 +9,13 @@
 
     </ListPreference>
 
+    <ListPreference
+        android:key="hash"
+        android:title="@string/hash_func_key"
+        android:entries="@array/hash_func_entries"
+        android:entryValues="@array/hash_func_values"
+        android:defaultValue="sha" />
+
     <Preference
         android:key="changepass"
         android:title="@string/change_pass"/>
