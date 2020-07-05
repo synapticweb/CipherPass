@@ -27,7 +27,8 @@ class CryptoPassTestRule : TestWatcher() {
     fun setDb() = runBlocking {
         repository.unlock(TEST_PASS.toByteArray())
         val salt = createSalt()
-        val hashStr = createHashString(TEST_PASS.toCharArray(), salt, HASH_SHA_VALUE)
+        val hashStr = createHashString(TEST_PASS.toCharArray(), salt, settings.getString(
+            HASH_TYPE_KEY, HASH_PBKDF2) ?: HASH_PBKDF2)
         val hash = Hash(hashStr, byteArrayToHexStr(salt))
         repository.insertHash(hash)
     }
@@ -54,14 +55,18 @@ class CryptoPassTestRule : TestWatcher() {
         editor.commit()
     }
 
+    fun removePref(key : String) {
+        val editor = settings.edit()
+        if(settings.contains(key))
+            editor.remove(key)
+        editor.apply()
+        editor.commit()
+    }
+
     override fun starting(description: Description?) {
         repository = (application.appComponent as TestAppComponent).repository
 
         appPrefs = settings.all
-        val editor = settings.edit()
-        editor.clear()
-        editor.apply()
-        editor.commit()
 
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
         IdlingRegistry.getInstance().register(dataBindingIdlingResource)

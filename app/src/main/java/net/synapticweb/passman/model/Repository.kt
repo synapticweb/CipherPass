@@ -11,7 +11,7 @@ interface Repository {
 
     suspend fun isPassValid(passphrase: CharArray, erasePass : Boolean) : Boolean
 
-    suspend fun createPassHash(passphrase : CharArray)
+    suspend fun createPassHash(passphrase : CharArray) : Boolean
 
     suspend fun reKey(passphrase: CharArray) : Boolean
 
@@ -29,5 +29,5 @@ interface Repository {
 
     suspend fun getHash() : Hash?
 
-    suspend fun putHash(hash : String, salt : String)
+    suspend fun putHash(hash : String, salt : String) : Boolean
 }

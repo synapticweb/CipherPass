@@ -9,9 +9,6 @@
         <variable
             name="viewModel"
             type="net.synapticweb.passman.authenticate.AuthenticateViewModel" />
-        <variable
-            name="lockStateViewModel"
-            type="net.synapticweb.passman.LockStateViewModel" />
     </data>
 
     <RelativeLayout
@@ -78,7 +75,7 @@
                 android:layout_margin="15dp"
                 android:indeterminate="true"
                 android:layout_gravity="center_horizontal"
-                android:visibility="@{lockStateViewModel.working ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.working ? View.VISIBLE : View.GONE}"
                 android:id="@+id/progress" />
 
             <Button
@@ -87,7 +84,7 @@
                 android:id="@+id/send_pass"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
-                android:enabled="@{lockStateViewModel.working ? false : true}"
+                android:enabled="@{viewModel.working ? false : true}"
                 android:text="@{viewModel.passSet ? @string/pass_set_send_pass : @string/pass_not_set_send_pass}"
                 />
 

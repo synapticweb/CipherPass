@@ -47,7 +47,6 @@ class AuthenticateFragment : Fragment() {
         viewDataBinding = AuthenticateFragmentBinding.inflate(inflater, container, false).apply {
             viewModel = viewModelFrg
             lifecycleOwner = fragment
-            lockStateViewModel = lockState
         }
 
         when(viewModelFrg.getApplockPref()) {
@@ -77,32 +76,26 @@ class AuthenticateFragment : Fragment() {
         }
 
         viewModelFrg.passwd.observe(viewLifecycleOwner, Observer {
-            lockState.unlockRepo(it)
+            viewModelFrg.authenticate(it)
         })
 
         setupPasswordFields(viewDataBinding.passLayout, arrayOf(viewDataBinding.passphrase,
             viewDataBinding.passphraseRetype))
 
-        lockState.unlockSuccess.observe(viewLifecycleOwner,
-            EventObserver {
-                lockState.startedUnlockActivity = false
-                if (it) {
-                        viewDataBinding.passphrase.text ?.let { editable ->
-                            //char array-ul rezultat e șters în createHash()
-                            viewModelFrg.checkFirstRun(editableToCharArray(editable))
-                            editable.clear()
-                        }
+        viewModelFrg.authResult.observe(viewLifecycleOwner, EventObserver {
+            lockState.startedUnlockActivity = false
+            when(it) {
+                AUTH_OK ->  findNavController().navigate(
+                    AuthenticateFragmentDirections.actionAuthenticateFragmentToSecretsListFragment()
+                )
 
-                    viewDataBinding.passphraseRetype.text?. apply {
-                        clear()
-                    }
-
-                    findNavController().navigate(
-                        AuthenticateFragmentDirections.actionAuthenticateFragmentToSecretsListFragment()
-                    )
-                } else
+                R.string.pass_incorect ->
                     viewDataBinding.passLayout.error = getString(R.string.pass_incorect)
-            })
+
+                R.string.error_setting_pass -> Snackbar.make(requireView(),
+                    getString(R.string.error_setting_pass), Snackbar.LENGTH_SHORT).show()
+            }
+        })
 
         viewDataBinding.passphrase.addTextChangedListener {
             viewDataBinding.passLayout.error = null
@@ -124,7 +117,7 @@ class AuthenticateFragment : Fragment() {
             }
 
             viewDataBinding.passphrase.text?. let {
-                lockState.unlockRepo(editableToCharArray(it)) //the byte array is cleared in repository.unlock()
+                viewModelFrg.authenticate(editableToCharArray(it)) //the byte array is cleared in repository.unlock()
              }
         }
     }

@@ -5,6 +5,7 @@
     <string name="pass_set_send_pass">Unlock database</string>
     <string name="passphrase_hint">Passphrase</string>
     <string name="pass_incorect">The passphrase you entered is not valid.</string>
+    <string name="error_setting_pass">An error occurred while setting the password.</string>
     <string name="passphrase_retype_hint">Retype passphrase</string>
     <string name="pass_no_match">The passphrases entered do not match.</string>
     <string name="pass_empty">Passphrase cannot be empty</string>

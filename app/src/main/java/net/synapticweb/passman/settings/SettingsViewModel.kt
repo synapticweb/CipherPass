@@ -52,13 +52,11 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
                 return@launch
             }
 
-            if(!repository.isPassValid(actualPass, true)) {
+            if(!repository.isPassValid(actualPass, true) || !repository.createPassHash(newPass)) {
                 changePassInvalid.value = Event(true)
                 changePassWorking.value = false
                 return@launch
             }
-
-            repository.createPassHash(newPass)
 
             if(weakAuthentication() && !encryptPassToDisk(newPass, cipher, false)) {
                 changePassFinish.value = Event(false)

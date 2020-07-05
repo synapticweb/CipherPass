@@ -40,7 +40,7 @@ class RepositoryImpl @Inject constructor(
 
     override suspend fun isPassValid(passphrase: CharArray, erasePass : Boolean) : Boolean {
         val hashType = PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(HASH_TYPE_KEY, HASH_SHA_VALUE) ?: HASH_SHA_VALUE
+            .getString(HASH_TYPE_KEY, HASH_PBKDF2) ?: HASH_PBKDF2
 
        return withContext(Dispatchers.Default) {
            wrapEspressoIdlingResource {
@@ -52,13 +52,13 @@ class RepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun createPassHash(passphrase: CharArray) {
+    override suspend fun createPassHash(passphrase: CharArray) : Boolean {
         val hashType = PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(HASH_TYPE_KEY, HASH_SHA_VALUE) ?: HASH_SHA_VALUE
+            .getString(HASH_TYPE_KEY, HASH_PBKDF2) ?: HASH_PBKDF2
         val salt = createSalt()
         val hash = createHashString(passphrase, salt, hashType)
 
-        withContext(Dispatchers.IO) {
+       return withContext(Dispatchers.IO) {
             putHash(
                 hash,
                 byteArrayToHexStr(salt)
@@ -117,14 +117,20 @@ class RepositoryImpl @Inject constructor(
         return database.dao.getHash()
     }
 
-    override suspend fun putHash(hash: String, salt: String) {
-        val currentHash = getHash()
-        currentHash?. let {
-            it.hash = hash
-            it.salt = salt
-            database.dao.updateHash(it)
-        } ?: run {
-            insertHash(Hash(hash, salt))
+    override suspend fun putHash(hash: String, salt: String) : Boolean {
+       return try {
+            val currentHash = getHash()
+            currentHash?.let {
+                it.hash = hash
+                it.salt = salt
+                database.dao.updateHash(it)
+            } ?: run {
+                insertHash(Hash(hash, salt))
+            }
+           true
+        }
+        catch (exc : Exception) {
+            false
         }
     }
 }

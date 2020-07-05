@@ -3,11 +3,8 @@ package net.synapticweb.passman
 import android.app.Application
 import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.*
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.Event
-import net.synapticweb.passman.util.charArrayToByteArray
-import net.synapticweb.passman.util.wrapEspressoIdlingResource
 import javax.inject.Inject
 
 class LockStateViewModel @Inject constructor(private val repository: Repository, application: Application)
@@ -18,11 +15,6 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
 
     val unauthorized = MutableLiveData<Event<Boolean>>()
 
-    val working = MutableLiveData<Boolean>()
-    val unlockSuccess = MutableLiveData<Event<Boolean>>()
-    //nu pot să folosesc viewModelScope pentru că îi anulează job-ul automat în onClear, cînd apăs de 2 ori
-    //back. Cînd repornesc aplicația blocul launch din unlockRepo nu se mai execută.
-    private val uiScope = CoroutineScope(Dispatchers.Main + Job())
     //flag care arată că a fost pornită activitatea sistem de autentificare, deci onPause și onResume
     //nu ar trebui să mai memoreze și să verifice timestampuri. Este setat înainte de
     //startActivityForResult în onCreateView și după setare urmează un onResume. Nu poate fi resetat
@@ -30,19 +22,6 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     //Am ales să îl resetez în observerul pentru unlockSuccess.
     var startedUnlockActivity = false
 
-    fun unlockRepo(passphrase : CharArray) {
-            uiScope.launch {
-                working.value = true
-                val result = withContext(Dispatchers.Default) {
-                    wrapEspressoIdlingResource {
-                        repository.unlock(charArrayToByteArray(passphrase))
-                    }
-                }
-                working.value = false
-                unlockSuccess.value = Event(result)
-            }
-
-    }
 
 
     private fun shouldManagePauseResume() : Boolean {

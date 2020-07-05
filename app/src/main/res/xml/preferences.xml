@@ -14,7 +14,7 @@
         android:title="@string/hash_func_key"
         android:entries="@array/hash_func_entries"
         android:entryValues="@array/hash_func_values"
-        android:defaultValue="sha" />
+        android:defaultValue="pbkdf2" />
 
     <Preference
         android:key="changepass"

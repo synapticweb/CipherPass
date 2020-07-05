@@ -15,9 +15,11 @@ const val APPLOCK_NOLOCK_VALUE = "none"
 
 const val HASH_MD5_VALUE = "md5"
 const val HASH_SHA_VALUE = "sha"
-const val HASH_PBKDF2 = "pkbkdf2"
+const val HASH_PBKDF2 = "pbkdf2"
 
 const val LOCK_ACTIVITY_CODE = 0
 
 const val CHANGE_PASS_KEY = "changepass"
 const val TEST_PASS = "test"
+
+const val AUTH_OK = 0

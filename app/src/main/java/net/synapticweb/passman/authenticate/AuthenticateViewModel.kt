@@ -7,13 +7,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import net.synapticweb.passman.*
-import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.*
 import java.io.DataInputStream
 import java.io.File
 import java.io.FileInputStream
-import java.util.*
 import javax.inject.Inject
 
 
@@ -24,6 +22,8 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
     val rePassword = MutableLiveData<String>()
     val passSet  = MutableLiveData(isPassSet())
     val passwd = MutableLiveData<CharArray>()
+    val working = MutableLiveData<Boolean>()
+    val authResult = MutableLiveData<Event<Int>>()
 
     fun isPassSet() : Boolean {
         val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
@@ -65,13 +65,42 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
         }
     }
 
-    fun checkFirstRun(passphrase : CharArray) {
-        if(!isPassSet()) {
-            setPassSet()
-
-            viewModelScope.launch {
-                repository.createPassHash(passphrase)
+    fun authenticate(passphrase: CharArray) {
+        viewModelScope.launch {
+            working.value = true
+            val unlockResult = withContext(Dispatchers.IO) {
+                wrapEspressoIdlingResource {
+                    repository.unlock(charArrayToByteArray(passphrase))
+                }
             }
+
+            if(!unlockResult) {
+                authResult.value = Event(R.string.pass_incorect)
+                working.value = false
+                return@launch
+            }
+
+            if(isPassSet()){
+                authResult.value = Event(AUTH_OK)
+                working.value = false
+                return@launch
+            }
+
+            val createHashResult = withContext(Dispatchers.Default) {
+                wrapEspressoIdlingResource {
+                    repository.createPassHash(passphrase)
+                }
+            }
+
+            if(!createHashResult) {
+                authResult.value = Event(R.string.error_setting_pass)
+                working.value = false
+                return@launch
+            }
+
+            setPassSet()
+            working.value = false
+            authResult.value = Event(AUTH_OK)
         }
     }
 }

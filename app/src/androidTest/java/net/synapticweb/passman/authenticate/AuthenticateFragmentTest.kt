@@ -9,11 +9,8 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import net.synapticweb.passman.HASH_SHA_VALUE
+import net.synapticweb.passman.*
 import net.synapticweb.passman.util.CryptoPassTestRule
-import net.synapticweb.passman.MainActivity
-import net.synapticweb.passman.PASSPHRASE_SET_KEY
-import net.synapticweb.passman.R
 import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.util.*
 import org.hamcrest.CoreMatchers.`is`
@@ -28,6 +25,7 @@ class AuthenticateFragmentTest {
 
     @Test
     fun dbNotInitialized_PasswdNoMatch_Error() {
+        testRule.removePref(PASSPHRASE_SET_KEY)
         val activityScenario = launch(MainActivity::class.java)
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
 
@@ -43,6 +41,7 @@ class AuthenticateFragmentTest {
 
     @Test
     fun dbNotInitialized_EmptyPasswd_Error() {
+        testRule.removePref(PASSPHRASE_SET_KEY)
         val activityScenario = launch(MainActivity::class.java)
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
 
@@ -55,6 +54,7 @@ class AuthenticateFragmentTest {
 
     @Test
     fun dbNotInitialized_goodPasswds_Authenticate()  {
+        testRule.removePref(PASSPHRASE_SET_KEY)
         val activityScenario = launch(MainActivity::class.java)
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
 
@@ -77,7 +77,8 @@ class AuthenticateFragmentTest {
 
         assertNotNull(hashObj)
         val currentHash = runBlocking {
-            createHashString("test".toCharArray(), hexStrToByteArray(hashObj!!.salt), HASH_SHA_VALUE)
+            createHashString("test".toCharArray(), hexStrToByteArray(hashObj!!.salt), testRule.getString(
+                HASH_TYPE_KEY) ?: HASH_PBKDF2)
         }
         assertThat(currentHash, `is`(hashObj!!.hash))
     }
