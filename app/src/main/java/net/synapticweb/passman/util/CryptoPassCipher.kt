@@ -104,7 +104,6 @@ open class CryptoPassCipher(private val context : Context) : CPCipher {
         val cipherOutputStream = CipherOutputStream(outputStream, cipher)
         cipherOutputStream.write(input)
         cipherOutputStream.close()
-        Arrays.fill(input, 0.toByte())
 
         return outputStream.toByteArray()
     }

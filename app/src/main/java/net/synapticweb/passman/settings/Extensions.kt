@@ -28,15 +28,13 @@ import java.io.IOException
 import java.util.*
 
 
-@ShouldTest
-suspend fun AndroidViewModel.encryptPassToDisk(passphrase: CharArray, cipher : CPCipher,
-                                               erasePass : Boolean) : Boolean {
-    //byte array-ul rezultat e șters în encrypt()
-    val encrypted = cipher.encrypt(charArrayToByteArray(passphrase))
-    if(erasePass)
-        Arrays.fill(passphrase, 0.toChar())
+suspend fun AndroidViewModel.encryptPassToDisk(passphrase: CharArray, cipher : CPCipher) : Boolean {
+    val passBytes = charArrayToByteArray(passphrase)
+    val encrypted = cipher.encrypt(passBytes)
     val path =  getApplication<CryptoPassApp>().filesDir.absolutePath + "/" +
             cipher.getEncryptedFilePath()
+    Arrays.fill(passBytes, 0.toByte())
+
      return  withContext(Dispatchers.IO) {
             try {
                 val stream = FileOutputStream(path)
@@ -48,7 +46,6 @@ suspend fun AndroidViewModel.encryptPassToDisk(passphrase: CharArray, cipher : C
             }
          true
         }
-
 }
 
 fun SettingsFragment.changeHash(preference: ListPreference, newHashName : String, newHashType : String)  {
@@ -90,6 +87,7 @@ fun SettingsFragment.changeHash(preference: ListPreference, newHashName : String
             viewModelFrg.passFinish.removeObservers(viewLifecycleOwner)
             viewModelFrg.passFinish.observe(viewLifecycleOwner,
                 EventObserver {
+                    binding.passphrase.text!!.clear()
                     dismiss()
                     if (it) {
                         viewModelFrg.setPref(newHashType)
@@ -170,6 +168,9 @@ fun SettingsFragment.changePass() {
 
         viewModelFrg.passFinish.removeObservers(viewLifecycleOwner)
         viewModelFrg.passFinish.observe(viewLifecycleOwner, EventObserver {
+            binding.actualPassphrase.text!!.clear()
+            binding.newPassphrase.text!!.clear()
+            binding.newPassphraseRetype.text!!.clear()
             dismiss()
             if(it)
                 Toast.makeText(requireContext(), getString(R.string.change_pass_ok), Toast.LENGTH_SHORT).show()

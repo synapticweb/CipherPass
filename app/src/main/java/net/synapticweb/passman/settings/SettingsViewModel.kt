@@ -15,6 +15,7 @@ import net.synapticweb.passman.util.CPCipher
 import net.synapticweb.passman.util.Event
 import net.synapticweb.passman.util.wrapEspressoIdlingResource
 import java.io.File
+import java.util.*
 import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(private val repository: Repository,
@@ -75,7 +76,7 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
             }
 
             wrapEspressoIdlingResource {
-                if (weakAuthentication() && !encryptPassToDisk(newPass, cipher, false)) {
+                if (weakAuthentication() && !encryptPassToDisk(newPass, cipher)) {
                     passFinish.value = Event(false)
                     passWorking.value = false
                     return@launch
@@ -84,6 +85,9 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
 
             passFinish.value = Event(repository.reKey(newPass))
             passWorking.value = false
+            Arrays.fill(actualPass, 0.toChar())
+            Arrays.fill(newPass, 0.toChar())
+            Arrays.fill(reNewPass, 0.toChar())
         }
     }
 
@@ -105,6 +109,7 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
             }
             passFinish.value = Event(true)
             passWorking.value = false
+            Arrays.fill(password, 0.toChar())
         }
     }
 }

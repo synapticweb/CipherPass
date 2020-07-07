@@ -12,6 +12,7 @@ import net.synapticweb.passman.util.*
 import java.io.DataInputStream
 import java.io.File
 import java.io.FileInputStream
+import java.util.*
 import javax.inject.Inject
 
 
@@ -97,6 +98,7 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
             setPassSet()
             working.value = false
             authResult.value = Event(AUTH_OK)
+            Arrays.fill(passphrase, 0.toChar())
         }
     }
 }

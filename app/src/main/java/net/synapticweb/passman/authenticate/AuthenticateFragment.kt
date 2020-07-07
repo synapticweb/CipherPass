@@ -29,7 +29,7 @@ class AuthenticateFragment : Fragment() {
     private val viewModelFrg by viewModels<AuthenticateViewModel> { viewModelFactory }
     private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
 
-    private lateinit var viewDataBinding : AuthenticateFragmentBinding
+    private lateinit var binding : AuthenticateFragmentBinding
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -44,7 +44,7 @@ class AuthenticateFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val fragment = this
-        viewDataBinding = AuthenticateFragmentBinding.inflate(inflater, container, false).apply {
+        binding = AuthenticateFragmentBinding.inflate(inflater, container, false).apply {
             viewModel = viewModelFrg
             lifecycleOwner = fragment
         }
@@ -69,8 +69,8 @@ class AuthenticateFragment : Fragment() {
                     }
             }
             APPLOCK_NOLOCK_VALUE -> {
-                viewDataBinding.passLayout.visibility = View.GONE
-                viewDataBinding.sendPass.visibility = View.GONE
+                binding.passLayout.visibility = View.GONE
+                binding.sendPass.visibility = View.GONE
                 viewModelFrg.getPassphrase()
             }
         }
@@ -79,44 +79,48 @@ class AuthenticateFragment : Fragment() {
             viewModelFrg.authenticate(it)
         })
 
-        setupPasswordFields(viewDataBinding.passLayout, arrayOf(viewDataBinding.passphrase,
-            viewDataBinding.passphraseRetype))
+        setupPasswordFields(binding.passLayout, arrayOf(binding.passphrase,
+            binding.passphraseRetype))
 
         viewModelFrg.authResult.observe(viewLifecycleOwner, EventObserver {
             lockState.startedUnlockActivity = false
             when(it) {
-                AUTH_OK ->  findNavController().navigate(
-                    AuthenticateFragmentDirections.actionAuthenticateFragmentToSecretsListFragment()
-                )
+                AUTH_OK -> {
+                    binding.passphrase.text!!.clear()
+                    binding.passphraseRetype.text.clear()
+                    findNavController().navigate(
+                        AuthenticateFragmentDirections.actionAuthenticateFragmentToSecretsListFragment()
+                    )
+                }
 
                 R.string.pass_incorect ->
-                    viewDataBinding.passLayout.error = getString(R.string.pass_incorect)
+                    binding.passLayout.error = getString(R.string.pass_incorect)
 
                 R.string.error_setting_pass -> Snackbar.make(requireView(),
                     getString(R.string.error_setting_pass), Snackbar.LENGTH_SHORT).show()
             }
         })
 
-        viewDataBinding.passphrase.addTextChangedListener {
-            viewDataBinding.passLayout.error = null
+        binding.passphrase.addTextChangedListener {
+            binding.passLayout.error = null
         }
 
         handleBackPressed(lockState)
-        return viewDataBinding.root
+        return binding.root
     }
 
     private fun setupSendPass() {
-        viewDataBinding.sendPass.setOnClickListener {
+        binding.sendPass.setOnClickListener {
             if (viewModelFrg.passEmpty()) {
-                viewDataBinding.passLayout.error = getString(R.string.pass_empty)
+                binding.passLayout.error = getString(R.string.pass_empty)
                 return@setOnClickListener
             }
             if (!viewModelFrg.isPassSet() && !viewModelFrg.passMatch()) {
-                viewDataBinding.passLayout.error = getString(R.string.pass_no_match)
+                binding.passLayout.error = getString(R.string.pass_no_match)
                 return@setOnClickListener
             }
 
-            viewDataBinding.passphrase.text?. let {
+            binding.passphrase.text?. let {
                 viewModelFrg.authenticate(editableToCharArray(it)) //the byte array is cleared in repository.unlock()
              }
         }
@@ -124,8 +128,8 @@ class AuthenticateFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if(requestCode == LOCK_ACTIVITY_CODE && resultCode == Activity.RESULT_OK) {
-            viewDataBinding.passLayout.visibility = View.GONE
-            viewDataBinding.sendPass.visibility = View.GONE
+            binding.passLayout.visibility = View.GONE
+            binding.sendPass.visibility = View.GONE
             viewModelFrg.getPassphrase()
         }
         else if(requestCode == LOCK_ACTIVITY_CODE && resultCode == Activity.RESULT_CANCELED) {

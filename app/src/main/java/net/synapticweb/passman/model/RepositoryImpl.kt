@@ -21,7 +21,7 @@ class RepositoryImpl @Inject constructor(
     private lateinit var database : CryptoPassDatabase
 
     override suspend fun unlock(passphrase: ByteArray) : Boolean {
-        val factory = SupportFactory(passphrase)
+        val factory = SupportFactory(passphrase, null, false)
 
         return withContext(Dispatchers.IO) {
             database = Room.databaseBuilder(

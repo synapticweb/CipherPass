@@ -10,6 +10,7 @@ import net.synapticweb.passman.*
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.*
 import java.io.*
+import java.util.*
 import javax.inject.Inject
 
 class SystemLockViewModel @Inject constructor(private val repository: Repository,
@@ -32,7 +33,6 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
         editor.commit()
     }
 
-    @ShouldTest
     fun validatePass(passphrase: CharArray) {
         viewModelScope.launch {
             working.value = true
@@ -46,7 +46,7 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
             }
 
             val encryptionResult = wrapEspressoIdlingResource {
-                encryptPassToDisk(passphrase, cipher, true)
+                encryptPassToDisk(passphrase, cipher)
             }
             if(!encryptionResult) {
                 errorFileWriteFail.value = true
@@ -59,6 +59,7 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
                 finish.value = true
                 setPref()
             }
+            Arrays.fill(passphrase, 0.toChar())
         }
     }
 

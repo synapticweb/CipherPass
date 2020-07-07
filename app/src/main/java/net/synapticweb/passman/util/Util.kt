@@ -93,21 +93,6 @@ fun createSalt() : ByteArray {
 }
 
 //https://stackoverflow.com/a/9670279
-fun editableToByteArray(input : Editable): ByteArray {
-    val chars = CharArray(input.length)
-    input.getChars(0, input.length, chars, 0)
-
-    val charBuffer: CharBuffer = CharBuffer.wrap(chars)
-    val byteBuffer: ByteBuffer = Charset.forName("UTF-8").encode(charBuffer)
-    val bytes: ByteArray = Arrays.copyOfRange(
-        byteBuffer.array(),
-        byteBuffer.position(), byteBuffer.limit()
-    )
-    Arrays.fill(byteBuffer.array(), 0.toByte())
-    Arrays.fill(chars, 0.toChar())
-    return bytes
-}
-
 fun editableToCharArray(input : Editable) : CharArray {
     val chars = CharArray(input.length)
     input.getChars(0, input.length, chars, 0)
@@ -150,9 +135,3 @@ fun setupPasswordFields(layout : TextInputLayout,
     }
 
 }
-
-@Target(
-    AnnotationTarget.FUNCTION
-)
-@Retention(AnnotationRetention.SOURCE)
-annotation class ShouldTest
