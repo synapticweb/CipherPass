@@ -53,20 +53,23 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
     }
 
     fun changePass(actualPass : CharArray, newPass : CharArray, reNewPass : CharArray) {
-        passWorking.value = true
         viewModelScope.launch {
+            passWorking.value = true
             if(!newPass.contentEquals(reNewPass)) {
                 passNoMatch.value = Event(true)
+                passWorking.value = false
                 return@launch
             }
 
             wrapEspressoIdlingResource {
                if(!repository.isPassValid(actualPass, true)) {
                    passInvalid.value = Event(true)
+                   passWorking.value = false
                    return@launch
                }
                 if(!repository.createPassHash(newPass, null)) {
                     passFinish.value = Event(false)
+                    passWorking.value = false
                     return@launch
                 }
             }
@@ -74,13 +77,14 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
             wrapEspressoIdlingResource {
                 if (weakAuthentication() && !encryptPassToDisk(newPass, cipher, false)) {
                     passFinish.value = Event(false)
+                    passWorking.value = false
                     return@launch
                 }
             }
 
             passFinish.value = Event(repository.reKey(newPass))
+            passWorking.value = false
         }
-        passWorking.value = false
     }
 
     fun changeHash(password : CharArray, hashType : String) {
