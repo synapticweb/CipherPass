@@ -53,8 +53,9 @@ class RepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun createPassHash(passphrase: CharArray) : Boolean {
-        val hashType = PreferenceManager.getDefaultSharedPreferences(context)
+    override suspend fun createPassHash(passphrase: CharArray, newHashType : String?) : Boolean {
+        val hashType = newHashType ?:
+            PreferenceManager.getDefaultSharedPreferences(context)
             .getString(HASH_TYPE_KEY, HASH_PBKDF2) ?: HASH_PBKDF2
         val salt = createSalt()
         val hash = createHashString(passphrase, salt, hashType)

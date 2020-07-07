@@ -22,8 +22,6 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     //Am ales să îl resetez în observerul pentru unlockSuccess.
     var startedUnlockActivity = false
 
-
-
     private fun shouldManagePauseResume() : Boolean {
         if(startedUnlockActivity) {
             return false

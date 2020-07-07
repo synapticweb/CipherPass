@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import net.synapticweb.passman.APPLOCK_KEY
 import net.synapticweb.passman.APPLOCK_PASSWD_VALUE
 import net.synapticweb.passman.CryptoPassApp
+import net.synapticweb.passman.HASH_TYPE_KEY
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.CPCipher
 import net.synapticweb.passman.util.Event
@@ -21,10 +22,18 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
                                             application: Application) :
     AndroidViewModel(application) {
 
-    val changePassWorking = MutableLiveData<Boolean>()
-    val changePassFinish = MutableLiveData<Event<Boolean>>()
-    val changePassInvalid = MutableLiveData<Event<Boolean>>()
-    val changePassNoMatch = MutableLiveData<Event<Boolean>>()
+    val passWorking = MutableLiveData<Boolean>()
+    val passFinish = MutableLiveData<Event<Boolean>>()
+    val passInvalid = MutableLiveData<Event<Boolean>>()
+    val passNoMatch = MutableLiveData<Event<Boolean>>()
+
+    fun setPref(newValue : String) {
+        val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
+        val editor = settings.edit()
+        editor.putString(HASH_TYPE_KEY, newValue)
+        editor.apply()
+        editor.commit()
+    }
 
     fun hasPasswdFile() : Boolean {
         val encFile = File(getApplication<CryptoPassApp>().filesDir.absolutePath + "/"
@@ -44,35 +53,54 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
     }
 
     fun changePass(actualPass : CharArray, newPass : CharArray, reNewPass : CharArray) {
+        passWorking.value = true
         viewModelScope.launch {
-            changePassWorking.value = true
-
             if(!newPass.contentEquals(reNewPass)) {
-                changePassNoMatch.value = Event(true)
-                changePassWorking.value = false
+                passNoMatch.value = Event(true)
                 return@launch
             }
 
             wrapEspressoIdlingResource {
-                if (!repository.isPassValid(actualPass, true) ||
-                    !repository.createPassHash(newPass)
-                ) {
-                    changePassInvalid.value = Event(true)
-                    changePassWorking.value = false
+               if(!repository.isPassValid(actualPass, true)) {
+                   passInvalid.value = Event(true)
+                   return@launch
+               }
+                if(!repository.createPassHash(newPass, null)) {
+                    passFinish.value = Event(false)
                     return@launch
                 }
             }
 
             wrapEspressoIdlingResource {
                 if (weakAuthentication() && !encryptPassToDisk(newPass, cipher, false)) {
-                    changePassFinish.value = Event(false)
-                    changePassWorking.value = false
+                    passFinish.value = Event(false)
                     return@launch
                 }
             }
 
-            changePassFinish.value = Event(repository.reKey(newPass))
-            changePassWorking.value = false
+            passFinish.value = Event(repository.reKey(newPass))
+        }
+        passWorking.value = false
+    }
+
+    fun changeHash(password : CharArray, hashType : String) {
+        viewModelScope .launch {
+            passWorking.value = true
+            wrapEspressoIdlingResource {
+                if(!repository.isPassValid(password, true)) {
+                    passInvalid.value = Event(true)
+                    passWorking.value = false
+                    return@launch
+                }
+
+                if(!repository.createPassHash(password, hashType)) {
+                    passFinish.value = Event(false)
+                    passWorking.value = false
+                    return@launch
+                }
+            }
+            passFinish.value = Event(true)
+            passWorking.value = false
         }
     }
 }

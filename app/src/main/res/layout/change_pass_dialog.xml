@@ -76,7 +76,7 @@
             android:layout_margin="15dp"
             android:indeterminate="true"
             android:layout_gravity="center_horizontal"
-            android:visibility="@{model.changePassWorking ? View.VISIBLE : View.GONE}"
+            android:visibility="@{model.passWorking ? View.VISIBLE : View.GONE}"
             android:id="@+id/progress" />
 
 </LinearLayout>

@@ -22,7 +22,7 @@ import java.io.DataInputStream
 import java.io.FileInputStream
 
 
-class SettingsFragmentTest {
+class ChangePassTest {
     @get:Rule
     val testRule = CryptoPassTestRule()
 

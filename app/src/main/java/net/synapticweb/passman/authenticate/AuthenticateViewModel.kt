@@ -85,7 +85,7 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
             }
 
             val createHashResult = wrapEspressoIdlingResource {
-                    repository.createPassHash(passphrase)
+                    repository.createPassHash(passphrase, null)
                 }
 
             if(!createHashResult) {
