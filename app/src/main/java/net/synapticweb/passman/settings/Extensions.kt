@@ -72,6 +72,7 @@ fun SettingsFragment.changeHash(preference: ListPreference, newHashName : String
         positiveButton(android.R.string.ok) {
             if(binding.passphrase.text!!.isEmpty()) {
                 binding.passLayout.error = getString(R.string.pass_empty)
+                return@positiveButton
             }
 
             viewModelFrg.passWorking.removeObservers(viewLifecycleOwner)
