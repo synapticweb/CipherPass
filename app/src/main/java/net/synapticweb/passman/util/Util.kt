@@ -151,23 +151,6 @@ fun setupPasswordFields(layout : TextInputLayout,
 
 }
 
-suspend fun createHashString(passphrase: CharArray, salt : ByteArray, hashType : String) : String {
-    return withContext(Dispatchers.Default) {
-        when (hashType) {
-            HASH_MD5_VALUE -> byteArrayToHexStr(
-                createHashMd5(charArrayToByteArray(passphrase), salt)
-            )
-            HASH_SHA_VALUE -> byteArrayToHexStr(
-                createHashSha(charArrayToByteArray(passphrase), salt)
-            )
-            HASH_PBKDF2 -> byteArrayToHexStr(
-                createHashPBKDF2(passphrase, salt)
-            )
-            else -> throw java.lang.IllegalArgumentException()
-        }
-    }
-}
-
 @Target(
     AnnotationTarget.FUNCTION
 )

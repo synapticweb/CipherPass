@@ -24,10 +24,4 @@ interface Repository {
     suspend fun getSecret(key : Long) : Secret
 
     fun getAllSecrets() : LiveData<List<Secret>>
-
-    suspend fun insertHash(hash: Hash) : Long
-
-    suspend fun getHash() : Hash?
-
-    suspend fun putHash(hash : String, salt : String) : Boolean
 }

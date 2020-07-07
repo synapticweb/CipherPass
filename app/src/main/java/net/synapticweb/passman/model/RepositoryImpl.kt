@@ -1,6 +1,7 @@
 package net.synapticweb.passman.model
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import androidx.room.Room
@@ -111,15 +112,18 @@ class RepositoryImpl @Inject constructor(
         return database.dao.getAllSecrets()
     }
 
-    override suspend fun insertHash(hash: Hash): Long {
+    @VisibleForTesting
+    suspend fun insertHash(hash: Hash): Long {
         return database.dao.insertHash(hash)
     }
 
-    override suspend fun getHash(): Hash? {
+    @VisibleForTesting
+    suspend fun getHash(): Hash? {
         return database.dao.getHash()
     }
 
-    override suspend fun putHash(hash: String, salt: String) : Boolean {
+    @VisibleForTesting
+    suspend fun putHash(hash: String, salt: String) : Boolean {
        return try {
             val currentHash = getHash()
             currentHash?.let {
@@ -133,6 +137,24 @@ class RepositoryImpl @Inject constructor(
         }
         catch (exc : Exception) {
             false
+        }
+    }
+
+    @VisibleForTesting
+    suspend fun createHashString(passphrase: CharArray, salt : ByteArray, hashType : String) : String {
+        return withContext(Dispatchers.Default) {
+            when (hashType) {
+                HASH_MD5_VALUE -> byteArrayToHexStr(
+                    createHashMd5(charArrayToByteArray(passphrase), salt)
+                )
+                HASH_SHA_VALUE -> byteArrayToHexStr(
+                    createHashSha(charArrayToByteArray(passphrase), salt)
+                )
+                HASH_PBKDF2 -> byteArrayToHexStr(
+                    createHashPBKDF2(passphrase, salt)
+                )
+                else -> throw java.lang.IllegalArgumentException()
+            }
         }
     }
 }

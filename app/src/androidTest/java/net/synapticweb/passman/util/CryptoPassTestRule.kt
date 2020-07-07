@@ -9,6 +9,7 @@ import net.synapticweb.passman.*
 import net.synapticweb.passman.di.TestAppComponent
 import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.model.Repository
+import net.synapticweb.passman.model.RepositoryImpl
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import java.io.File
@@ -19,7 +20,7 @@ class CryptoPassTestRule : TestWatcher() {
     private lateinit var appPrefs : Map<String, *>
     val dataBindingIdlingResource = DataBindingIdlingResource()
 
-    lateinit var repository: Repository
+    lateinit var repository: RepositoryImpl
     val application: CryptoPassApp = ApplicationProvider.getApplicationContext()
     val encFile : File = File(application.filesDir.absolutePath + "/" + TEST_ENCRYPTED_PASS_FILENAME)
 
@@ -27,7 +28,7 @@ class CryptoPassTestRule : TestWatcher() {
     fun setDb() = runBlocking {
         repository.unlock(TEST_PASS.toByteArray())
         val salt = createSalt()
-        val hashStr = createHashString(TEST_PASS.toCharArray(), salt, settings.getString(
+        val hashStr = repository.createHashString(TEST_PASS.toCharArray(), salt, settings.getString(
             HASH_TYPE_KEY, HASH_PBKDF2) ?: HASH_PBKDF2)
         val hash = Hash(hashStr, byteArrayToHexStr(salt))
         repository.insertHash(hash)
@@ -64,7 +65,7 @@ class CryptoPassTestRule : TestWatcher() {
     }
 
     override fun starting(description: Description?) {
-        repository = (application.appComponent as TestAppComponent).repository
+        repository = (application.appComponent as TestAppComponent).repository as RepositoryImpl
 
         appPrefs = settings.all
 

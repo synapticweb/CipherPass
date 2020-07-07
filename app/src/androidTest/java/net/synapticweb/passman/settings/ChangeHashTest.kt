@@ -78,7 +78,7 @@ class ChangeHashTest {
         assertNotNull(hashObj)
         assertThat(testRule.getString(HASH_TYPE_KEY) == HASH_SHA_VALUE, `is`(true))
         val currentHash = runBlocking {
-            createHashString(
+            testRule.repository.createHashString(
                 TEST_PASS.toCharArray(), hexStrToByteArray(hashObj!!.salt), HASH_SHA_VALUE)
         }
         assertThat(currentHash, `is`(hashObj!!.hash))

@@ -74,7 +74,7 @@ class AuthenticateFragmentTest {
 
         assertNotNull(hashObj)
         val currentHash = runBlocking {
-            createHashString("test".toCharArray(), hexStrToByteArray(hashObj!!.salt), testRule.getString(
+            testRule.repository.createHashString("test".toCharArray(), hexStrToByteArray(hashObj!!.salt), testRule.getString(
                 HASH_TYPE_KEY) ?: HASH_PBKDF2)
         }
         assertThat(currentHash, `is`(hashObj!!.hash))
