@@ -42,7 +42,7 @@ open class RepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun isPassValid(passphrase: CharArray, erasePass : Boolean) : Boolean {
+    override suspend fun isPassValid(passphrase: CharArray) : Boolean {
         val hashType = PreferenceManager.getDefaultSharedPreferences(context)
             .getString(HASH_TYPE_KEY, HASH_PBKDF2) ?: HASH_PBKDF2
 

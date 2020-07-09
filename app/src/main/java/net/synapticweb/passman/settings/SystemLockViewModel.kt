@@ -30,7 +30,7 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
         viewModelScope.launch {
             working.value = true
             val result = wrapEspressoIdlingResource {
-                repository.isPassValid(passphrase, false)
+                repository.isPassValid(passphrase)
             }
             working.value = false
             if (!result) {

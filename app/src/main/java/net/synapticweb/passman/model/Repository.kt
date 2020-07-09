@@ -9,7 +9,7 @@ interface Repository {
 
     suspend fun unlock(passphrase : ByteArray) : Boolean
 
-    suspend fun isPassValid(passphrase: CharArray, erasePass : Boolean) : Boolean
+    suspend fun isPassValid(passphrase: CharArray) : Boolean
 
     suspend fun createPassHash(passphrase : CharArray, newHashType : String?) : Boolean
 

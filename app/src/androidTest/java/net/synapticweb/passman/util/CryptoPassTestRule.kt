@@ -101,5 +101,6 @@ class CryptoPassTestRule : TestWatcher() {
         repository.createPassHashFalse = false
         cipher.encryptFileReturnError = false
         cipher.hasHardwareStorage = false
+        cipher.decryptFileReturnError = false
     }
 }

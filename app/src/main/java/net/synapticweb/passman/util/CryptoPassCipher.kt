@@ -9,10 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.synapticweb.passman.APP_TAG
 import net.synapticweb.passman.ENCRYPTED_PASS_FILENAME
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.FileOutputStream
-import java.io.IOException
+import java.io.*
 import java.math.BigInteger
 import java.security.*
 import java.util.*
@@ -127,6 +124,22 @@ open class CryptoPassCipher(private val context : Context) : CPCipher {
                 return@withContext false
             }
             true
+        }
+    }
+
+    override suspend fun decryptPassFromDisk(encFile: File): CharArray? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val reader = DataInputStream(FileInputStream(encFile))
+                val nBytesToRead: Int = reader.available()
+                val bytes = ByteArray(nBytesToRead)
+                if (nBytesToRead > 0)
+                    reader.read(bytes)
+
+                byteArrayToCharArray(decrypt(bytes))
+            } catch (exc: IOException) {
+                null
+            }
         }
     }
 }

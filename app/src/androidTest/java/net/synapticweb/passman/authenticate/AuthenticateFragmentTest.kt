@@ -6,6 +6,7 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import junit.framework.Assert.assertNotNull
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.passman.*
 import net.synapticweb.passman.util.CryptoPassTestRule
@@ -150,5 +151,39 @@ class AuthenticateFragmentTest {
 
         val dbFile = testRule.application.getDatabasePath(TEST_DATABASE_NAME)
         assertThat(dbFile.exists(), `is`(false))
+    }
+
+    @Test
+    fun dbInitialized_noLock_authenticate() {
+        testRule.setDb()
+        runBlocking {
+            testRule.cipher.encryptPassToDisk(TEST_PASS.toCharArray())
+        }
+        testRule.repository.lock()
+        testRule.setBoolean(PASSPHRASE_SET_KEY, true)
+        testRule.setString(APPLOCK_KEY, APPLOCK_NOLOCK_VALUE)
+
+        val activityScenario = launch(MainActivity::class.java)
+        testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        runBlocking {
+            delay(300)
+        }
+        onView(withId(R.id.secrets_list)).check(matches(isDisplayed()))
+        assertThat(testRule.repository.isUnlocked(), `is`(true))
+    }
+
+    @Test
+    fun dbInitialized_noLock_readFileError() {
+        testRule.setDb()
+        testRule.repository.lock()
+        testRule.setBoolean(PASSPHRASE_SET_KEY, true)
+        testRule.setString(APPLOCK_KEY, APPLOCK_NOLOCK_VALUE)
+
+        val activityScenario = launch(MainActivity::class.java)
+        testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        onView(withText(testRule.application.getString(R.string.system_lock_unavailable)))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
     }
 }

@@ -55,7 +55,7 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
             }
 
             wrapEspressoIdlingResource {
-                if(!repository.isPassValid(actualPass, true)) {
+                if(!repository.isPassValid(actualPass)) {
                     passInvalid.value = Event(true)
                     passWorking.value = false
                     return@launch
@@ -93,7 +93,7 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
         viewModelScope .launch {
             passWorking.value = true
             wrapEspressoIdlingResource {
-                if(!repository.isPassValid(password, true)) {
+                if(!repository.isPassValid(password)) {
                     passInvalid.value = Event(true)
                     passWorking.value = false
                     return@launch

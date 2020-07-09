@@ -20,6 +20,7 @@ import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.AuthenticateFragmentBinding
 import net.synapticweb.passman.util.*
+import java.util.*
 import javax.inject.Inject
 
 class AuthenticateFragment : Fragment() {
@@ -48,9 +49,9 @@ class AuthenticateFragment : Fragment() {
             viewModel = viewModelFrg
             lifecycleOwner = fragment
         }
+        setupSendPass()
 
         when(viewModelFrg.getApplockPref()) {
-            APPLOCK_PASSWD_VALUE -> setupSendPass()
             APPLOCK_SYSTEM_VALUE -> {
                 val keyMan =
                     requireActivity().getSystemService(Context.KEYGUARD_SERVICE) as
@@ -62,7 +63,6 @@ class AuthenticateFragment : Fragment() {
                     startActivityForResult(intent, LOCK_ACTIVITY_CODE)
                 }
                     ?: run {
-                        setupSendPass()
                         //necesar pentru că încă nu s-a încheiat onCreateView()
                         Snackbar.make(requireActivity().findViewById(android.R.id.content), getString(R.string.system_lock_unavailable),
                             Snackbar.LENGTH_LONG).show()
@@ -76,7 +76,11 @@ class AuthenticateFragment : Fragment() {
         }
 
         viewModelFrg.passwd.observe(viewLifecycleOwner, Observer {
-            viewModelFrg.authenticate(it)
+            if(it != null)
+                viewModelFrg.authenticate(it)
+            else
+                Snackbar.make(requireActivity().findViewById(android.R.id.content), getString(R.string.system_lock_unavailable),
+                    Snackbar.LENGTH_LONG).show()
         })
 
         setupPasswordFields(binding.passLayout, arrayOf(binding.passphrase,
@@ -111,17 +115,21 @@ class AuthenticateFragment : Fragment() {
 
     private fun setupSendPass() {
         binding.sendPass.setOnClickListener {
-            if (viewModelFrg.passEmpty()) {
+            if (binding.passphrase.text!!.isEmpty()) {
                 binding.passLayout.error = getString(R.string.pass_empty)
                 return@setOnClickListener
             }
-            if (!viewModelFrg.isPassSet() && !viewModelFrg.passMatch()) {
+            val pass = editableToCharArray(binding.passphrase.text!!)
+            val rePass = editableToCharArray(binding.passphraseRetype.text)
+
+            if (!viewModelFrg.isPassSet() && !pass.contentEquals(rePass)) {
                 binding.passLayout.error = getString(R.string.pass_no_match)
                 return@setOnClickListener
             }
 
+            Arrays.fill(rePass, 0.toChar())
             binding.passphrase.text?. let {
-                viewModelFrg.authenticate(editableToCharArray(it)) //the byte array is cleared in repository.unlock()
+                viewModelFrg.authenticate(pass)
              }
         }
     }
@@ -131,9 +139,6 @@ class AuthenticateFragment : Fragment() {
             binding.passLayout.visibility = View.GONE
             binding.sendPass.visibility = View.GONE
             viewModelFrg.getPassphrase()
-        }
-        else if(requestCode == LOCK_ACTIVITY_CODE && resultCode == Activity.RESULT_CANCELED) {
-            setupSendPass()
         }
     }
 }
