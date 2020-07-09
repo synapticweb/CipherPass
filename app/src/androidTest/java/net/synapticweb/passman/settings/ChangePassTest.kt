@@ -4,8 +4,8 @@ import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -25,13 +25,6 @@ import java.io.FileInputStream
 class ChangePassTest {
     @get:Rule
     val testRule = CryptoPassTestRule()
-
-    private lateinit var cipher : TestCryptoPassCipher
-
-    @Before
-    fun init() {
-        cipher = (testRule.application.appComponent as TestAppComponent).cipher as TestCryptoPassCipher
-    }
 
     @Test
     fun emptyActPass_error() {
@@ -102,6 +95,7 @@ class ChangePassTest {
     @Test
     fun correctInput_strongPass_passChange() {
         testRule.setDb()
+        testRule.setString(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
@@ -155,7 +149,61 @@ class ChangePassTest {
             bytes
         }
 
-        val passDecrypt = cipher.decrypt(encrypted)
+        val passDecrypt = testRule.cipher.decrypt(encrypted)
         assertThat(passDecrypt.contentEquals("test1".toByteArray()), `is`(true))
+    }
+
+    @Test
+    fun correctInput_weakAuth_errorPassHash() {
+        testRule.setDb()
+        testRule.repository.createPassHashFalse = true
+        testRule.setString(APPLOCK_KEY, APPLOCK_SYSTEM_VALUE)
+        val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
+        onView(withText("Change password")).perform(click())
+        onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
+
+        onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
+        onView(withId(R.id.new_passphrase_retype)).perform(typeText("test1"), closeSoftKeyboard())
+
+        //verificăm toastul
+        onView(withText("OK")).perform(click())
+        onView(withText(R.string.change_pass_error)).inRoot(isToast()).check(matches(isDisplayed()))
+
+        runBlocking {
+            testRule.repository.lock()
+            testRule.repository.unlock(TEST_PASS.toByteArray())
+        }
+        assertThat(testRule.repository.isUnlocked(), `is`(true)) //parola nu s-a schimbat
+        assertThat(testRule.encFile.exists(), `is`(false))
+        assertThat(testRule.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
+    }
+
+    @Test
+    fun correctInput_weakAuth_errorWriteFile() {
+        testRule.setDb()
+        testRule.cipher.encryptFileReturnError = true
+        testRule.setString(APPLOCK_KEY, APPLOCK_SYSTEM_VALUE)
+        val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
+        onView(withText("Change password")).perform(click())
+        onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
+
+        onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
+        onView(withId(R.id.new_passphrase_retype)).perform(typeText("test1"), closeSoftKeyboard())
+
+        //verificăm toastul
+        onView(withText("OK")).perform(click())
+        onView(withText(R.string.change_pass_error)).inRoot(isToast()).check(matches(isDisplayed()))
+
+        runBlocking {
+            testRule.repository.lock()
+            testRule.repository.unlock(TEST_PASS.toByteArray())
+        }
+        assertThat(testRule.repository.isUnlocked(), `is`(true)) //parola nu s-a schimbat
+        assertThat(testRule.encFile.exists(), `is`(false))
+        assertThat(testRule.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
     }
 }

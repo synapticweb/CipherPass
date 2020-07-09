@@ -8,8 +8,7 @@ import kotlinx.coroutines.runBlocking
 import net.synapticweb.passman.*
 import net.synapticweb.passman.di.TestAppComponent
 import net.synapticweb.passman.model.Hash
-import net.synapticweb.passman.model.Repository
-import net.synapticweb.passman.model.RepositoryImpl
+import net.synapticweb.passman.model.TestRepositoryImpl
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import java.io.File
@@ -20,16 +19,18 @@ class CryptoPassTestRule : TestWatcher() {
     private lateinit var appPrefs : Map<String, *>
     val dataBindingIdlingResource = DataBindingIdlingResource()
 
-    lateinit var repository: RepositoryImpl
+    lateinit var repository: TestRepositoryImpl
+    lateinit var cipher : TestCryptoPassCipher
     val application: CryptoPassApp = ApplicationProvider.getApplicationContext()
     val encFile : File = File(application.filesDir.absolutePath + "/" + TEST_ENCRYPTED_PASS_FILENAME)
 
 
-    fun setDb() = runBlocking {
+    fun setDb(hashType : String? = null) = runBlocking {
+        val actHashType = hashType ?: settings.getString(
+            HASH_TYPE_KEY, HASH_PBKDF2) ?: HASH_PBKDF2
         repository.unlock(TEST_PASS.toByteArray())
         val salt = createSalt()
-        val hashStr = repository.createHashString(TEST_PASS.toCharArray(), salt, settings.getString(
-            HASH_TYPE_KEY, HASH_PBKDF2) ?: HASH_PBKDF2)
+        val hashStr = repository.createHashString(TEST_PASS.toCharArray(), salt, actHashType)
         val hash = Hash(hashStr, byteArrayToHexStr(salt))
         repository.insertHash(hash)
     }
@@ -65,7 +66,8 @@ class CryptoPassTestRule : TestWatcher() {
     }
 
     override fun starting(description: Description?) {
-        repository = (application.appComponent as TestAppComponent).repository as RepositoryImpl
+        repository = (application.appComponent as TestAppComponent).repository as TestRepositoryImpl
+        cipher = (application.appComponent as TestAppComponent).cipher as TestCryptoPassCipher
 
         appPrefs = settings.all
 
@@ -89,10 +91,15 @@ class CryptoPassTestRule : TestWatcher() {
         IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
 
         val dbFile = application.getDatabasePath(TEST_DATABASE_NAME)
+        repository.lock() //rămîne un singur fișier
         if(dbFile.exists())
             dbFile.delete()
 
         if(encFile.exists())
             encFile.delete()
+
+        repository.createPassHashFalse = false
+        cipher.encryptFileReturnError = false
+        cipher.hasHardwareStorage = false
     }
 }

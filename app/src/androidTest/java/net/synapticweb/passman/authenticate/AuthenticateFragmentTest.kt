@@ -4,10 +4,8 @@ import androidx.test.core.app.ActivityScenario.launch
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.*
 import junit.framework.Assert.assertNotNull
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.passman.*
 import net.synapticweb.passman.util.CryptoPassTestRule
@@ -133,5 +131,24 @@ class AuthenticateFragmentTest {
 
         onView(withId(R.id.secrets_list)).check(matches(isDisplayed()))
         assertThat(testRule.repository.isUnlocked(), `is`(true))
+    }
+
+    @Test
+    fun dbNotInitialized_createHashReturnFalse_showSnackbar() {
+        testRule.repository.createPassHashFalse = true
+        testRule.removePref(PASSPHRASE_SET_KEY)
+        val activityScenario = launch(MainActivity::class.java)
+        testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        onView(withId(R.id.passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
+        onView(withId(R.id.passphrase_retype)).perform(typeText(TEST_PASS), closeSoftKeyboard())
+        onView(withId(R.id.send_pass)).perform(click())
+
+        //Testăm dacă arată snackbarul: https://stackoverflow.com/a/39915776
+        onView(withText(testRule.application.getString(R.string.error_setting_pass)))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+
+        val dbFile = testRule.application.getDatabasePath(TEST_DATABASE_NAME)
+        assertThat(dbFile.exists(), `is`(false))
     }
 }

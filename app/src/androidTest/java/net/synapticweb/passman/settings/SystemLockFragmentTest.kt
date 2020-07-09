@@ -27,13 +27,6 @@ class SystemLockFragmentTest {
     @get:Rule
     val testRule = CryptoPassTestRule()
 
-    private lateinit var cipher : TestCryptoPassCipher
-
-    @Before
-    fun init() {
-        cipher = (testRule.application.appComponent as TestAppComponent).cipher as TestCryptoPassCipher
-    }
-
     @Test
     fun emptyPass_Error() {
         val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
@@ -62,7 +55,7 @@ class SystemLockFragmentTest {
     @Test
     fun goodPass_hardwareStorage_goSettings() {
         testRule.setDb()
-        cipher.hasHardwareStorage = true
+        testRule.cipher.hasHardwareStorage = true
         //https://stackoverflow.com/a/59027482
         val mockNav = mock(NavController::class.java)
         val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
@@ -98,7 +91,7 @@ class SystemLockFragmentTest {
         if (nBytesToRead > 0)
             reader.read(encrypted)
 
-        assertThat(TEST_PASS, `is`(String(cipher.decrypt(encrypted))))
+        assertThat(TEST_PASS, `is`(String(testRule.cipher.decrypt(encrypted))))
         encFile.delete()
 
         assertThat(testRule.getString(APPLOCK_KEY), `is`(APPLOCK_SYSTEM_VALUE))
@@ -114,7 +107,7 @@ class SystemLockFragmentTest {
     @Test
     fun goodPass_softwareStorage_secondScreen_ok_goSettings() {
         testRule.setDb()
-        cipher.hasHardwareStorage = false
+        testRule.cipher.hasHardwareStorage = false
 
         val mockNav = mock(NavController::class.java)
         val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
@@ -144,7 +137,7 @@ class SystemLockFragmentTest {
     @Test
     fun goodPass_softwareStorage_secondScreen_cancel_goSettings() {
         testRule.setDb()
-        cipher.hasHardwareStorage = false
+        testRule.cipher.hasHardwareStorage = false
         testRule.setString(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
 
         val mockNav = mock(NavController::class.java)
@@ -173,6 +166,26 @@ class SystemLockFragmentTest {
                 TEST_ENCRYPTED_PASS_FILENAME)
 
         assertThat(encFile.exists(), `is`(false))
+        assertThat(testRule.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
+    }
+
+    @Test
+    fun goodPass_errorWritingFile() {
+        testRule.setDb()
+        testRule.cipher.encryptFileReturnError = true
+        testRule.setString(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+
+        val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
+        val fragmentScenario = launchFragmentInContainer<SystemLockFragment>(bundle, R.style.AppTheme)
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
+        onView(withId(R.id.passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
+        onView(withId(R.id.action_button)).perform(click())
+
+        //dacă afișează Snackbar
+        onView(withText(testRule.application.getString(R.string.system_lock_file_write_fail)))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+
         assertThat(testRule.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
     }
 }

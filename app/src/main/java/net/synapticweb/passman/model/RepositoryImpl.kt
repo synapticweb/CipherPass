@@ -15,7 +15,7 @@ import net.synapticweb.passman.util.*
 import java.lang.Exception
 import javax.inject.Inject
 
-class RepositoryImpl @Inject constructor(
+open class RepositoryImpl @Inject constructor(
     private val context: Context,
     private val fileName : String) : Repository {
     private lateinit var database : CryptoPassDatabase
@@ -156,5 +156,9 @@ class RepositoryImpl @Inject constructor(
                 else -> throw java.lang.IllegalArgumentException()
             }
         }
+    }
+
+    override fun removeDb() {
+        context.deleteDatabase(fileName)
     }
 }

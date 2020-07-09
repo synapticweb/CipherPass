@@ -5,4 +5,5 @@ interface CPCipher {
     fun decrypt(input : ByteArray) : ByteArray
     fun isStorageHardwareBacked(): Boolean
     fun getEncryptedFilePath() : String
+    suspend fun encryptPassToDisk(passphrase: CharArray) : Boolean
 }

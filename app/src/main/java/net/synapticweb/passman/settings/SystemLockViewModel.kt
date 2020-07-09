@@ -25,13 +25,6 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
     val finish = MutableLiveData<Boolean>()
     lateinit var prefValue: String
 
-    private fun setPref() {
-        val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
-        val editor = settings.edit()
-        editor.putString(APPLOCK_KEY, prefValue)
-        editor.apply()
-        editor.commit()
-    }
 
     fun validatePass(passphrase: CharArray) {
         viewModelScope.launch {
@@ -46,7 +39,7 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
             }
 
             val encryptionResult = wrapEspressoIdlingResource {
-                encryptPassToDisk(passphrase, cipher)
+                cipher.encryptPassToDisk(passphrase)
             }
             if(!encryptionResult) {
                 errorFileWriteFail.value = true
@@ -57,14 +50,14 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
                 storageSoft.value = true
             else {
                 finish.value = true
-                setPref()
+                setPref(getApplication(), APPLOCK_KEY, prefValue)
             }
             Arrays.fill(passphrase, 0.toChar())
         }
     }
 
     fun onStorageSoftAccept() {
-        setPref()
+        setPref(getApplication(), APPLOCK_KEY, prefValue)
         finish.value = true
     }
 

@@ -3,20 +3,20 @@ package net.synapticweb.passman.util
 import android.content.Context
 import android.os.Build
 import android.security.KeyPairGeneratorSpec
-import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyInfo
-import android.security.keystore.KeyProperties
-import android.util.Base64
-import androidx.annotation.RequiresApi
+import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import net.synapticweb.passman.APP_TAG
 import net.synapticweb.passman.ENCRYPTED_PASS_FILENAME
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.FileOutputStream
+import java.io.IOException
 import java.math.BigInteger
-import java.nio.charset.Charset
 import java.security.*
 import java.util.*
 import javax.crypto.*
-import javax.crypto.spec.GCMParameterSpec
 import javax.security.auth.x500.X500Principal
 
 const val ASYM_KEY_ALIAS : String = "passkey"
@@ -109,4 +109,24 @@ open class CryptoPassCipher(private val context : Context) : CPCipher {
     }
 
     override fun getEncryptedFilePath(): String = ENCRYPTED_PASS_FILENAME
+
+    override suspend fun encryptPassToDisk(passphrase: CharArray) : Boolean {
+        val passBytes = charArrayToByteArray(passphrase)
+        val encrypted = encrypt(passBytes)
+        val path =  context.filesDir.absolutePath + "/" +
+                getEncryptedFilePath()
+        Arrays.fill(passBytes, 0.toByte())
+
+        return  withContext(Dispatchers.IO) {
+            try {
+                val stream = FileOutputStream(path)
+                stream.write(encrypted)
+                stream.close()
+            } catch (exc: IOException) {
+                Log.e(APP_TAG, "Error writing the encrypted password: " + exc.message)
+                return@withContext false
+            }
+            true
+        }
+    }
 }

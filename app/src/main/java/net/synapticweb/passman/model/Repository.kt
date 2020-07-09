@@ -24,4 +24,6 @@ interface Repository {
     suspend fun getSecret(key : Long) : Secret
 
     fun getAllSecrets() : LiveData<List<Secret>>
+
+    fun removeDb()
 }

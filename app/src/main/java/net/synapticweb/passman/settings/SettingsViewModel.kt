@@ -9,10 +9,10 @@ import kotlinx.coroutines.launch
 import net.synapticweb.passman.APPLOCK_KEY
 import net.synapticweb.passman.APPLOCK_PASSWD_VALUE
 import net.synapticweb.passman.CryptoPassApp
-import net.synapticweb.passman.HASH_TYPE_KEY
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.CPCipher
 import net.synapticweb.passman.util.Event
+import net.synapticweb.passman.util.setPref
 import net.synapticweb.passman.util.wrapEspressoIdlingResource
 import java.io.File
 import java.util.*
@@ -27,14 +27,6 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
     val passFinish = MutableLiveData<Event<Boolean>>()
     val passInvalid = MutableLiveData<Event<Boolean>>()
     val passNoMatch = MutableLiveData<Event<Boolean>>()
-
-    fun setPref(newValue : String) {
-        val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
-        val editor = settings.edit()
-        editor.putString(HASH_TYPE_KEY, newValue)
-        editor.apply()
-        editor.commit()
-    }
 
     fun hasPasswdFile() : Boolean {
         val encFile = File(getApplication<CryptoPassApp>().filesDir.absolutePath + "/"
@@ -63,20 +55,26 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
             }
 
             wrapEspressoIdlingResource {
-               if(!repository.isPassValid(actualPass, true)) {
-                   passInvalid.value = Event(true)
-                   passWorking.value = false
-                   return@launch
-               }
-                if(!repository.createPassHash(newPass, null)) {
+                if(!repository.isPassValid(actualPass, true)) {
+                    passInvalid.value = Event(true)
+                    passWorking.value = false
+                    return@launch
+                }
+
+                if (weakAuthentication() && !cipher.encryptPassToDisk(newPass)) {
+                    if(hasPasswdFile())
+                        deletePasswdFile()
+                    setPref(getApplication(), APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
                     passFinish.value = Event(false)
                     passWorking.value = false
                     return@launch
                 }
-            }
 
-            wrapEspressoIdlingResource {
-                if (weakAuthentication() && !encryptPassToDisk(newPass, cipher)) {
+                if(!repository.createPassHash(newPass, null)) {
+                    if(hasPasswdFile()) {
+                        setPref(getApplication(), APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+                        deletePasswdFile()
+                    }
                     passFinish.value = Event(false)
                     passWorking.value = false
                     return@launch

@@ -3,11 +3,9 @@ package net.synapticweb.passman.settings
 import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.preference.ListPreference
@@ -17,36 +15,11 @@ import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.customview.customView
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.ChangePassDialogBinding
 import net.synapticweb.passman.databinding.PasswdValidatorDialogBinding
 import net.synapticweb.passman.util.*
-import java.io.FileOutputStream
-import java.io.IOException
-import java.util.*
 
-
-suspend fun AndroidViewModel.encryptPassToDisk(passphrase: CharArray, cipher : CPCipher) : Boolean {
-    val passBytes = charArrayToByteArray(passphrase)
-    val encrypted = cipher.encrypt(passBytes)
-    val path =  getApplication<CryptoPassApp>().filesDir.absolutePath + "/" +
-            cipher.getEncryptedFilePath()
-    Arrays.fill(passBytes, 0.toByte())
-
-     return  withContext(Dispatchers.IO) {
-            try {
-                val stream = FileOutputStream(path)
-                stream.write(encrypted)
-                stream.close()
-            } catch (exc: IOException) {
-                Log.e(APP_TAG, "Error writing the encrypted password: " + exc.message)
-                return@withContext false
-            }
-         true
-        }
-}
 
 fun SettingsFragment.changeHash(preference: ListPreference, newHashName : String, newHashType : String)  {
     val binding : PasswdValidatorDialogBinding =
@@ -90,7 +63,7 @@ fun SettingsFragment.changeHash(preference: ListPreference, newHashName : String
                     binding.passphrase.text!!.clear()
                     dismiss()
                     if (it) {
-                        viewModelFrg.setPref(newHashType)
+                        setPref(requireContext(), HASH_TYPE_KEY, newHashType)
                         preference.summary = newHashName
                         preference.value = newHashType
                         Toast.makeText(
