@@ -4,11 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyInfo
-import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import net.synapticweb.passman.APP_TAG
-import net.synapticweb.passman.ENCRYPTED_PASS_FILENAME
+import net.synapticweb.passman.ENCRYPTED_PASS_KEY
 import java.io.*
 import java.math.BigInteger
 import java.security.*
@@ -28,8 +24,12 @@ const val ASYM_PROVIDER = "AndroidKeyStore"
 //https://source.android.com/security/keystore
 //IV + o serie de articole despre criptare în Android:
 //https://proandroiddev.com/secure-data-in-android-initialization-vector-6ca1c659762c
+//About AndroidKeyStore: https://stackoverflow.com/questions/46578584/how-to-securely-store-encryption-keys-in-android
+//Some examples: https://stackoverflow.com/questions/29642271/android-lollipop-decryption-using-aes-is-not-working-properly
+//https://source.android.com/security/keystore
 open class CryptoPassCipher(private val context : Context) : CPCipher {
-        private var keyStore: KeyStore = KeyStore.getInstance(ASYM_PROVIDER)
+    private var keyStore: KeyStore = KeyStore.getInstance(ASYM_PROVIDER)
+    private val prefWrapper = PrefWrapper.getInstance(context)
 
         init {
             keyStore.load(null)
@@ -105,41 +105,19 @@ open class CryptoPassCipher(private val context : Context) : CPCipher {
         return outputStream.toByteArray()
     }
 
-    override fun getEncryptedFilePath(): String = ENCRYPTED_PASS_FILENAME
-
-    override suspend fun encryptPassToDisk(passphrase: CharArray) : Boolean {
+    override fun encryptPassToSettings(passphrase: CharArray) : Boolean {
         val passBytes = charArrayToByteArray(passphrase)
-        val encrypted = encrypt(passBytes)
-        val path =  context.filesDir.absolutePath + "/" +
-                getEncryptedFilePath()
+        val encryptedPass = encrypt(passBytes)
         Arrays.fill(passBytes, 0.toByte())
 
-        return  withContext(Dispatchers.IO) {
-            try {
-                val stream = FileOutputStream(path)
-                stream.write(encrypted)
-                stream.close()
-            } catch (exc: IOException) {
-                Log.e(APP_TAG, "Error writing the encrypted password: " + exc.message)
-                return@withContext false
-            }
-            true
-        }
+        return prefWrapper.setPrefSync(ENCRYPTED_PASS_KEY, byteArrayToHexStr(encryptedPass))
     }
 
-    override suspend fun decryptPassFromDisk(encFile: File): CharArray? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val reader = DataInputStream(FileInputStream(encFile))
-                val nBytesToRead: Int = reader.available()
-                val bytes = ByteArray(nBytesToRead)
-                if (nBytesToRead > 0)
-                    reader.read(bytes)
-
-                byteArrayToCharArray(decrypt(bytes))
-            } catch (exc: IOException) {
-                null
-            }
+    override fun decryptPassFromSettings() : CharArray? {
+        val encryptedPass = prefWrapper.getString(ENCRYPTED_PASS_KEY)
+        return encryptedPass?.let {
+            val passBytes = hexStrToByteArray(it)
+            byteArrayToCharArray(decrypt(passBytes))
         }
     }
 }

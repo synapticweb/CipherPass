@@ -3,8 +3,6 @@ package net.synapticweb.passman
 const val PASSPHRASE_SET_KEY = "passphrase_set_key"
 const val TEST_DATABASE_NAME = "testpassman.db"
 const val DATABASE_FILE_NAME = "passman.db"
-const val ENCRYPTED_PASS_FILENAME = "dfsg45o"
-const val TEST_ENCRYPTED_PASS_FILENAME = "testdfsg45o"
 const val APP_TAG = "CryptoPass"
 
 const val APPLOCK_KEY = "applock"
@@ -23,3 +21,4 @@ const val CHANGE_PASS_KEY = "changepass"
 const val TEST_PASS = "test"
 
 const val AUTH_OK = 0
+const val ENCRYPTED_PASS_KEY = "enc_pass_key"

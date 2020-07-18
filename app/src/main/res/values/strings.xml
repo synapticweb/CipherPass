@@ -39,4 +39,5 @@
     <string name="hash_func_PBKDF2">PBKDF2 (slow - good security)</string>
     <string name="hash_change_success">The hash function was successfully changed</string>
     <string name="hash_change_error">Error changing the hash function.</string>
+    <string name="enter_pass">Enter password:</string>
 </resources>

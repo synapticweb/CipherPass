@@ -4,12 +4,10 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import net.synapticweb.passman.*
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.*
-import java.io.*
 import java.util.*
 import javax.inject.Inject
 
@@ -24,6 +22,7 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
     val errorFileWriteFail = MutableLiveData<Boolean>()
     val finish = MutableLiveData<Boolean>()
     lateinit var prefValue: String
+    private val prefWrapper = PrefWrapper.getInstance(getApplication())
 
 
     fun validatePass(passphrase: CharArray) {
@@ -39,7 +38,7 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
             }
 
             val encryptionResult = wrapEspressoIdlingResource {
-                cipher.encryptPassToDisk(passphrase)
+                cipher.encryptPassToSettings(passphrase)
             }
             if(!encryptionResult) {
                 errorFileWriteFail.value = true
@@ -50,22 +49,19 @@ class SystemLockViewModel @Inject constructor(private val repository: Repository
                 storageSoft.value = true
             else {
                 finish.value = true
-                setPref(getApplication(), APPLOCK_KEY, prefValue)
+                prefWrapper.setPref(APPLOCK_KEY, prefValue)
             }
             Arrays.fill(passphrase, 0.toChar())
         }
     }
 
     fun onStorageSoftAccept() {
-        setPref(getApplication(), APPLOCK_KEY, prefValue)
+        prefWrapper.setPref(APPLOCK_KEY, prefValue)
         finish.value = true
     }
 
     fun onStorageSoftRenounce() {
-        val encFile = File(getApplication<CryptoPassApp>().filesDir.absolutePath + "/" +
-                cipher.getEncryptedFilePath())
-        if(encFile.exists())
-            encFile.delete()
+        prefWrapper.removePref(ENCRYPTED_PASS_KEY)
         finish.value = true
     }
 }

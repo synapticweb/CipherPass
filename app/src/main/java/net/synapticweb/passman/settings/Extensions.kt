@@ -32,7 +32,7 @@ fun SettingsFragment.changeHash(preference: ListPreference, newHashName : String
 
     MaterialDialog(requireContext()).show {
         noAutoDismiss()
-        title(null, "Verify password")
+        title(null, getString(R.string.enter_pass))
         customView(null, binding.root)
 
         binding.passphrase.addTextChangedListener {
@@ -63,7 +63,8 @@ fun SettingsFragment.changeHash(preference: ListPreference, newHashName : String
                     binding.passphrase.text!!.clear()
                     dismiss()
                     if (it) {
-                        setPref(requireContext(), HASH_TYPE_KEY, newHashType)
+                        PrefWrapper.getInstance(requireContext()).
+                            setPref(HASH_TYPE_KEY, newHashType)
                         preference.summary = newHashName
                         preference.value = newHashType
                         Toast.makeText(
@@ -168,7 +169,7 @@ fun SettingsFragment.changeAuthentication(preference: Preference, newValue : Str
     val appLockValues = requireActivity().resources.getStringArray(R.array.applock_values)
 
     when(newValue) {
-        appLockValues[0] -> { viewModelFrg.deletePasswdFile() //pashphrase
+        appLockValues[0] -> { viewModelFrg.deleteEncryptedPass() //pashphrase
             preference.summary = appLockEntries[0]
             return true
         }
@@ -187,7 +188,7 @@ fun SettingsFragment.changeAuthentication(preference: Preference, newValue : Str
                 return false
             }
 
-            return if(!viewModelFrg.hasPasswdFile()) {
+            return if(!viewModelFrg.hasEncryptedPass()) {
                 findNavController().navigate(
                     SettingsFragmentDirections.actionSettingsFragmentToSystemLockFragment(
                         APPLOCK_SYSTEM_VALUE
@@ -201,7 +202,7 @@ fun SettingsFragment.changeAuthentication(preference: Preference, newValue : Str
 
         //no lock
         appLockValues[2] -> {
-            return  if(!viewModelFrg.hasPasswdFile()) {
+            return  if(!viewModelFrg.hasEncryptedPass()) {
                 findNavController().navigate(
                     SettingsFragmentDirections.
                     actionSettingsFragmentToSystemLockFragment(APPLOCK_NOLOCK_VALUE))

@@ -1,6 +1,5 @@
 package net.synapticweb.passman.util
 
-import android.content.Context
 import android.text.Editable
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
@@ -8,7 +7,6 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import com.google.android.material.textfield.TextInputLayout
 import net.synapticweb.passman.*
 import java.nio.ByteBuffer
@@ -19,7 +17,6 @@ import java.security.SecureRandom
 import java.util.*
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
-
 
 fun Fragment.handleBackPressed(lockState: LockStateViewModel) {
     requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
@@ -134,15 +131,4 @@ fun setupPasswordFields(layout : TextInputLayout,
         }
     }
 
-}
-
-fun setPref(context: Context, key : String, value : Any) {
-    val settings = PreferenceManager.getDefaultSharedPreferences(context)
-    val editor = settings.edit()
-    if(value is String)
-        editor.putString(key, value)
-    else if(value is Boolean)
-        editor.putBoolean(key, value)
-    editor.apply()
-    editor.commit()
 }

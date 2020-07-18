@@ -1,6 +1,7 @@
 package net.synapticweb.passman.settings
 
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
@@ -8,7 +9,6 @@ import androidx.test.espresso.matcher.ViewMatchers
 import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.passman.*
-import net.synapticweb.passman.di.TestAppComponent
 import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.util.*
 import org.hamcrest.CoreMatchers.`is`
@@ -19,6 +19,7 @@ import org.junit.Test
 class ChangeHashTest {
     @get:Rule
     val testRule = CryptoPassTestRule()
+    private val prefWrapper = PrefWrapper.getInstance(ApplicationProvider.getApplicationContext())
 
     @Test
     fun emptyPass_error() {
@@ -27,6 +28,7 @@ class ChangeHashTest {
 
         Espresso.onView(ViewMatchers.withText("Hash function")).perform(ViewActions.click())
         Espresso.onView(ViewMatchers.withText("SHA512 (fast - medium security)")).perform(ViewActions.click())
+        Thread.sleep(100)
         Espresso.onView(ViewMatchers.withText("OK")).perform(ViewActions.click())
 
         Espresso.onView(ViewMatchers.withId(R.id.pass_layout)).check(
@@ -54,7 +56,7 @@ class ChangeHashTest {
     @Test
     fun goodPass_hashFunctionChanged() {
         testRule.setDb(HASH_MD5_VALUE)
-        testRule.setString(HASH_TYPE_KEY, HASH_MD5_VALUE)
+        prefWrapper.setPref(HASH_TYPE_KEY, HASH_MD5_VALUE)
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
@@ -69,7 +71,7 @@ class ChangeHashTest {
         }
 
         assertNotNull(hashObj)
-        assertThat(testRule.getString(HASH_TYPE_KEY) == HASH_SHA_VALUE, `is`(true))
+        assertThat(prefWrapper.getString(HASH_TYPE_KEY), `is`(HASH_SHA_VALUE))
         val currentHash = runBlocking {
             testRule.repository.createHashString(
                 TEST_PASS.toCharArray(), hexStrToByteArray(hashObj!!.salt), HASH_SHA_VALUE)
@@ -80,7 +82,7 @@ class ChangeHashTest {
     @Test
     fun goodPass_errorPassHash() {
         testRule.setDb(HASH_MD5_VALUE)
-        testRule.setString(HASH_TYPE_KEY, HASH_MD5_VALUE)
+        prefWrapper.setPref(HASH_TYPE_KEY, HASH_MD5_VALUE)
         testRule.repository.createPassHashFalse = true
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
@@ -94,6 +96,6 @@ class ChangeHashTest {
         Espresso.onView(ViewMatchers.withText(R.string.hash_change_error))
             .inRoot(isToast()).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
-        assertThat(testRule.getString(HASH_TYPE_KEY), `is`(HASH_MD5_VALUE))
+        assertThat(prefWrapper.getString(HASH_TYPE_KEY), `is`(HASH_MD5_VALUE))
     }
 }

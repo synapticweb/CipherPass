@@ -1,30 +1,26 @@
 package net.synapticweb.passman.settings
 
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
-import kotlinx.coroutines.Dispatchers
+import junit.framework.Assert.assertNotNull
+import junit.framework.Assert.assertNull
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import net.synapticweb.passman.*
-import net.synapticweb.passman.di.TestAppComponent
-import net.synapticweb.passman.model.Hash
 import net.synapticweb.passman.util.*
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.io.DataInputStream
-import java.io.FileInputStream
 
 
 class ChangePassTest {
     @get:Rule
     val testRule = CryptoPassTestRule()
+    private val prefWrapper = PrefWrapper.getInstance(ApplicationProvider.getApplicationContext())
 
     @Test
     fun emptyActPass_error() {
@@ -95,7 +91,9 @@ class ChangePassTest {
     @Test
     fun correctInput_strongPass_passChange() {
         testRule.setDb()
-        testRule.setString(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.removePref(ENCRYPTED_PASS_KEY)
+
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
@@ -114,17 +112,17 @@ class ChangePassTest {
 
         assertThat(testRule.repository.isUnlocked(), `is`(true))
         val passValid = runBlocking {
-            testRule.repository.isPassValid("test1".toCharArray(), false)
+            testRule.repository.isPassValid("test1".toCharArray())
         }
 
         assertThat(passValid, `is`(true))
-        assertThat(testRule.encFile.exists(), `is`(false))
+        assertNull(prefWrapper.getString(ENCRYPTED_PASS_KEY))
     }
 
     @Test
     fun correctInput_weakPass_passChange() {
         testRule.setDb()
-        testRule.setString(APPLOCK_KEY, APPLOCK_SYSTEM_VALUE)
+        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_SYSTEM_VALUE)
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
@@ -137,27 +135,18 @@ class ChangePassTest {
 
         onView(withText("OK")).perform(click())
 
-        assertThat(testRule.encFile.exists(), `is`(true))
+        val encryptedPass = prefWrapper.getString(ENCRYPTED_PASS_KEY)
+        assertNotNull(encryptedPass)
 
-        val encrypted : ByteArray = runBlocking(Dispatchers.IO) {
-            val reader = DataInputStream(FileInputStream(testRule.encFile))
-            val nBytesToRead: Int = reader.available()
-            val bytes = ByteArray(nBytesToRead)
-            if (nBytesToRead > 0)
-                reader.read(bytes)
-
-            bytes
-        }
-
-        val passDecrypt = testRule.cipher.decrypt(encrypted)
-        assertThat(passDecrypt.contentEquals("test1".toByteArray()), `is`(true))
+        assertThat(String(testRule.cipher.decrypt(hexStrToByteArray(encryptedPass!!))),
+            `is`("test1"))
     }
 
     @Test
     fun correctInput_weakAuth_errorPassHash() {
         testRule.setDb()
         testRule.repository.createPassHashFalse = true
-        testRule.setString(APPLOCK_KEY, APPLOCK_SYSTEM_VALUE)
+        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_SYSTEM_VALUE)
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
@@ -176,15 +165,15 @@ class ChangePassTest {
             testRule.repository.unlock(TEST_PASS.toByteArray())
         }
         assertThat(testRule.repository.isUnlocked(), `is`(true)) //parola nu s-a schimbat
-        assertThat(testRule.encFile.exists(), `is`(false))
-        assertThat(testRule.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
+        assertNull(prefWrapper.getString(ENCRYPTED_PASS_KEY)) //nu s-a salvat parola criptată
+        assertThat(prefWrapper.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
     }
 
     @Test
-    fun correctInput_weakAuth_errorWriteFile() {
+    fun correctInput_weakAuth_errorWriteEncryptedPass() {
         testRule.setDb()
-        testRule.cipher.encryptFileReturnError = true
-        testRule.setString(APPLOCK_KEY, APPLOCK_SYSTEM_VALUE)
+        testRule.cipher.encryptPassReturnError = true
+        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_SYSTEM_VALUE)
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
@@ -203,7 +192,7 @@ class ChangePassTest {
             testRule.repository.unlock(TEST_PASS.toByteArray())
         }
         assertThat(testRule.repository.isUnlocked(), `is`(true)) //parola nu s-a schimbat
-        assertThat(testRule.encFile.exists(), `is`(false))
-        assertThat(testRule.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
+        assertNull(prefWrapper.getString(ENCRYPTED_PASS_KEY)) //nu s-a salvat parola criptată
+        assertThat(prefWrapper.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
     }
 }

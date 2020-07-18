@@ -4,17 +4,12 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
 import kotlinx.coroutines.launch
 import net.synapticweb.passman.APPLOCK_KEY
 import net.synapticweb.passman.APPLOCK_PASSWD_VALUE
-import net.synapticweb.passman.CryptoPassApp
+import net.synapticweb.passman.ENCRYPTED_PASS_KEY
 import net.synapticweb.passman.model.Repository
-import net.synapticweb.passman.util.CPCipher
-import net.synapticweb.passman.util.Event
-import net.synapticweb.passman.util.setPref
-import net.synapticweb.passman.util.wrapEspressoIdlingResource
-import java.io.File
+import net.synapticweb.passman.util.*
 import java.util.*
 import javax.inject.Inject
 
@@ -27,22 +22,18 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
     val passFinish = MutableLiveData<Event<Boolean>>()
     val passInvalid = MutableLiveData<Event<Boolean>>()
     val passNoMatch = MutableLiveData<Event<Boolean>>()
+    private val prefWrapper = PrefWrapper.getInstance(getApplication())
 
-    fun hasPasswdFile() : Boolean {
-        val encFile = File(getApplication<CryptoPassApp>().filesDir.absolutePath + "/"
-                + cipher.getEncryptedFilePath())
-        return encFile.exists()
+    fun hasEncryptedPass() : Boolean {
+        return prefWrapper.getString(ENCRYPTED_PASS_KEY) != null
     }
 
-    fun deletePasswdFile() {
-        val encFile = File(getApplication<CryptoPassApp>().filesDir.absolutePath + "/"
-                + cipher.getEncryptedFilePath())
-        encFile.delete()
+    fun deleteEncryptedPass() {
+        prefWrapper.removePref(ENCRYPTED_PASS_KEY)
     }
 
     private fun weakAuthentication() : Boolean {
-        val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
-        return settings.getString(APPLOCK_KEY, APPLOCK_PASSWD_VALUE) != APPLOCK_PASSWD_VALUE
+        return prefWrapper.getString(APPLOCK_KEY) != APPLOCK_PASSWD_VALUE
     }
 
     fun changePass(actualPass : CharArray, newPass : CharArray, reNewPass : CharArray) {
@@ -61,19 +52,18 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
                     return@launch
                 }
 
-                if (weakAuthentication() && !cipher.encryptPassToDisk(newPass)) {
-                    if(hasPasswdFile())
-                        deletePasswdFile()
-                    setPref(getApplication(), APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+                if (weakAuthentication() && !cipher.encryptPassToSettings(newPass)) {
+                        deleteEncryptedPass()
+                   prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
                     passFinish.value = Event(false)
                     passWorking.value = false
                     return@launch
                 }
 
                 if(!repository.createPassHash(newPass, null)) {
-                    if(hasPasswdFile()) {
-                        setPref(getApplication(), APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
-                        deletePasswdFile()
+                    if(hasEncryptedPass()) {
+                        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+                        deleteEncryptedPass()
                     }
                     passFinish.value = Event(false)
                     passWorking.value = false

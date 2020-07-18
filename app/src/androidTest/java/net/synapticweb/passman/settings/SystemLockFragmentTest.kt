@@ -3,29 +3,27 @@ package net.synapticweb.passman.settings
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import net.synapticweb.passman.*
-import net.synapticweb.passman.di.TestAppComponent
 import net.synapticweb.passman.util.*
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
-import java.io.DataInputStream
-import java.io.File
-import java.io.FileInputStream
 
 class SystemLockFragmentTest {
     @get:Rule
     val testRule = CryptoPassTestRule()
+    private val prefWrapper = PrefWrapper.getInstance(ApplicationProvider.getApplicationContext())
 
     @Test
     fun emptyPass_Error() {
@@ -75,26 +73,10 @@ class SystemLockFragmentTest {
         verify(mockNav).navigate(SystemLockFragmentDirections.
                 actionSystemLockFragmentToSettingsFragment())
 
-        checkPassEncryptionAndPrefsSet()
-    }
-
-    private fun checkPassEncryptionAndPrefsSet() {
-        val encFile = File(testRule.application.filesDir.absolutePath + "/" +
-                TEST_ENCRYPTED_PASS_FILENAME)
-
-        assertThat(encFile.exists(), `is`(true))
-
-
-        val reader = DataInputStream(FileInputStream(encFile))
-        val nBytesToRead: Int = reader.available()
-        val encrypted = ByteArray(nBytesToRead)
-        if (nBytesToRead > 0)
-            reader.read(encrypted)
-
-        assertThat(TEST_PASS, `is`(String(testRule.cipher.decrypt(encrypted))))
-        encFile.delete()
-
-        assertThat(testRule.getString(APPLOCK_KEY), `is`(APPLOCK_SYSTEM_VALUE))
+        val encryptedPass = prefWrapper.getString(ENCRYPTED_PASS_KEY)
+        assertNotNull(encryptedPass)
+        assertThat(String(testRule.cipher.decrypt(hexStrToByteArray(encryptedPass!!))),
+            `is`(TEST_PASS))
     }
 
     private fun checkSecondScreen() {
@@ -131,14 +113,18 @@ class SystemLockFragmentTest {
         verify(mockNav).navigate(SystemLockFragmentDirections.
         actionSystemLockFragmentToSettingsFragment())
 
-        checkPassEncryptionAndPrefsSet()
+        val encryptedPass = prefWrapper.getString(ENCRYPTED_PASS_KEY)
+        assertNotNull(encryptedPass)
+        assertThat(String(testRule.cipher.decrypt(hexStrToByteArray(encryptedPass!!))),
+            `is`(TEST_PASS))
     }
 
     @Test
     fun goodPass_softwareStorage_secondScreen_cancel_goSettings() {
         testRule.setDb()
         testRule.cipher.hasHardwareStorage = false
-        testRule.setString(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.removePref(ENCRYPTED_PASS_KEY)
 
         val mockNav = mock(NavController::class.java)
         val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
@@ -162,18 +148,15 @@ class SystemLockFragmentTest {
         verify(mockNav).navigate(SystemLockFragmentDirections.
             actionSystemLockFragmentToSettingsFragment())
 
-        val encFile = File(testRule.application.filesDir.absolutePath + "/" +
-                TEST_ENCRYPTED_PASS_FILENAME)
-
-        assertThat(encFile.exists(), `is`(false))
-        assertThat(testRule.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
+        assertNull(prefWrapper.getString(ENCRYPTED_PASS_KEY)) //nu s-a salvat parola criptată
+        assertThat(prefWrapper.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
     }
 
     @Test
-    fun goodPass_errorWritingFile() {
+    fun goodPass_errorWritingSettings() {
         testRule.setDb()
-        testRule.cipher.encryptFileReturnError = true
-        testRule.setString(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        testRule.cipher.encryptPassReturnError = true
+        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
 
         val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
         val fragmentScenario = launchFragmentInContainer<SystemLockFragment>(bundle, R.style.AppTheme)
@@ -186,6 +169,6 @@ class SystemLockFragmentTest {
         onView(withText(testRule.application.getString(R.string.system_lock_file_write_fail)))
             .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
 
-        assertThat(testRule.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
+        assertThat(prefWrapper.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
     }
 }

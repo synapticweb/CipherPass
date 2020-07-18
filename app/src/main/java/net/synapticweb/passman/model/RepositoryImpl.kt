@@ -3,7 +3,6 @@ package net.synapticweb.passman.model
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
-import androidx.preference.PreferenceManager
 import androidx.room.Room
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,6 +18,7 @@ open class RepositoryImpl @Inject constructor(
     private val context: Context,
     private val fileName : String) : Repository {
     private lateinit var database : CryptoPassDatabase
+    private  val prefWrapper = PrefWrapper.getInstance(context)
 
     override suspend fun unlock(passphrase: ByteArray) : Boolean {
         val factory = SupportFactory(passphrase, null, false)
@@ -43,8 +43,7 @@ open class RepositoryImpl @Inject constructor(
     }
 
     override suspend fun isPassValid(passphrase: CharArray) : Boolean {
-        val hashType = PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(HASH_TYPE_KEY, HASH_PBKDF2) ?: HASH_PBKDF2
+        val hashType = prefWrapper.getString(HASH_TYPE_KEY) ?: HASH_PBKDF2
 
        return withContext(Dispatchers.Default) {
            val oldHash = getHash()
@@ -55,9 +54,7 @@ open class RepositoryImpl @Inject constructor(
 
 
     override suspend fun createPassHash(passphrase: CharArray, newHashType : String?) : Boolean {
-        val hashType = newHashType ?:
-            PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(HASH_TYPE_KEY, HASH_PBKDF2) ?: HASH_PBKDF2
+        val hashType = newHashType ?: prefWrapper.getString(HASH_TYPE_KEY) ?: HASH_PBKDF2
         val salt = createSalt()
         val hash = createHashString(passphrase, salt, hashType)
 

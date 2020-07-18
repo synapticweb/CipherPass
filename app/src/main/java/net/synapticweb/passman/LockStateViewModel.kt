@@ -2,9 +2,9 @@ package net.synapticweb.passman
 
 import android.app.Application
 import androidx.lifecycle.*
-import androidx.preference.PreferenceManager
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.Event
+import net.synapticweb.passman.util.PrefWrapper
 import javax.inject.Inject
 
 class LockStateViewModel @Inject constructor(private val repository: Repository, application: Application)
@@ -26,8 +26,8 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
         if(startedUnlockActivity) {
             return false
         }
-        val settings = PreferenceManager.getDefaultSharedPreferences(getApplication())
-        return settings.getString(APPLOCK_KEY, APPLOCK_PASSWD_VALUE) != APPLOCK_NOLOCK_VALUE
+        val prefWrapper = PrefWrapper.getInstance(getApplication())
+        return prefWrapper.getString(APPLOCK_KEY) != APPLOCK_NOLOCK_VALUE
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
