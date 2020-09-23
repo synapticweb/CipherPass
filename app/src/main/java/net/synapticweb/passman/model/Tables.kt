@@ -4,8 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "secrets")
-class Secret {
+@Entity(tableName = "credentials")
+class Credential {
     constructor(accountId : String, password : String) {
         this.accountId = accountId
         this.password = password

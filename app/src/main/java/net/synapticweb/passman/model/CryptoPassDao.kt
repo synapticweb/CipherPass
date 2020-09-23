@@ -1,25 +1,24 @@
 package net.synapticweb.passman.model
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 
 @Dao
 interface CryptoPassDao {
     @Insert
-    suspend fun insertSecret(secret : Secret) : Long
+    suspend fun insertCredential(credential : Credential) : Long
 
     @Update
-    suspend fun updateSecret(secret : Secret) : Int
+    suspend fun updateCredential(credential : Credential) : Int
 
     @Delete
-    suspend fun deleteSecret(secret : Secret) : Int
+    suspend fun deleteCredential(credential : Credential) : Int
 
-    @Query("SELECT * FROM `secrets` WHERE `id`= :key")
-    suspend fun getSecret(key: Long) : Secret
+    @Query("SELECT * FROM `credentials` WHERE `id`= :key")
+    suspend fun getCredential(key: Long) : Credential
 
-    @Query("SELECT * FROM `secrets` ORDER BY `insertion_date` DESC")
-    fun getAllSecrets() : LiveData<List<Secret>>
+    @Query("SELECT * FROM `credentials` ORDER BY `insertion_date` DESC")
+    fun getAllCredentials() : LiveData<List<Credential>>
 
     @Insert
     suspend fun insertHash(hash : Hash) : Long

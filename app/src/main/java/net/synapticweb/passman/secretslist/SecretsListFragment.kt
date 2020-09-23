@@ -41,6 +41,11 @@ class SecretsListFragment : Fragment() {
         val insert = rootView.findViewById<Button>(R.id.insert_data)
         insert.setOnClickListener { viewModel.insertSecret() }
 
+        val autoFill = rootView.findViewById<Button>(R.id.putAutofill)
+        autoFill.setOnClickListener {
+            viewModel.putAutofillData()
+        }
+
         viewModel.secrets.observe(viewLifecycleOwner, Observer {
             when  {
                 it.isEmpty() -> rootView.findViewById<TextView>(R.id.secrets_list)?.text = "Empty list"

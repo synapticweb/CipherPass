@@ -40,4 +40,5 @@
     <string name="hash_change_success">The hash function was successfully changed</string>
     <string name="hash_change_error">Error changing the hash function.</string>
     <string name="enter_pass">Enter password:</string>
+    <string name="autofill_service_label">CryptoPass Autofill Service</string>
 </resources>

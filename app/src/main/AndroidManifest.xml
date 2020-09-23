@@ -17,6 +17,15 @@
             </intent-filter>
         </activity>
 
+        <service android:name=".service.CPAutofillService"
+            android:label="@string/autofill_service_label"
+            android:permission="android.permission.BIND_AUTOFILL_SERVICE">
+        <intent-filter>
+            <action android:name="android.service.autofill.AutofillService" />
+        </intent-filter>
+
+        </service>
+
     </application>
 
 </manifest>
