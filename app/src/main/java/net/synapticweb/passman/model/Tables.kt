@@ -6,10 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "credentials")
 class Credential {
-    constructor(accountId : String, password : String) {
-        this.accountId = accountId
-        this.password = password
-    }
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
     var id : Long = 0L

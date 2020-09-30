@@ -22,6 +22,9 @@
         <action
             android:id="@+id/action_secretsListFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_secretsListFragment_to_addeditCredFragment"
+            app:destination="@id/addeditCredFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -50,5 +53,24 @@
         <argument
             android:name="prefEntryValue"
             app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/addeditCredFragment"
+        android:name="net.synapticweb.passman.addeditcredential.AddeditCredFragment"
+        android:label="{title}" >
+        <argument
+            android:name="credentialId"
+            app:argType="string"
+            app:nullable="true"/>
+        <argument
+            android:name="title"
+            app:argType="string"
+            app:nullable="false"/>
+        <action
+            android:id="@+id/action_addeditCredFragment_to_secretsListFragment"
+            app:destination="@id/secretsListFragment" />
+        <action
+            android:id="@+id/action_addeditCredFragment_to_authenticateFragment"
+            app:destination="@id/authenticateFragment" />
     </fragment>
 </navigation>

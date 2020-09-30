@@ -5,6 +5,7 @@ import android.content.Context
 import dagger.BindsInstance
 import dagger.Component
 import net.synapticweb.passman.MainActivity
+import net.synapticweb.passman.addeditcredential.di.AddeditCredComponent
 import net.synapticweb.passman.authenticate.di.AuthenticateComponent
 import net.synapticweb.passman.secretslist.di.SecretsListComponent
 import net.synapticweb.passman.settings.di.SettingsComponent
@@ -24,4 +25,5 @@ interface AppComponent {
     fun secretsListComponent() : SecretsListComponent.Factory
     fun authenticateComponent() : AuthenticateComponent.Factory
     fun settingsComponent() : SettingsComponent.Factory
+    fun addCredentialComponent() : AddeditCredComponent.Factory
 }

@@ -41,4 +41,16 @@
     <string name="hash_change_error">Error changing the hash function.</string>
     <string name="enter_pass">Enter password:</string>
     <string name="autofill_service_label">CryptoPass Autofill Service</string>
+    <string name="new_entry">New entry</string>
+    <string name="addedit_name">Entry name</string>
+    <string name="addedit_id">Username</string>
+    <string name="addedit_pass">Password</string>
+    <string name="addedit_repass">Retype password</string>
+    <string name="addedit_url">Url</string>
+    <string name="addedit_comment">Comment</string>
+    <string name="addedit_close">Close</string>
+    <string name="addedit_name_empty">The entry name cannot be empty.</string>
+    <string name="addedit_id_empty">The username cannot be empty.</string>
+    <string name="addedit_pass_empty">The password cannot be empty.</string>
+    <string name="addedit_pass_nomatch">The passwords entered do not match.</string>
 </resources>

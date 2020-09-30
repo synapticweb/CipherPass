@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="viewModel"
+            type="net.synapticweb.passman.addeditcredential.AddeditCredViewModel" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:maxWidth="50dp"
+            android:layout_margin="15dp"
+            android:indeterminate="true"
+            android:layout_gravity="center_horizontal"
+            android:visibility="@{viewModel.working ? View.VISIBLE : View.GONE}"
+            android:id="@+id/progress" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/name_layout"
+            style="@style/addedit_field"
+            android:visibility="@{viewModel.working ? View.GONE : View.VISIBLE}"
+            android:hint="@string/addedit_name">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/name"
+                android:inputType="text"
+                android:text="@{viewModel.name}"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/addedit_id"
+            android:id="@+id/id_layout"
+            style="@style/addedit_field"
+            android:visibility="@{viewModel.working ? View.GONE : View.VISIBLE}"
+            app:startIconDrawable="@drawable/account">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/id"
+                android:inputType="text"
+                android:text="@{viewModel.username}"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/addedit_pass"
+            app:startIconDrawable="@drawable/key"
+            app:passwordToggleEnabled="true"
+            android:id="@+id/pass_layout"
+            android:visibility="@{viewModel.working ? View.GONE : View.VISIBLE}"
+            style="@style/addedit_field">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/pass"
+                android:inputType="textPassword"
+                android:text="@{viewModel.password}"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:id="@+id/repass"
+            android:inputType="textPassword"
+            android:layout_gravity="start"
+            android:hint="@string/addedit_repass"
+            android:text="@{viewModel.password}"
+            android:visibility="@{viewModel.working ? View.GONE : View.VISIBLE}"
+            android:autofillHints="@string/addedit_repass"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/addedit_url"
+            app:startIconDrawable="@drawable/globe"
+            android:visibility="@{viewModel.working ? View.GONE : View.VISIBLE}"
+            style="@style/addedit_field">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/url"
+                android:text="@{viewModel.url}"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/addedit_field"
+            android:visibility="@{viewModel.working ? View.GONE : View.VISIBLE}"
+           >
+
+            <ImageView
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="13dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/comment"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:alpha="0.6"
+                android:id="@+id/comment_img"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_marginStart="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/addedit_comment"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@id/comment_img"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:minLines="5"
+                android:gravity="top|start"
+                android:id="@+id/comment"
+                android:text="@{viewModel.comment}"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    </ScrollView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:id="@+id/save"
+            android:src="@drawable/done"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"/>
+
+    </RelativeLayout>
+</layout>

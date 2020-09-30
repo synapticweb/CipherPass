@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import net.synapticweb.passman.*
 import net.synapticweb.passman.util.EventObserver
 import net.synapticweb.passman.util.handleBackPressed
@@ -74,6 +75,11 @@ class SecretsListFragment : Fragment() {
         return rootView
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        setupFab()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.secrets_list_menu, menu)
     }
@@ -86,6 +92,20 @@ class SecretsListFragment : Fragment() {
                 true
             }
             else -> false
+        }
+    }
+
+    private fun setupFab() {
+        activity?.findViewById<FloatingActionButton>(R.id.add_credential)?.let {
+            it.setOnClickListener {
+                val action = SecretsListFragmentDirections.
+                actionSecretsListFragmentToAddeditCredFragment(
+                    null,
+                    resources.getString(R.string.new_entry)
+                )
+
+                findNavController().navigate(action)
+            }
         }
     }
 }

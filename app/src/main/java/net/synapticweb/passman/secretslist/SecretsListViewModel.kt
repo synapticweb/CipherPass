@@ -21,10 +21,10 @@ class SecretsListViewModel @Inject constructor(private val repository: Repositor
     fun insertSecret() {
         if(!repository.isUnlocked())
             return
-        val secret = Credential("vasile_id", "vasile_pass")
-        viewModelScope.launch {
-            repository.insertCredential(secret)
-        }
+//        val secret = Credential("vasile_id", "vasile_pass")
+//        viewModelScope.launch {
+//            repository.insertCredential(secret)
+//        }
     }
 
     fun putAutofillData() {
