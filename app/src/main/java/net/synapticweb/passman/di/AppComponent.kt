@@ -7,7 +7,7 @@ import dagger.Component
 import net.synapticweb.passman.MainActivity
 import net.synapticweb.passman.addeditcredential.di.AddeditCredComponent
 import net.synapticweb.passman.authenticate.di.AuthenticateComponent
-import net.synapticweb.passman.secretslist.di.SecretsListComponent
+import net.synapticweb.passman.credentialslist.di.CredListComponent
 import net.synapticweb.passman.settings.di.SettingsComponent
 import javax.inject.Singleton
 
@@ -22,7 +22,7 @@ interface AppComponent {
     }
 
     fun inject(activity : MainActivity)
-    fun secretsListComponent() : SecretsListComponent.Factory
+    fun credListComponent() : CredListComponent.Factory
     fun authenticateComponent() : AuthenticateComponent.Factory
     fun settingsComponent() : SettingsComponent.Factory
     fun addCredentialComponent() : AddeditCredComponent.Factory

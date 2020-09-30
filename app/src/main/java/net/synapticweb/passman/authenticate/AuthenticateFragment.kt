@@ -93,7 +93,7 @@ class AuthenticateFragment : Fragment() {
                     binding.passphrase.text!!.clear()
                     binding.passphraseRetype.text.clear()
                     findNavController().navigate(
-                        AuthenticateFragmentDirections.actionAuthenticateFragmentToSecretsListFragment()
+                        AuthenticateFragmentDirections.actionAuthenticateFragmentToCredListFragment()
                     )
                 }
 

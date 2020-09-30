@@ -67,7 +67,7 @@ class AddeditCredFragment : Fragment() {
         viewModel.working.observe(viewLifecycleOwner, Observer {
             if(!it)
                 findNavController().navigate(
-                    AddeditCredFragmentDirections.actionAddeditCredFragmentToSecretsListFragment()
+                    AddeditCredFragmentDirections.actionAddeditCredFragmentToCredListFragment()
                 )
         })
 

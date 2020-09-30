@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
 
         val navController = findNavController(R.id.nav_host_fragment)
-        appBarConfiguration = AppBarConfiguration(setOf(R.id.authenticateFragment, R.id.secretsListFragment))
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.authenticateFragment, R.id.credListFragment))
         setupActionBarWithNavController(navController, appBarConfiguration)
         lifecycle.addObserver(lockState)
     }
