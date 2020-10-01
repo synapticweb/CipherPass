@@ -1,10 +1,10 @@
 package net.synapticweb.passman.addeditcredential
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -32,7 +32,7 @@ class AddeditCredFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        val parentActivity : AppCompatActivity = context as AppCompatActivity
+        val parentActivity : Activity = context as Activity
         val app : CryptoPassApp = parentActivity.application as CryptoPassApp
         app.appComponent.addCredentialComponent().create().inject(this)
     }
