@@ -1,33 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="viewModel"
+            type="net.synapticweb.passman.credentialslist.CredListViewModel" />
+    </data>
+
+<FrameLayout
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
-<LinearLayout
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <TextView
-        android:layout_width="wrap_content"
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/creds_list"
-         />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/insert_data"
-        android:text="insert data" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/putAutofill"
-        android:text="Autofill" />
-
-</LinearLayout>
+        android:id="@+id/credentials_list"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_credential"
@@ -39,3 +29,5 @@
         android:layout_gravity="bottom|end"/>
 
 </FrameLayout>
+
+</layout>

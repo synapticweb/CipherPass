@@ -3,8 +3,6 @@ package net.synapticweb.passman.credentialslist
 import android.content.Context
 import android.os.Bundle
 import android.view.*
-import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -15,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import net.synapticweb.passman.*
+import net.synapticweb.passman.databinding.CredListFragmentBinding
 import net.synapticweb.passman.util.EventObserver
 import net.synapticweb.passman.util.handleBackPressed
 
@@ -22,8 +21,10 @@ class CredListFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory : ViewModelProvider.Factory
 
-    private val viewModel by viewModels<CredListViewModel> { viewModelFactory }
+    private val _viewModel by viewModels<CredListViewModel> { viewModelFactory }
     private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
+    private lateinit var binding : CredListFragmentBinding
+    private lateinit var adapter: CredentialsAdapter
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -38,27 +39,12 @@ class CredListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.cred_list_fragment, container, false)
-        val insert = rootView.findViewById<Button>(R.id.insert_data)
-        insert.setOnClickListener { viewModel.insertSecret() }
-
-        val autoFill = rootView.findViewById<Button>(R.id.putAutofill)
-        autoFill.setOnClickListener {
-            viewModel.putAutofillData()
+        binding = CredListFragmentBinding.inflate(inflater, container, false).apply {
+            viewModel = _viewModel
         }
 
-        viewModel.credentials.observe(viewLifecycleOwner, Observer {
-            when  {
-                it.isEmpty() -> rootView.findViewById<TextView>(R.id.creds_list)?.text = "Empty list"
-
-                else -> {
-                    var text = ""
-                    for(credential in it) {
-                        text += (credential.accountId + " " + credential.password + "\n")
-                    }
-                    rootView.findViewById<TextView>(R.id.creds_list)?.text = text
-                }
-            }
+        _viewModel.credentials.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
         })
 
         lockState.unauthorized.observe(viewLifecycleOwner,
@@ -72,11 +58,12 @@ class CredListFragment : Fragment() {
         handleBackPressed(lockState)
         setHasOptionsMenu(true)
 
-        return rootView
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        setupAdapter()
         setupFab()
     }
 
@@ -103,9 +90,16 @@ class CredListFragment : Fragment() {
                     null,
                     resources.getString(R.string.new_entry)
                 )
-
                 findNavController().navigate(action)
             }
+        }
+    }
+
+    private fun setupAdapter() {
+        val viewModel = binding.viewModel
+        if (viewModel != null) {
+            adapter = CredentialsAdapter(viewModel)
+            binding.credentialsList.adapter = adapter
         }
     }
 }

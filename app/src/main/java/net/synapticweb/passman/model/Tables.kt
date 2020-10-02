@@ -5,29 +5,29 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "credentials")
-class Credential {
+data class Credential constructor(
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
-    var id : Long = 0L
+    var id : Long = 0L,
 
     @ColumnInfo(name = "account_name")
-    var accountName : String = ""
+    var accountName : String = "",
 
     @ColumnInfo(name = "account_id")
-    var accountId : String = ""
+    var accountId : String = "",
 
     @ColumnInfo(name = "password")
-    var password : String = ""
+    var password : String = "",
 
     @ColumnInfo(name = "url")
-    var url : String? = null
+    var url : String? = null,
 
     @ColumnInfo(name = "comment")
-    var comment : String? = null
+    var comment : String? = null,
 
     @ColumnInfo(name = "insertion_date")
     var insertionDate : Long = System.currentTimeMillis()
-}
+)
 
 @Entity(tableName = "hash")
 class Hash(

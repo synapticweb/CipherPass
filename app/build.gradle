@@ -54,6 +54,7 @@ ext {
     espressoVersion = "3.2.0"
     fragmentVersion = "1.2.5"
     navigationVersion = "2.2.2"
+    recyclerViewVersion = '1.0.0'
     roomVersion = "2.3.0-alpha01"
     sqlcipherVersion = "4.4.0"
     sqliteVersion = "2.1.0"
@@ -63,10 +64,11 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.3.0'
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'com.google.android.material:material:1.3.0-alpha01'
     implementation "com.afollestad.material-dialogs:core:$afollestadVersion"
+    implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
 
     //navigation:
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
