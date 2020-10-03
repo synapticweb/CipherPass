@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.CredListFragmentBinding
 import net.synapticweb.passman.util.EventObserver
@@ -45,6 +44,12 @@ class CredListFragment : Fragment() {
 
         _viewModel.credentials.observe(viewLifecycleOwner, Observer {
             adapter.submitList(it)
+        })
+
+        _viewModel.openCredEvent.observe(viewLifecycleOwner, EventObserver {
+            findNavController().navigate(
+                CredListFragmentDirections.actionCredListFragmentToCredDetailFragment(it.first, it.second)
+            )
         })
 
         lockState.unauthorized.observe(viewLifecycleOwner,
@@ -83,11 +88,11 @@ class CredListFragment : Fragment() {
     }
 
     private fun setupFab() {
-        activity?.findViewById<FloatingActionButton>(R.id.add_credential)?.let {
+       binding.addCredential.let {
             it.setOnClickListener {
                 val action = CredListFragmentDirections.
                 actionCredListFragmentToAddeditCredFragment(
-                    null,
+                    0L,
                     resources.getString(R.string.new_entry)
                 )
                 findNavController().navigate(action)

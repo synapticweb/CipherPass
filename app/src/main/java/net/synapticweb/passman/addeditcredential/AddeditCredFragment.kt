@@ -24,7 +24,7 @@ class AddeditCredFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory : ViewModelProvider.Factory
 
-    private val viewModel by viewModels<AddeditCredViewModel> { viewModelFactory }
+    private val _viewModel by viewModels<AddeditCredViewModel> { viewModelFactory }
     private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
 
     private val args : AddeditCredFragmentArgs by navArgs()
@@ -44,7 +44,7 @@ class AddeditCredFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.addedit_cred_fragment, container, false)
         binding = AddeditCredFragmentBinding.bind(root).apply {
-            this.viewModel = viewModel
+            viewModel = _viewModel
         }
 
         binding.lifecycleOwner = this.viewLifecycleOwner
@@ -61,10 +61,10 @@ class AddeditCredFragment : Fragment() {
                     )
             })
 
-        if(args.credentialId != null)
-            viewModel.populate(args.credentialId!!)
+        if(args.credentialId != 0L)
+            _viewModel.populate(args.credentialId)
 
-        viewModel.working.observe(viewLifecycleOwner, Observer {
+        _viewModel.working.observe(viewLifecycleOwner, Observer {
             if(!it)
                 findNavController().navigate(
                     AddeditCredFragmentDirections.actionAddeditCredFragmentToCredListFragment()
@@ -86,11 +86,6 @@ class AddeditCredFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            if(binding.id.text!!.isEmpty()) {
-                Toast.makeText(requireContext(), getString(R.string.addedit_id_empty), Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
             if(binding.pass.text!!.isEmpty()) {
                 Toast.makeText(requireContext(), getString(R.string.addedit_pass_empty), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -101,12 +96,12 @@ class AddeditCredFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            viewModel.saveCredential(binding.name.text.toString(),
-                                    binding.id.text.toString(),
-                                    binding.pass.text.toString(),
-                                    binding.url.text.toString(),
-                                    binding.comment.text.toString(),
-                                    args.credentialId
+            _viewModel.saveCredential(binding.name.text.toString(),
+                if(binding.id.text!!.isBlank()) null else binding.id.text.toString(),
+                binding.pass.text.toString(),
+                if(binding.url.text!!.isBlank()) null else binding.url.text.toString(),
+                if(binding.comment.text!!.isBlank()) null else binding.comment.text.toString(),
+                if(args.credentialId == 0L) null else args.credentialId
             )
         }
     }

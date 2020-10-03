@@ -53,4 +53,9 @@
     <string name="addedit_id_empty">The username cannot be empty.</string>
     <string name="addedit_pass_empty">The password cannot be empty.</string>
     <string name="addedit_pass_nomatch">The passwords entered do not match.</string>
+    <string name="detail_username">Username</string>
+    <string name="detail_passwd">Password</string>
+    <string name="detail_url">Url</string>
+    <string name="detail_comment">Comment</string>
+    <string name="detail_date_created">Date created</string>
 </resources>

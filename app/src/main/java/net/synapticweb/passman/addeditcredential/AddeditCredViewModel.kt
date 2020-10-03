@@ -22,10 +22,11 @@ class AddeditCredViewModel @Inject constructor(private val repository: Repositor
     val comment = MutableLiveData<String>()
     val working = MutableLiveData<Boolean>()
 
-    fun populate(credId : String) {
+    fun populate(credId : Long) {
         viewModelScope.launch {
-            repository.getCredential(credId.toLong()). let { credential ->
+            repository.getCredential(credId). let { credential ->
                 name.value = credential.accountName
+                password.value = credential.password
                 username.value = credential.accountId
                 url.value = credential.url
                 comment.value = credential.comment
@@ -34,30 +35,28 @@ class AddeditCredViewModel @Inject constructor(private val repository: Repositor
     }
 
     fun saveCredential(name : String,
-                       username : String,
+                       username : String?,
                        password : String,
                        url : String?,
                        comment : String?,
-                       credId : String?) {
+                       credId : Long?) {
 
         lateinit var credential : Credential
         viewModelScope.launch {
             working.value = true
             credential = if (credId != null)
                 withContext(Dispatchers.IO) {
-                    repository.getCredential(credId.toLong())
+                    repository.getCredential(credId)
                 }
             else
                 Credential()
-        }
 
-        credential.accountName = name
-        credential.accountId = username
-        credential.password = password
-        credential.url = url
-        credential.comment = comment
+            credential.accountName = name
+            credential.accountId = username
+            credential.password = password
+            credential.url = url
+            credential.comment = comment
 
-        viewModelScope.launch {
             if(credId != null)
                 repository.updateCredential(credential)
             else

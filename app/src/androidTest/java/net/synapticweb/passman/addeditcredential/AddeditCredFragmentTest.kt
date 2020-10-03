@@ -32,17 +32,6 @@ class AddeditCredFragmentTest {
     }
 
     @Test
-    fun addCred_usernameEmpty_showToast() {
-        val bundle = AddeditCredFragmentArgs(null, "New entry").toBundle()
-        val fragmentScenario = launchFragmentInContainer<AddeditCredFragment>(bundle, R.style.AppTheme)
-        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
-        onView(withId(R.id.name)).perform(typeText("test_name"))
-        onView(withId(R.id.save)).perform(click())
-
-        onView(withText(R.string.addedit_id_empty)).inRoot(isToast()).check(matches(isDisplayed()))
-    }
-
-    @Test
     fun addCred_passwdEmpty_showToast() {
         val bundle = AddeditCredFragmentArgs(null, "New entry").toBundle()
         val fragmentScenario = launchFragmentInContainer<AddeditCredFragment>(bundle, R.style.AppTheme)

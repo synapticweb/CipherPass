@@ -25,6 +25,9 @@
         <action
             android:id="@+id/action_credListFragment_to_addeditCredFragment"
             app:destination="@id/addeditCredFragment" />
+        <action
+            android:id="@+id/action_credListFragment_to_credDetailFragment"
+            app:destination="@id/credDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -60,8 +63,8 @@
         android:label="{title}" >
         <argument
             android:name="credentialId"
-            app:argType="string"
-            app:nullable="true"/>
+            app:argType="long"
+            app:nullable="false"/>
         <argument
             android:name="title"
             app:argType="string"
@@ -72,5 +75,27 @@
         <action
             android:id="@+id/action_addeditCredFragment_to_authenticateFragment"
             app:destination="@id/authenticateFragment" />
+        <action
+            android:id="@+id/action_addeditCredFragment_to_credDetailFragment"
+            app:destination="@id/credDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/credDetailFragment"
+        android:name="net.synapticweb.passman.credentialdetail.CredDetailFragment"
+        android:label="{title}" >
+        <argument
+            android:name="credentialId"
+            app:argType="long" />
+        <argument android:name="title"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_credDetailFragment_to_credListFragment"
+            app:destination="@id/credListFragment" />
+        <action
+            android:id="@+id/action_credDetailFragment_to_authenticateFragment"
+            app:destination="@id/authenticateFragment" />
+        <action
+            android:id="@+id/action_credDetailFragment_to_addeditCredFragment"
+            app:destination="@id/addeditCredFragment" />
     </fragment>
 </navigation>

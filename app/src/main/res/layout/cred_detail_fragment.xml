@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="fragment"
+            type="net.synapticweb.passman.credentialdetail.CredDetailFragment" />
+        <variable
+            name="viewModel"
+            type="net.synapticweb.passman.credentialdetail.CredDetailViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                style="@style/detail_field"
+                android:id="@+id/username_slot"
+                android:visibility="@{viewModel.credential.accountId != null ? View.VISIBLE : View.GONE }"
+                >
+
+                <ImageView
+                    android:id="@+id/username_img"
+                    android:src="@drawable/account"
+                    style="@style/detail_start_image"
+                    />
+
+                <TextView
+                    android:text="@string/detail_username"
+                    android:layout_toEndOf="@id/username_img"
+                    android:layout_toStartOf="@id/username_copy"
+                    style="@style/detail_item_caption" />
+
+                <TextView
+                    android:layout_toEndOf="@id/username_img"
+                    android:layout_toStartOf="@id/username_copy"
+                    android:text="@{viewModel.credential.accountId}"
+                    style="@style/detail_item_text"/>
+
+
+                <ImageButton
+                    android:id="@+id/username_copy"
+                    android:src="@drawable/copy"
+                    style="@style/detail_button" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                style="@style/detail_field"
+                android:id="@+id/password_slot"
+                >
+
+                <ImageView
+                    android:id="@+id/password_img"
+                    android:src="@drawable/key"
+                    style="@style/detail_start_image"/>
+
+                <TextView
+                    android:text="@string/detail_passwd"
+                    android:layout_toEndOf="@id/password_img"
+                    android:layout_toStartOf="@id/password_show"
+                    style="@style/detail_item_caption" />
+
+                <EditText
+                    android:id="@+id/password"
+                    android:inputType="textPassword"
+                    android:layout_toEndOf="@id/password_img"
+                    android:layout_toStartOf="@id/password_show"
+                    android:editable="false"
+                    android:focusable="false"
+                    android:background="@android:color/transparent"
+                    style="@style/detail_item_text"
+                    android:text="@{viewModel.credential.password}"
+                    />
+
+
+                <ImageButton
+                    android:id="@+id/password_show"
+                    android:layout_alignParentEnd="false"
+                    android:src="@drawable/eye"
+                    style="@style/detail_button"
+                    android:layout_toStartOf="@id/password_copy"
+                    android:onClick="@{() -> fragment.setupTogglePassword()}"
+                    />
+
+                <ImageButton
+                    android:id="@+id/password_copy"
+                    android:src="@drawable/copy"
+                    android:layout_marginStart="10dp"
+                    style="@style/detail_button" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                style="@style/detail_field"
+                android:id="@+id/url_slot"
+                android:visibility="@{viewModel.credential.url != null ? View.VISIBLE : View.GONE}"
+                >
+
+                <ImageView
+                    android:id="@+id/url_img"
+                    android:src="@drawable/globe"
+                    style="@style/detail_start_image"/>
+
+                <TextView
+                    android:text="@string/detail_url"
+                    android:layout_toEndOf="@id/url_img"
+                    android:layout_toStartOf="@id/url_copy"
+                    style="@style/detail_item_caption" />
+
+                <TextView
+                    android:layout_toEndOf="@id/url_img"
+                    android:layout_toStartOf="@id/url_copy"
+                    style="@style/detail_item_text"
+                    android:text="@{viewModel.credential.url}"/>
+
+
+                <ImageButton
+                    android:id="@+id/url_copy"
+                    android:src="@drawable/copy"
+                    style="@style/detail_button" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                style="@style/detail_field"
+                android:layout_height="wrap_content"
+                android:id="@+id/comment_slot"
+                android:visibility="@{viewModel.credential.comment != null ? View.VISIBLE : View.GONE}"
+                >
+
+                <ImageView
+                    android:id="@+id/comment_img"
+                    android:src="@drawable/comment"
+                    style="@style/detail_start_image"/>
+
+                <TextView
+                    android:id="@+id/comment_caption"
+                    android:text="@string/detail_comment"
+                    android:layout_toEndOf="@id/comment_img"
+                    style="@style/detail_item_caption"
+                    android:layout_marginBottom="10dp"/>
+
+                <TextView
+                    style="@style/detail_item_text"
+                    android:layout_alignParentBottom="false"
+                    android:layout_marginBottom="0dp"
+                    android:layout_toEndOf="@id/comment_img"
+                    android:layout_below="@id/comment_caption"
+                    android:text="@{viewModel.credential.comment}"
+                    />
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                style="@style/detail_field"
+                android:id="@+id/date_created_slot"
+                >
+
+                <ImageView
+                    android:id="@+id/date_created_img"
+                    android:src="@drawable/date_created"
+                    style="@style/detail_start_image"/>
+
+                <TextView
+                    android:id="@+id/date_created_caption"
+                    android:text="@string/detail_date_created"
+                    android:layout_toEndOf="@id/date_created_img"
+                    style="@style/detail_item_caption"
+                    android:layout_marginBottom="10dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:layout_toEndOf="@id/date_created_img"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="10dp"
+                    android:text="@{viewModel.credential.hrInsertionDate}"
+                    />
+
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/edit_credential"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:fabSize="normal"
+            android:src="@drawable/edit"
+            android:layout_gravity="bottom|end"
+            android:onClick="@{() -> fragment.fabListener(viewModel.credential.id, viewModel.credential.accountName)}"/>
+
+    </FrameLayout>
+
+</layout>

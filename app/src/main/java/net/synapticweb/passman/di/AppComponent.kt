@@ -7,6 +7,7 @@ import dagger.Component
 import net.synapticweb.passman.MainActivity
 import net.synapticweb.passman.addeditcredential.di.AddeditCredComponent
 import net.synapticweb.passman.authenticate.di.AuthenticateComponent
+import net.synapticweb.passman.credentialdetail.di.CredDetailComponent
 import net.synapticweb.passman.credentialslist.di.CredListComponent
 import net.synapticweb.passman.settings.di.SettingsComponent
 import javax.inject.Singleton
@@ -26,4 +27,5 @@ interface AppComponent {
     fun authenticateComponent() : AuthenticateComponent.Factory
     fun settingsComponent() : SettingsComponent.Factory
     fun addCredentialComponent() : AddeditCredComponent.Factory
+    fun credDetailComponent() : CredDetailComponent.Factory
 }
