@@ -93,7 +93,7 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
+            android:layout_marginStart="45dp"
             android:id="@+id/repass"
             android:inputType="textPassword"
             android:layout_gravity="start"

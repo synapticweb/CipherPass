@@ -7,6 +7,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
+import kotlinx.coroutines.runBlocking
 import net.synapticweb.passman.R
 import net.synapticweb.passman.model.Credential
 import net.synapticweb.passman.util.CryptoPassTestRule
@@ -23,7 +24,7 @@ class AddeditCredFragmentTest {
 
     @Test
     fun addCred_nameEmpty_showToast() {
-        val bundle = AddeditCredFragmentArgs(null, "New entry").toBundle()
+        val bundle = AddeditCredFragmentArgs(0, "New entry").toBundle()
         val fragmentScenario = launchFragmentInContainer<AddeditCredFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
         onView(withId(R.id.save)).perform(click())
@@ -33,7 +34,7 @@ class AddeditCredFragmentTest {
 
     @Test
     fun addCred_passwdEmpty_showToast() {
-        val bundle = AddeditCredFragmentArgs(null, "New entry").toBundle()
+        val bundle = AddeditCredFragmentArgs(0, "New entry").toBundle()
         val fragmentScenario = launchFragmentInContainer<AddeditCredFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
         onView(withId(R.id.name)).perform(typeText("test_name"))
@@ -45,7 +46,7 @@ class AddeditCredFragmentTest {
 
     @Test
     fun addEdit_passwdNoMatch_showToast() {
-        val bundle = AddeditCredFragmentArgs(null, "New entry").toBundle()
+        val bundle = AddeditCredFragmentArgs(0, "New entry").toBundle()
         val fragmentScenario = launchFragmentInContainer<AddeditCredFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
         onView(withId(R.id.name)).perform(typeText("test_name"))
@@ -60,7 +61,7 @@ class AddeditCredFragmentTest {
     @Test
     fun addEdit_goodInputSave_recordInDb() {
         testRule.setDb()
-        val bundle = AddeditCredFragmentArgs(null, "New entry").toBundle()
+        val bundle = AddeditCredFragmentArgs(0, "New entry").toBundle()
         val mockNav = Mockito.mock(NavController::class.java)
         val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
             AddeditCredFragment().also { fragment ->
@@ -88,5 +89,43 @@ class AddeditCredFragmentTest {
             assertThat(credential.url, `is`("url"))
             assertThat(credential.comment, `is`("comment"))
         }
+    }
+
+    @Test
+    fun addEdit_edit_retainChanges() = runBlocking {
+        testRule.setDb()
+
+        val item = Credential()
+        item.accountName = "account_name"
+        item.accountId = "username"
+        item.password = "password"
+        item.url = "url"
+        testRule.repository.insertCredential(item)
+
+        val bundle = AddeditCredFragmentArgs(1, "account_name").toBundle()
+        val mockNav = Mockito.mock(NavController::class.java)
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
+            AddeditCredFragment().also { fragment ->
+                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
+                    if(viewLifeCycleOwner != null)
+                        Navigation.setViewNavController(fragment.requireView(), mockNav)
+                }
+            }
+        }
+
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+        onView(withId(R.id.id)).perform(replaceText("username_changed"), closeSoftKeyboard())
+        onView(withId(R.id.pass)).perform(replaceText("password_changed"), closeSoftKeyboard())
+        onView(withId(R.id.repass)).perform(replaceText("password_changed"), closeSoftKeyboard())
+        onView(withId(R.id.comment)).perform(typeText("comment"), closeSoftKeyboard())
+        onView(withId(R.id.save)).perform(click())
+
+        val credential : Credential = testRule.repository.getCredential(1)
+
+        assertThat(credential.accountName, `is`("account_name"))
+        assertThat(credential.accountId, `is`("username_changed"))
+        assertThat(credential.password, `is`("password_changed"))
+        assertThat(credential.url, `is`("url"))
+        assertThat(credential.comment, `is`("comment"))
     }
 }
