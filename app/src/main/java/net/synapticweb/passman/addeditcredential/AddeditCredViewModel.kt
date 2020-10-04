@@ -4,11 +4,11 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import net.synapticweb.passman.R
 import net.synapticweb.passman.model.Credential
 import net.synapticweb.passman.model.Repository
+import net.synapticweb.passman.util.Event
 import javax.inject.Inject
 
 class AddeditCredViewModel @Inject constructor(private val repository: Repository,
@@ -20,7 +20,8 @@ class AddeditCredViewModel @Inject constructor(private val repository: Repositor
     val password = MutableLiveData<String>()
     val url = MutableLiveData<String>()
     val comment = MutableLiveData<String>()
-    val working = MutableLiveData<Boolean>()
+    val result = MutableLiveData<Event<Int>>()
+    lateinit var savedCred : Credential
 
     fun populate(credId : Long) {
         viewModelScope.launch {
@@ -30,6 +31,7 @@ class AddeditCredViewModel @Inject constructor(private val repository: Repositor
                 username.value = credential.accountId
                 url.value = credential.url
                 comment.value = credential.comment
+                savedCred = credential
             }
         }
     }
@@ -39,29 +41,49 @@ class AddeditCredViewModel @Inject constructor(private val repository: Repositor
                        password : String,
                        url : String?,
                        comment : String?,
-                       credId : Long?) {
+                       credId : Long) {
+        var dirty = false
 
-        lateinit var credential : Credential
-        viewModelScope.launch {
-            working.value = true
-            credential = if (credId != null)
-                withContext(Dispatchers.IO) {
-                    repository.getCredential(credId)
-                }
-            else
-                Credential()
-
+        val credential = if (credId != 0L) savedCred
+        else
+            Credential()
+        if(credential.accountName != name) {
             credential.accountName = name
-            credential.accountId = username
-            credential.password = password
-            credential.url = url
-            credential.comment = comment
-
-            if(credId != null)
-                repository.updateCredential(credential)
-            else
-                repository.insertCredential(credential)
-            working.value = false
+            dirty = true
         }
+        if(credential.accountId != username) {
+            credential.accountId = username
+            dirty = true
+        }
+
+        if(credential.password != password) {
+            credential.password = password
+            dirty = true
+        }
+
+        if(credential.url != url) {
+            credential.url = url
+            dirty = true
+        }
+
+        if(credential.comment != comment) {
+            credential.comment = comment
+            dirty = true
+        }
+
+        if(dirty) {
+            viewModelScope.launch {
+                if (credId != 0L) {
+                    repository.updateCredential(credential)
+                    result.value = Event(R.string.addedit_save_ok)
+                }
+                else {
+                    repository.insertCredential(credential)
+                    result.value = Event(0)
+                }
+            }
+        }
+        else
+            result.value = Event(R.string.addedit_nochange)
     }
 }

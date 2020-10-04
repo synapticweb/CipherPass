@@ -4,11 +4,11 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -64,11 +64,18 @@ class AddeditCredFragment : Fragment() {
         if(args.credentialId != 0L)
             _viewModel.populate(args.credentialId)
 
-        _viewModel.working.observe(viewLifecycleOwner, Observer {
-            if(!it)
-                findNavController().navigate(
-                    AddeditCredFragmentDirections.actionAddeditCredFragmentToCredListFragment()
-                )
+
+        _viewModel.result.observe(viewLifecycleOwner, EventObserver {
+            val imm: InputMethodManager =
+                requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(requireView().windowToken, 0)
+
+            if(it == R.string.addedit_nochange || it == R.string.addedit_save_ok)
+                Toast.makeText(requireContext(), getString(it), Toast.LENGTH_SHORT).show()
+
+            findNavController().navigate(
+                AddeditCredFragmentDirections.actionAddeditCredFragmentToCredListFragment()
+            )
         })
 
         return binding.root
@@ -101,9 +108,8 @@ class AddeditCredFragment : Fragment() {
                 binding.pass.text.toString(),
                 if(binding.url.text!!.isBlank()) null else binding.url.text.toString(),
                 if(binding.comment.text!!.isBlank()) null else binding.comment.text.toString(),
-                if(args.credentialId == 0L) null else args.credentialId
+                args.credentialId
             )
         }
     }
-
 }

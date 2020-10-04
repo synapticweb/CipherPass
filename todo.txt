@@ -1,5 +1,9 @@
- fără string la parolele conturilor
- dată modificare cont
- grupuri
- iconițe pentru fiecare cont și grup
- log cu timber 
+fără string la parolele conturilor
+dată modificare cont
+grupuri
+iconițe pentru fiecare cont și grup
+log cu timber 
+ordonare: creation last mod, alfa
+db remote
+dialog cu progres la creare/editare
+custom fields

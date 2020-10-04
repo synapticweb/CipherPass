@@ -5,19 +5,20 @@ import android.content.Context
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.afollestad.materialdialogs.MaterialDialog
 import net.synapticweb.passman.CryptoPassApp
 import net.synapticweb.passman.LockStateViewModel
 import net.synapticweb.passman.R
 import net.synapticweb.passman.databinding.CredDetailFragmentBinding
+import net.synapticweb.passman.util.EventObserver
 import javax.inject.Inject
 
 class CredDetailFragment : Fragment() {
@@ -47,8 +48,36 @@ class CredDetailFragment : Fragment() {
         }
         binding.lifecycleOwner = viewLifecycleOwner
         _viewModel.getCredential(args.credentialId)
-        
+        setHasOptionsMenu(true)
+
+        _viewModel.finishDeletion.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(requireContext(), getString(R.string.deletion_ok), Toast.LENGTH_SHORT).show()
+            val action = CredDetailFragmentDirections.actionCredDetailFragmentToCredListFragment()
+            findNavController().navigate(action)
+        })
+
         return binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.detail_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.delete -> {
+                MaterialDialog(requireContext()).show {
+                    title(R.string.confirm_deletion_title)
+                    message(R.string.confirm_deletion_message)
+                    positiveButton(android.R.string.ok) {
+                        _viewModel.delete()
+                    }
+                    negativeButton(android.R.string.cancel) {  }
+                }
+                true
+            }
+            else -> false
+        }
     }
 
     fun setupTogglePassword() {
