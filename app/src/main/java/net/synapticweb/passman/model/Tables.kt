@@ -3,21 +3,20 @@ package net.synapticweb.passman.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Entity(tableName = "credentials")
-data class Credential constructor(
+@Entity(tableName = "entries")
+data class Entry (
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
     var id : Long = 0L,
 
-    @ColumnInfo(name = "account_name")
-    var accountName : String = "",
+    @ColumnInfo(name = "entry_name")
+    var entryName : String = "",
 
-    @ColumnInfo(name = "account_id")
-    var accountId : String? = null,
+    @ColumnInfo(name = "username")
+    var username : String? = null,
 
     @ColumnInfo(name = "password")
     var password : String = "",
@@ -34,7 +33,7 @@ data class Credential constructor(
     val hrInsertionDate : String
         get() {
             val date = Date(insertionDate)
-            val format  = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.US)
+            val format  = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
             return format.format(date)
         }
 }
@@ -47,5 +46,4 @@ class Hash(
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
     var id : Long = 0L
-
 }

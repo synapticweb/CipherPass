@@ -6,19 +6,19 @@ import androidx.room.*
 @Dao
 interface CryptoPassDao {
     @Insert
-    suspend fun insertCredential(credential : Credential) : Long
+    suspend fun insertEntry(entry : Entry) : Long
 
     @Update
-    suspend fun updateCredential(credential : Credential) : Int
+    suspend fun updateEntry(entry : Entry) : Int
 
     @Delete
-    suspend fun deleteCredential(credential : Credential) : Int
+    suspend fun deleteEntry(entry : Entry) : Int
 
-    @Query("SELECT * FROM `credentials` WHERE `id`= :key")
-    suspend fun getCredential(key: Long) : Credential
+    @Query("SELECT * FROM `entries` WHERE `id`= :key")
+    suspend fun getEntry(key: Long) : Entry
 
-    @Query("SELECT * FROM `credentials` ORDER BY `insertion_date` DESC")
-    fun getAllCredentials() : LiveData<List<Credential>>
+    @Query("SELECT * FROM `entries` ORDER BY `insertion_date` DESC")
+    fun getAllEntries() : LiveData<List<Entry>>
 
     @Insert
     suspend fun insertHash(hash : Hash) : Long

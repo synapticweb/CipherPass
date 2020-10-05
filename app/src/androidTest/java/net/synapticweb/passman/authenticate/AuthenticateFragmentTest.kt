@@ -69,7 +69,7 @@ class AuthenticateFragmentTest {
         onView(withId(R.id.passphrase_retype)).perform(typeText(TEST_PASS), closeSoftKeyboard())
         onView(withId(R.id.send_pass)).perform(click())
 
-        onView(withId(R.id.credentials_list)).check(matches(isDisplayed()))
+        onView(withId(R.id.entries_list_root)).check(matches(isDisplayed()))
         assertThat(testRule.repository.isUnlocked(), `is`(true))
 
         assertThat(prefWrapper.getBoolean(PASSPHRASE_SET_KEY), `is`(true))
@@ -141,7 +141,7 @@ class AuthenticateFragmentTest {
         onView(withId(R.id.passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
         onView(withId(R.id.send_pass)).perform(click())
 
-        onView(withId(R.id.credentials_list)).check(matches(isDisplayed()))
+        onView(withId(R.id.entries_list_root)).check(matches(isDisplayed()))
         assertThat(testRule.repository.isUnlocked(), `is`(true))
     }
 
@@ -181,7 +181,7 @@ class AuthenticateFragmentTest {
         runBlocking {
             delay(300)
         }
-        onView(withId(R.id.credentials_list)).check(matches(isDisplayed()))
+        onView(withId(R.id.entries_list_root)).check(matches(isDisplayed()))
         assertThat(testRule.repository.isUnlocked(), `is`(true))
     }
 

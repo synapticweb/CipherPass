@@ -1,4 +1,4 @@
-package net.synapticweb.passman.addeditcredential
+package net.synapticweb.passman.addeditentry
 
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
@@ -9,7 +9,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.passman.R
-import net.synapticweb.passman.model.Credential
+import net.synapticweb.passman.model.Entry
 import net.synapticweb.passman.util.CryptoPassTestRule
 import net.synapticweb.passman.util.isToast
 import net.synapticweb.passman.util.monitorFragment
@@ -18,14 +18,14 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
 
-class AddeditCredFragmentTest {
+class AddeditEntryFragmentTest {
     @get:Rule
     val testRule = CryptoPassTestRule()
 
     @Test
-    fun addCred_nameEmpty_showToast() {
-        val bundle = AddeditCredFragmentArgs(0, "New entry").toBundle()
-        val fragmentScenario = launchFragmentInContainer<AddeditCredFragment>(bundle, R.style.AppTheme)
+    fun addEntry_nameEmpty_showToast() {
+        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
+        val fragmentScenario = launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
         onView(withId(R.id.save)).perform(click())
 
@@ -33,9 +33,9 @@ class AddeditCredFragmentTest {
     }
 
     @Test
-    fun addCred_passwdEmpty_showToast() {
-        val bundle = AddeditCredFragmentArgs(0, "New entry").toBundle()
-        val fragmentScenario = launchFragmentInContainer<AddeditCredFragment>(bundle, R.style.AppTheme)
+    fun addEntry_passwdEmpty_showToast() {
+        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
+        val fragmentScenario = launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
         onView(withId(R.id.name)).perform(typeText("test_name"))
         onView(withId(R.id.id)).perform(typeText("test_username"))
@@ -46,8 +46,8 @@ class AddeditCredFragmentTest {
 
     @Test
     fun addEdit_passwdNoMatch_showToast() {
-        val bundle = AddeditCredFragmentArgs(0, "New entry").toBundle()
-        val fragmentScenario = launchFragmentInContainer<AddeditCredFragment>(bundle, R.style.AppTheme)
+        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
+        val fragmentScenario = launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
         onView(withId(R.id.name)).perform(typeText("test_name"))
         onView(withId(R.id.id)).perform(typeText("test_username"))
@@ -61,10 +61,10 @@ class AddeditCredFragmentTest {
     @Test
     fun addEdit_goodInputSave_recordInDb() {
         testRule.setDb()
-        val bundle = AddeditCredFragmentArgs(0, "New entry").toBundle()
+        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
         val mockNav = Mockito.mock(NavController::class.java)
         val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
-            AddeditCredFragment().also { fragment ->
+            AddeditEntryFragment().also { fragment ->
                 fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
                     if(viewLifeCycleOwner != null)
                         Navigation.setViewNavController(fragment.requireView(), mockNav)
@@ -81,13 +81,13 @@ class AddeditCredFragmentTest {
         onView(withId(R.id.comment)).perform(typeText("comment"), closeSoftKeyboard())
         onView(withId(R.id.save)).perform(click())
 
-        val credential : Credential? = testRule.repository.getAllCredentials().value?.get(0)
-        if (credential != null) {
-            assertThat(credential.accountName, `is`("test_name"))
-            assertThat(credential.accountId, `is`("test_username"))
-            assertThat(credential.password, `is`("test_pass"))
-            assertThat(credential.url, `is`("url"))
-            assertThat(credential.comment, `is`("comment"))
+        val entry : Entry? = testRule.repository.getAllEntries().value?.get(0)
+        if (entry != null) {
+            assertThat(entry.entryName, `is`("test_name"))
+            assertThat(entry.username, `is`("test_username"))
+            assertThat(entry.password, `is`("test_pass"))
+            assertThat(entry.url, `is`("url"))
+            assertThat(entry.comment, `is`("comment"))
         }
     }
 
@@ -95,17 +95,17 @@ class AddeditCredFragmentTest {
     fun addEdit_edit_retainChanges() = runBlocking {
         testRule.setDb()
 
-        val item = Credential()
-        item.accountName = "account_name"
-        item.accountId = "username"
+        val item = Entry()
+        item.entryName = "account_name"
+        item.username = "username"
         item.password = "password"
         item.url = "url"
-        testRule.repository.insertCredential(item)
+        testRule.repository.insertEntry(item)
 
-        val bundle = AddeditCredFragmentArgs(1, "account_name").toBundle()
+        val bundle = AddeditEntryFragmentArgs(1, "account_name").toBundle()
         val mockNav = Mockito.mock(NavController::class.java)
         val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
-            AddeditCredFragment().also { fragment ->
+            AddeditEntryFragment().also { fragment ->
                 fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
                     if(viewLifeCycleOwner != null)
                         Navigation.setViewNavController(fragment.requireView(), mockNav)
@@ -120,12 +120,13 @@ class AddeditCredFragmentTest {
         onView(withId(R.id.comment)).perform(typeText("comment"), closeSoftKeyboard())
         onView(withId(R.id.save)).perform(click())
 
-        val credential : Credential = testRule.repository.getCredential(1)
+        val entry : Entry = testRule.repository.getEntry(1)
 
-        assertThat(credential.accountName, `is`("account_name"))
-        assertThat(credential.accountId, `is`("username_changed"))
-        assertThat(credential.password, `is`("password_changed"))
-        assertThat(credential.url, `is`("url"))
-        assertThat(credential.comment, `is`("comment"))
+        assertThat(entry.entryName, `is`("account_name"))
+        assertThat(entry.username, `is`("username_changed"))
+        assertThat(entry.password, `is`("password_changed"))
+        assertThat(entry.url, `is`("url"))
+        assertThat(entry.comment, `is`("comment"))
     }
+
 }

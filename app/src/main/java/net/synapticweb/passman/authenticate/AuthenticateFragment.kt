@@ -27,7 +27,7 @@ class AuthenticateFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory : ViewModelProvider.Factory
 
-    private val viewModelFrg by viewModels<AuthenticateViewModel> { viewModelFactory }
+    private val _viewModel by viewModels<AuthenticateViewModel> { viewModelFactory }
     private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
 
     private lateinit var binding : AuthenticateFragmentBinding
@@ -46,12 +46,12 @@ class AuthenticateFragment : Fragment() {
     ): View? {
         val fragment = this
         binding = AuthenticateFragmentBinding.inflate(inflater, container, false).apply {
-            viewModel = viewModelFrg
+            viewModel = _viewModel
             lifecycleOwner = fragment
         }
         setupSendPass()
 
-        when(viewModelFrg.getApplockPref()) {
+        when(_viewModel.getApplockPref()) {
             APPLOCK_SYSTEM_VALUE -> {
                 val keyMan =
                     requireActivity().getSystemService(Context.KEYGUARD_SERVICE) as
@@ -71,13 +71,13 @@ class AuthenticateFragment : Fragment() {
             APPLOCK_NOLOCK_VALUE -> {
                 binding.passLayout.visibility = View.GONE
                 binding.sendPass.visibility = View.GONE
-                viewModelFrg.getPassphrase()
+                _viewModel.getPassphrase()
             }
         }
 
-        viewModelFrg.passwd.observe(viewLifecycleOwner, Observer {
+        _viewModel.passwd.observe(viewLifecycleOwner, Observer {
             if(it != null)
-                viewModelFrg.authenticate(it)
+                _viewModel.authenticate(it)
             else
                 Snackbar.make(requireActivity().findViewById(android.R.id.content), getString(R.string.system_lock_unavailable),
                     Snackbar.LENGTH_LONG).show()
@@ -86,14 +86,14 @@ class AuthenticateFragment : Fragment() {
         setupPasswordFields(binding.passLayout, arrayOf(binding.passphrase,
             binding.passphraseRetype))
 
-        viewModelFrg.authResult.observe(viewLifecycleOwner, EventObserver {
+        _viewModel.authResult.observe(viewLifecycleOwner, EventObserver {
             lockState.startedUnlockActivity = false
             when(it) {
                 AUTH_OK -> {
                     binding.passphrase.text!!.clear()
                     binding.passphraseRetype.text.clear()
                     findNavController().navigate(
-                        AuthenticateFragmentDirections.actionAuthenticateFragmentToCredListFragment()
+                        AuthenticateFragmentDirections.actionAuthenticateFragmentToEntriesListFragment()
                     )
                 }
 
@@ -122,14 +122,14 @@ class AuthenticateFragment : Fragment() {
             val pass = editableToCharArray(binding.passphrase.text!!)
             val rePass = editableToCharArray(binding.passphraseRetype.text)
 
-            if (!viewModelFrg.isPassSet() && !pass.contentEquals(rePass)) {
+            if (!_viewModel.isPassSet() && !pass.contentEquals(rePass)) {
                 binding.passLayout.error = getString(R.string.pass_no_match)
                 return@setOnClickListener
             }
 
             Arrays.fill(rePass, 0.toChar())
             binding.passphrase.text?. let {
-                viewModelFrg.authenticate(pass)
+                _viewModel.authenticate(pass)
              }
         }
     }
@@ -138,7 +138,7 @@ class AuthenticateFragment : Fragment() {
         if(requestCode == LOCK_ACTIVITY_CODE && resultCode == Activity.RESULT_OK) {
             binding.passLayout.visibility = View.GONE
             binding.sendPass.visibility = View.GONE
-            viewModelFrg.getPassphrase()
+            _viewModel.getPassphrase()
         }
     }
 }

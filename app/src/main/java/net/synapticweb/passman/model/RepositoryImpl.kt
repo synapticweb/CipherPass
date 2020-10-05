@@ -34,7 +34,7 @@ open class RepositoryImpl @Inject constructor(
             //inițial am încercat să verific cu isOpen, dar întoarce false chiar dacă parola a fost
             // corectă. După o interogare reușită isOpen întoarce true.
             try {
-                database.query("SELECT COUNT(*) FROM `credentials`", null)
+                database.query("SELECT COUNT(*) FROM `entries`", null)
                 true
             } catch (e: Exception) {
                 false
@@ -89,24 +89,24 @@ open class RepositoryImpl @Inject constructor(
             database.close()
     }
 
-    override suspend fun insertCredential(credential: Credential) : Long {
-        return database.dao.insertCredential(credential)
+    override suspend fun insertEntry(entry: Entry) : Long {
+        return database.dao.insertEntry(entry)
     }
 
-    override suspend fun updateCredential(credential: Credential): Int {
-        return database.dao.updateCredential(credential)
+    override suspend fun updateEntry(entry: Entry): Int {
+        return database.dao.updateEntry(entry)
     }
 
-    override suspend fun deleteCredential(credential: Credential): Int {
-        return database.dao.deleteCredential(credential)
+    override suspend fun deleteEntry(entry: Entry): Int {
+        return database.dao.deleteEntry(entry)
     }
 
-    override suspend fun getCredential(key: Long): Credential {
-        return database.dao.getCredential(key)
+    override suspend fun getEntry(key: Long): Entry {
+        return database.dao.getEntry(key)
     }
 
-    override fun getAllCredentials(): LiveData<List<Credential>> {
-        return database.dao.getAllCredentials()
+    override fun getAllEntries(): LiveData<List<Entry>> {
+        return database.dao.getAllEntries()
     }
 
     @VisibleForTesting

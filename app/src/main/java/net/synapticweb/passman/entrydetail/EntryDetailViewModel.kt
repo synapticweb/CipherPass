@@ -1,32 +1,32 @@
-package net.synapticweb.passman.credentialdetail
+package net.synapticweb.passman.entrydetail
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import net.synapticweb.passman.model.Credential
+import net.synapticweb.passman.model.Entry
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.Event
 import javax.inject.Inject
 
-class CredDetailViewModel @Inject constructor(private val repository: Repository,
-                                              application: Application
+class EntryDetailViewModel @Inject constructor(private val repository: Repository,
+                                               application: Application
 ) : AndroidViewModel(application) {
 
-    val credential = MutableLiveData<Credential>()
+    val entry = MutableLiveData<Entry>()
     val finishDeletion = MutableLiveData<Event<Boolean>>()
 
-    fun getCredential(credId : Long) {
+    fun getEntry(entryId : Long) {
         viewModelScope.launch {
-            credential.value = repository.getCredential(credId)
+            entry.value = repository.getEntry(entryId)
         }
     }
 
-    fun delete() {
-        credential.value?.let {
+    fun deleteEntry() {
+        entry.value?.let {
             viewModelScope.launch {
-                repository.deleteCredential(it)
+                repository.deleteEntry(it)
                 finishDeletion.value = Event(true)
             }
         }

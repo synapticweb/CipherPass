@@ -5,10 +5,10 @@ import android.content.Context
 import dagger.BindsInstance
 import dagger.Component
 import net.synapticweb.passman.MainActivity
-import net.synapticweb.passman.addeditcredential.di.AddeditCredComponent
+import net.synapticweb.passman.addeditentry.di.AddeditEntryComponent
 import net.synapticweb.passman.authenticate.di.AuthenticateComponent
-import net.synapticweb.passman.credentialdetail.di.CredDetailComponent
-import net.synapticweb.passman.credentialslist.di.CredListComponent
+import net.synapticweb.passman.entrydetail.di.EntryDetailComponent
+import net.synapticweb.passman.entrieslist.di.EntriesListComponent
 import net.synapticweb.passman.settings.di.SettingsComponent
 import javax.inject.Singleton
 
@@ -23,9 +23,9 @@ interface AppComponent {
     }
 
     fun inject(activity : MainActivity)
-    fun credListComponent() : CredListComponent.Factory
+    fun entriesListComponent() : EntriesListComponent.Factory
     fun authenticateComponent() : AuthenticateComponent.Factory
     fun settingsComponent() : SettingsComponent.Factory
-    fun addCredentialComponent() : AddeditCredComponent.Factory
-    fun credDetailComponent() : CredDetailComponent.Factory
+    fun addEntryComponent() : AddeditEntryComponent.Factory
+    fun entryDetailComponent() : EntryDetailComponent.Factory
 }

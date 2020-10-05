@@ -15,15 +15,15 @@ interface Repository {
 
     suspend fun reKey(passphrase: CharArray) : Boolean
 
-    suspend fun insertCredential(credential : Credential) : Long
+    suspend fun insertEntry(entry : Entry) : Long
 
-    suspend fun updateCredential(credential: Credential) : Int
+    suspend fun updateEntry(entry: Entry) : Int
 
-    suspend fun deleteCredential(credential: Credential) : Int
+    suspend fun deleteEntry(entry: Entry) : Int
 
-    suspend fun getCredential(key : Long) : Credential
+    suspend fun getEntry(key : Long) : Entry
 
-    fun getAllCredentials() : LiveData<List<Credential>>
+    fun getAllEntries() : LiveData<List<Entry>>
 
     fun removeDb()
 }

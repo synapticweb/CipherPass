@@ -1,4 +1,4 @@
-package net.synapticweb.passman.credentialdetail
+package net.synapticweb.passman.entrydetail
 
 import android.app.Activity
 import android.content.Context
@@ -17,23 +17,24 @@ import com.afollestad.materialdialogs.MaterialDialog
 import net.synapticweb.passman.CryptoPassApp
 import net.synapticweb.passman.LockStateViewModel
 import net.synapticweb.passman.R
-import net.synapticweb.passman.databinding.CredDetailFragmentBinding
+import net.synapticweb.passman.databinding.EntryDetailFragmentBinding
+import net.synapticweb.passman.entrieslist.EntriesListFragmentDirections
 import net.synapticweb.passman.util.EventObserver
 import javax.inject.Inject
 
-class CredDetailFragment : Fragment() {
+class EntryDetailFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory : ViewModelProvider.Factory
-    private val _viewModel by viewModels<CredDetailViewModel> { viewModelFactory }
+    private val _viewModel by viewModels<EntryDetailViewModel> { viewModelFactory }
     private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
-    private val args : CredDetailFragmentArgs by navArgs()
-    private lateinit var binding: CredDetailFragmentBinding
+    private val args : EntryDetailFragmentArgs by navArgs()
+    private lateinit var binding: EntryDetailFragmentBinding
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val parentActivity : Activity = context as Activity
         val app : CryptoPassApp = parentActivity.application as CryptoPassApp
-        app.appComponent.credDetailComponent().create().inject(this)
+        app.appComponent.entryDetailComponent().create().inject(this)
     }
 
     override fun onCreateView(
@@ -41,20 +42,14 @@ class CredDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-       val root = inflater.inflate(R.layout.cred_detail_fragment, container, false)
-        binding = CredDetailFragmentBinding.bind(root).apply {
+       val root = inflater.inflate(R.layout.entry_detail_fragment, container, false)
+        binding = EntryDetailFragmentBinding.bind(root).apply {
             viewModel = _viewModel
-            fragment = this@CredDetailFragment
+            fragment = this@EntryDetailFragment
         }
         binding.lifecycleOwner = viewLifecycleOwner
-        _viewModel.getCredential(args.credentialId)
+        _viewModel.getEntry(args.entryId)
         setHasOptionsMenu(true)
-
-        _viewModel.finishDeletion.observe(viewLifecycleOwner, EventObserver {
-            Toast.makeText(requireContext(), getString(R.string.deletion_ok), Toast.LENGTH_SHORT).show()
-            val action = CredDetailFragmentDirections.actionCredDetailFragmentToCredListFragment()
-            findNavController().navigate(action)
-        })
 
         return binding.root
     }
@@ -70,7 +65,7 @@ class CredDetailFragment : Fragment() {
                     title(R.string.confirm_deletion_title)
                     message(R.string.confirm_deletion_message)
                     positiveButton(android.R.string.ok) {
-                        _viewModel.delete()
+                        _viewModel.deleteEntry()
                     }
                     negativeButton(android.R.string.cancel) {  }
                 }
@@ -78,6 +73,27 @@ class CredDetailFragment : Fragment() {
             }
             else -> false
         }
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        setupNavigation()
+    }
+
+    private fun setupNavigation() {
+        lockState.unauthorized.observe(viewLifecycleOwner,
+            EventObserver {
+                if (it)
+                    findNavController().navigate(
+                        EntryDetailFragmentDirections.actionEntryDetailFragmentToAuthenticateFragment()
+                    )
+            })
+
+        _viewModel.finishDeletion.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(requireContext(), getString(R.string.deletion_ok), Toast.LENGTH_SHORT).show()
+            val action = EntryDetailFragmentDirections.actionEntryDetailFragmentToEntriesListFragment()
+            findNavController().navigate(action)
+        })
     }
 
     fun setupTogglePassword() {
@@ -91,9 +107,9 @@ class CredDetailFragment : Fragment() {
         }
     }
 
-    fun fabListener(credId : Long, title : String) {
-        val action = CredDetailFragmentDirections
-            .actionCredDetailFragmentToAddeditCredFragment(credId, title)
+    fun fabListener(entryId : Long, title : String) {
+        val action = EntryDetailFragmentDirections
+            .actionEntryDetailFragmentToAddeditEntryFragment(entryId, title)
         findNavController().navigate(action)
     }
 }

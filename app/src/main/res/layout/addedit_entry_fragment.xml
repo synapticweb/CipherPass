@@ -5,7 +5,7 @@
         <import type="android.view.View" />
         <variable
             name="viewModel"
-            type="net.synapticweb.passman.addeditcredential.AddeditCredViewModel" />
+            type="net.synapticweb.passman.addeditentry.AddeditEntryViewModel" />
     </data>
 
     <RelativeLayout

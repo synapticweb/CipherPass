@@ -8,34 +8,34 @@
         android:name="net.synapticweb.passman.authenticate.AuthenticateFragment"
         android:label="@string/app_name" >
         <action
-            android:id="@+id/action_authenticateFragment_to_credListFragment"
-            app:destination="@id/credListFragment" />
+            android:id="@+id/action_authenticateFragment_to_entriesListFragment"
+            app:destination="@id/entriesListFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/credListFragment"
-        android:name="net.synapticweb.passman.credentialslist.CredListFragment"
+        android:id="@+id/entriesListFragment"
+        android:name="net.synapticweb.passman.entrieslist.EntriesListFragment"
         android:label="@string/app_name" >
         <action
-            android:id="@+id/action_credListFragment_to_authenticateFragment"
+            android:id="@+id/action_entriesListFragment_to_authenticateFragment"
             app:destination="@id/authenticateFragment" />
         <action
-            android:id="@+id/action_credListFragment_to_settingsFragment"
+            android:id="@+id/action_entriesListFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
         <action
-            android:id="@+id/action_credListFragment_to_addeditCredFragment"
-            app:destination="@id/addeditCredFragment" />
+            android:id="@+id/action_entriesListFragment_to_addeditEntryFragment"
+            app:destination="@id/addeditEntryFragment" />
         <action
-            android:id="@+id/action_credListFragment_to_credDetailFragment"
-            app:destination="@id/credDetailFragment" />
+            android:id="@+id/action_entriesListFragment_to_entryDetailFragment"
+            app:destination="@id/entryDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="net.synapticweb.passman.settings.SettingsFragment"
         android:label="SettingsFragment" >
         <action
-            android:id="@+id/action_settingsFragment_to_credListFragment"
-            app:destination="@id/credListFragment" />
+            android:id="@+id/action_settingsFragment_to_entriesListFragment"
+            app:destination="@id/entriesListFragment" />
         <action
             android:id="@+id/action_settingsFragment_to_authenticateFragment"
             app:destination="@id/authenticateFragment" />
@@ -58,11 +58,11 @@
             app:argType="string" />
     </fragment>
     <fragment
-        android:id="@+id/addeditCredFragment"
-        android:name="net.synapticweb.passman.addeditcredential.AddeditCredFragment"
+        android:id="@+id/addeditEntryFragment"
+        android:name="net.synapticweb.passman.addeditentry.AddeditEntryFragment"
         android:label="{title}" >
         <argument
-            android:name="credentialId"
+            android:name="entryId"
             app:argType="long"
             app:nullable="false"/>
         <argument
@@ -70,32 +70,32 @@
             app:argType="string"
             app:nullable="false"/>
         <action
-            android:id="@+id/action_addeditCredFragment_to_credListFragment"
-            app:destination="@id/credListFragment" />
+            android:id="@+id/action_addeditEntryFragment_to_entriesListFragment"
+            app:destination="@id/entriesListFragment" />
         <action
-            android:id="@+id/action_addeditCredFragment_to_authenticateFragment"
+            android:id="@+id/action_addeditEntryFragment_to_authenticateFragment"
             app:destination="@id/authenticateFragment" />
         <action
-            android:id="@+id/action_addeditCredFragment_to_credDetailFragment"
-            app:destination="@id/credDetailFragment" />
+            android:id="@+id/action_addeditEntryFragment_to_entryDetailFragment"
+            app:destination="@id/entryDetailFragment" />
     </fragment>
     <fragment
-        android:id="@+id/credDetailFragment"
-        android:name="net.synapticweb.passman.credentialdetail.CredDetailFragment"
+        android:id="@+id/entryDetailFragment"
+        android:name="net.synapticweb.passman.entrydetail.EntryDetailFragment"
         android:label="{title}" >
         <argument
-            android:name="credentialId"
+            android:name="entryId"
             app:argType="long" />
         <argument android:name="title"
             app:argType="string" />
         <action
-            android:id="@+id/action_credDetailFragment_to_credListFragment"
-            app:destination="@id/credListFragment" />
+            android:id="@+id/action_entryDetailFragment_to_entriesListFragment"
+            app:destination="@id/entriesListFragment" />
         <action
-            android:id="@+id/action_credDetailFragment_to_authenticateFragment"
+            android:id="@+id/action_entryDetailFragment_to_authenticateFragment"
             app:destination="@id/authenticateFragment" />
         <action
-            android:id="@+id/action_credDetailFragment_to_addeditCredFragment"
-            app:destination="@id/addeditCredFragment" />
+            android:id="@+id/action_entryDetailFragment_to_addeditEntryFragment"
+            app:destination="@id/addeditEntryFragment" />
     </fragment>
 </navigation>

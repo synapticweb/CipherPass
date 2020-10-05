@@ -5,10 +5,10 @@
         <import type="android.view.View" />
         <variable
             name="fragment"
-            type="net.synapticweb.passman.credentialdetail.CredDetailFragment" />
+            type="net.synapticweb.passman.entrydetail.EntryDetailFragment" />
         <variable
             name="viewModel"
-            type="net.synapticweb.passman.credentialdetail.CredDetailViewModel" />
+            type="net.synapticweb.passman.entrydetail.EntryDetailViewModel" />
     </data>
 
     <FrameLayout
@@ -32,7 +32,7 @@
                 android:layout_width="match_parent"
                 style="@style/detail_field"
                 android:id="@+id/username_slot"
-                android:visibility="@{viewModel.credential.accountId != null ? View.VISIBLE : View.GONE }"
+                android:visibility="@{viewModel.entry.username != null ? View.VISIBLE : View.GONE }"
                 >
 
                 <ImageView
@@ -50,7 +50,7 @@
                 <TextView
                     android:layout_toEndOf="@id/username_img"
                     android:layout_toStartOf="@id/username_copy"
-                    android:text="@{viewModel.credential.accountId}"
+                    android:text="@{viewModel.entry.username}"
                     style="@style/detail_item_text"/>
 
 
@@ -87,7 +87,7 @@
                     android:focusable="false"
                     android:background="@android:color/transparent"
                     style="@style/detail_item_text"
-                    android:text="@{viewModel.credential.password}"
+                    android:text="@{viewModel.entry.password}"
                     />
 
 
@@ -112,7 +112,7 @@
                 android:layout_width="match_parent"
                 style="@style/detail_field"
                 android:id="@+id/url_slot"
-                android:visibility="@{viewModel.credential.url != null ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.entry.url != null ? View.VISIBLE : View.GONE}"
                 >
 
                 <ImageView
@@ -130,7 +130,7 @@
                     android:layout_toEndOf="@id/url_img"
                     android:layout_toStartOf="@id/url_copy"
                     style="@style/detail_item_text"
-                    android:text="@{viewModel.credential.url}"/>
+                    android:text="@{viewModel.entry.url}"/>
 
 
                 <ImageButton
@@ -145,7 +145,7 @@
                 style="@style/detail_field"
                 android:layout_height="wrap_content"
                 android:id="@+id/comment_slot"
-                android:visibility="@{viewModel.credential.comment != null ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.entry.comment != null ? View.VISIBLE : View.GONE}"
                 >
 
                 <ImageView
@@ -166,7 +166,7 @@
                     android:layout_marginBottom="0dp"
                     android:layout_toEndOf="@id/comment_img"
                     android:layout_below="@id/comment_caption"
-                    android:text="@{viewModel.credential.comment}"
+                    android:text="@{viewModel.entry.comment}"
                     />
 
 
@@ -197,7 +197,7 @@
                     android:layout_toEndOf="@id/date_created_img"
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="10dp"
-                    android:text="@{viewModel.credential.hrInsertionDate}"
+                    android:text="@{viewModel.entry.hrInsertionDate}"
                     />
 
 
@@ -208,14 +208,14 @@
         </ScrollView>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/edit_credential"
+            android:id="@+id/edit_entry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             app:fabSize="normal"
             android:src="@drawable/edit"
             android:layout_gravity="bottom|end"
-            android:onClick="@{() -> fragment.fabListener(viewModel.credential.id, viewModel.credential.accountName)}"/>
+            android:onClick="@{() -> fragment.fabListener(viewModel.entry.id, viewModel.entry.entryName)}"/>
 
     </FrameLayout>
 

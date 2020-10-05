@@ -3,10 +3,10 @@
     <data>
         <variable
             name="viewModel"
-            type="net.synapticweb.passman.credentialslist.CredListViewModel" />
+            type="net.synapticweb.passman.entrieslist.EntriesListViewModel" />
         <variable
-            name="credential"
-            type="net.synapticweb.passman.model.Credential" />
+            name="entry"
+            type="net.synapticweb.passman.model.Entry" />
     </data>
 
 <LinearLayout
@@ -17,16 +17,16 @@
     android:paddingTop="8dp"
     android:paddingBottom="8dp"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:onClick="@{() -> viewModel.openCredential(credential.id, credential.accountName)}">
+    android:onClick="@{() -> viewModel.openEntry(entry.id, entry.entryName)}">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/credential_name"
+        android:id="@+id/entry_name"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
         android:textSize="14sp"
-        android:text="@{credential.accountName}" />
+        android:text="@{entry.entryName}" />
 
 </LinearLayout>
 
