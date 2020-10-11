@@ -1,9 +1,12 @@
 fără string la parolele conturilor
-dată modificare cont
+*dată modificare cont
 grupuri
-iconițe pentru fiecare cont și grup
+*iconițe pentru fiecare cont și grup
 log cu timber 
-ordonare: creation last mod, alfa
+*ordonare: creation last mod, alfa
+*cautare
 db remote
 dialog cu progres la creare/editare
 custom fields
+*clipboard timeout
+*backup and export db

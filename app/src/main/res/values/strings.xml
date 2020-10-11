@@ -63,4 +63,10 @@
     <string name="confirm_deletion_title">Confirm deletion</string>
     <string name="confirm_deletion_message">Are you sure you want to delete this entry? (Recovery is not possible)</string>
     <string name="deletion_ok">Entry successfully deleted.</string>
+    <string name="confirm_discard_title">Discard changes?</string>
+    <string name="confirm_discard_message">Do you really want to discard the changes made?</string>
+    <string name="copied_to_clipboard"> copied to clipboard.</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="url">Url</string>
 </resources>

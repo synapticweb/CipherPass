@@ -176,8 +176,8 @@ class AddeditEntryFragment : Fragment() {
         }
         if (dirty)
             MaterialDialog(requireContext()).show {
-                title(null, "Discard changes?")
-                message(null, "Do you really want to discard the changes made?")
+                title(R.string.confirm_discard_title)
+                message(R.string.confirm_discard_message)
                 positiveButton {
                     goUp()
                 }

@@ -48,6 +48,7 @@
                     style="@style/detail_item_caption" />
 
                 <TextView
+                    android:id="@+id/username"
                     android:layout_toEndOf="@id/username_img"
                     android:layout_toStartOf="@id/username_copy"
                     android:text="@{viewModel.entry.username}"
@@ -57,6 +58,7 @@
                 <ImageButton
                     android:id="@+id/username_copy"
                     android:src="@drawable/copy"
+                    android:onClick="@{() -> viewModel.copy(username.text, @string/username)}"
                     style="@style/detail_button" />
 
             </RelativeLayout>
@@ -104,6 +106,7 @@
                     android:id="@+id/password_copy"
                     android:src="@drawable/copy"
                     android:layout_marginStart="10dp"
+                    android:onClick="@{() -> viewModel.copy(password.text, @string/password)}"
                     style="@style/detail_button" />
 
             </RelativeLayout>
@@ -127,6 +130,7 @@
                     style="@style/detail_item_caption" />
 
                 <TextView
+                    android:id="@+id/url"
                     android:layout_toEndOf="@id/url_img"
                     android:layout_toStartOf="@id/url_copy"
                     style="@style/detail_item_text"
@@ -136,6 +140,7 @@
                 <ImageButton
                     android:id="@+id/url_copy"
                     android:src="@drawable/copy"
+                    android:onClick="@{() -> viewModel.copy(url.text, @string/url)}"
                     style="@style/detail_button" />
 
             </RelativeLayout>

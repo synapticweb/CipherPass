@@ -18,7 +18,6 @@ import net.synapticweb.passman.CryptoPassApp
 import net.synapticweb.passman.LockStateViewModel
 import net.synapticweb.passman.R
 import net.synapticweb.passman.databinding.EntryDetailFragmentBinding
-import net.synapticweb.passman.entrieslist.EntriesListFragmentDirections
 import net.synapticweb.passman.util.EventObserver
 import javax.inject.Inject
 
@@ -78,6 +77,7 @@ class EntryDetailFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupNavigation()
+        setupCopyToast()
     }
 
     private fun setupNavigation() {
@@ -111,5 +111,11 @@ class EntryDetailFragment : Fragment() {
         val action = EntryDetailFragmentDirections
             .actionEntryDetailFragmentToAddeditEntryFragment(entryId, title)
         findNavController().navigate(action)
+    }
+
+    private fun setupCopyToast() {
+        _viewModel.finishCopy.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(requireContext(), it + getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show()
+        })
     }
 }
