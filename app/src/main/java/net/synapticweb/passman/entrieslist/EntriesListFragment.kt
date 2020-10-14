@@ -1,8 +1,10 @@
 package net.synapticweb.passman.entrieslist
 
+import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -24,6 +26,7 @@ class EntriesListFragment : Fragment() {
     private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
     private lateinit var binding : EntriesListFragmentBinding
     private lateinit var adapter: EntriesAdapter
+    private lateinit var searchPopup : SearchPopup
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -38,9 +41,7 @@ class EntriesListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = EntriesListFragmentBinding.inflate(inflater, container, false).apply {
-            viewModel = _viewModel
-        }
+        binding = EntriesListFragmentBinding.inflate(inflater, container, false)
 
         _viewModel.entries.observe(viewLifecycleOwner, Observer {
             adapter.submitList(it)
@@ -56,11 +57,34 @@ class EntriesListFragment : Fragment() {
         setupAdapter()
         setupFab()
         setupNavigation()
+        setupSearch()
         handleBackPressed(lockState)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.entries_list_menu, menu)
+
+        val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE)
+                as SearchManager
+        (menu.findItem(R.id.search).actionView as SearchView).apply {
+            setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
+            //https://stackoverflow.com/questions/18063103/searchview-in-optionsmenu-not-full-width
+            maxWidth = Integer.MAX_VALUE
+
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextChange(newText : String?): Boolean {
+                    newText?.apply {
+                        _viewModel.search(newText)
+                    }
+                    return true
+                }
+
+                override fun onQueryTextSubmit(p0: String?): Boolean {
+                    TODO("Not yet implemented")
+                }
+            })
+        }
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -76,6 +100,9 @@ class EntriesListFragment : Fragment() {
 
     private fun setupNavigation() {
         _viewModel.openEntryEvent.observe(viewLifecycleOwner, EventObserver {
+            if(::searchPopup.isInitialized && searchPopup.isShowing)
+                searchPopup.dismiss()
+
             findNavController().navigate(
                 EntriesListFragmentDirections.actionEntriesListFragmentToEntryDetailFragment(it.first, it.second)
             )
@@ -103,10 +130,20 @@ class EntriesListFragment : Fragment() {
     }
 
     private fun setupAdapter() {
-        val viewModel = binding.viewModel
-        if (viewModel != null) {
-            adapter = EntriesAdapter(viewModel)
-            binding.entriesList.adapter = adapter
-        }
+        adapter = EntriesAdapter(_viewModel)
+        binding.entriesList.adapter = adapter
+    }
+
+    private fun setupSearch() {
+        _viewModel.searchResults.observe(viewLifecycleOwner, EventObserver {
+            if(::searchPopup.isInitialized && searchPopup.isShowing)
+                searchPopup.dismiss()
+
+            if(it.isNotEmpty()) {
+                searchPopup = SearchPopup(requireContext(), _viewModel)
+                searchPopup.setList(it)
+                searchPopup.showAsDropDown(requireActivity().findViewById(R.id.search))
+            }
+        })
     }
 }

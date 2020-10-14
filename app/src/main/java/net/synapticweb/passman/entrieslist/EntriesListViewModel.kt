@@ -2,6 +2,9 @@ package net.synapticweb.passman.entrieslist
 
 import android.app.Application
 import androidx.lifecycle.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.model.Entry
 import net.synapticweb.passman.util.Event
@@ -19,8 +22,27 @@ class EntriesListViewModel @Inject constructor(private val repository: Repositor
     private val _openEntryEvent = MutableLiveData<Event<Pair<Long, String>>>()
     val openEntryEvent : LiveData<Event<Pair<Long, String>>> = _openEntryEvent
 
+    private val _searchResults = MutableLiveData<Event<List<Entry>>>()
+    val searchResults : MutableLiveData<Event<List<Entry>>> = _searchResults
+
     fun openEntry(entryId : Long, title : String) {
         _openEntryEvent.value = Event(Pair(entryId, title))
+    }
+
+    fun search(query : String) {
+        val elems = query.split("\\s+".toRegex())
+        val finalElems = mutableListOf<String>()
+        for(elem in elems)
+            if(elem.isNotBlank())
+                finalElems.add(elem)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.queryDb(finalElems). let {
+                    withContext(Dispatchers.Main) {
+                        _searchResults.value = Event(it)
+                    }
+            }
+        }
     }
 
 }

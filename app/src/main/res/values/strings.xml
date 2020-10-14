@@ -69,4 +69,7 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="url">Url</string>
+    <string name="search_hint">Search entries</string>
+    <string name="search_title">Search</string>
+    <string name="entries_list_filter">filter</string>
 </resources>

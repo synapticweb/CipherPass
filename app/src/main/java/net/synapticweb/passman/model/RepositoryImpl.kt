@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.room.Room
+import androidx.sqlite.db.SimpleSQLiteQuery
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.sqlcipher.database.SQLiteDatabase
@@ -12,6 +13,7 @@ import net.sqlcipher.database.SupportFactory
 import net.synapticweb.passman.*
 import net.synapticweb.passman.util.*
 import java.lang.Exception
+import java.lang.StringBuilder
 import javax.inject.Inject
 
 open class RepositoryImpl @Inject constructor(
@@ -157,5 +159,21 @@ open class RepositoryImpl @Inject constructor(
 
     override fun removeDb() {
         context.deleteDatabase(fileName)
+    }
+
+    override suspend fun queryDb(elements: List<String>) : List<Entry> {
+        val queryStem = "SELECT * FROM `entries` JOIN `entries_fts` ON `id`=`docid` WHERE `entries_fts` MATCH "
+
+        val sb = StringBuilder()
+        sb.append("'")
+        for((index, element) in elements.withIndex()) {
+            sb.append("$element*")
+            if(index < elements.lastIndex)
+                sb.append(" OR ")
+        }
+        sb.append("'")
+
+        val query = SimpleSQLiteQuery(queryStem + sb.toString())
+        return database.dao.queryDb(query)
     }
 }

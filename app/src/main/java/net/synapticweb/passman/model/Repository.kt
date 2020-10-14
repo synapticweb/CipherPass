@@ -26,4 +26,6 @@ interface Repository {
     fun getAllEntries() : LiveData<List<Entry>>
 
     fun removeDb()
+
+    suspend fun queryDb(elements : List<String>) : List<Entry>
 }

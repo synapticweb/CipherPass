@@ -2,6 +2,7 @@ package net.synapticweb.passman.model
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 
 @Dao
 interface CryptoPassDao {
@@ -31,4 +32,7 @@ interface CryptoPassDao {
 
     @Query("SELECT * FROM `hash` WHERE `id`=1")
     suspend fun getHash() : Hash?
+
+    @RawQuery
+    suspend fun queryDb(query : SupportSQLiteQuery) : List<Entry>
 }

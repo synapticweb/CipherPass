@@ -15,16 +15,24 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- https://stackoverflow.com/questions/11543287/android-getsearchableinfogetcomponentname-returning-null -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
 
-        <service android:name=".service.CPAutofillService"
-            android:label="@string/autofill_service_label"
-            android:permission="android.permission.BIND_AUTOFILL_SERVICE">
-        <intent-filter>
-            <action android:name="android.service.autofill.AutofillService" />
-        </intent-filter>
+<!--        <service android:name=".service.CPAutofillService"-->
+<!--            android:label="@string/autofill_service_label"-->
+<!--            android:permission="android.permission.BIND_AUTOFILL_SERVICE">-->
+<!--        <intent-filter>-->
+<!--            <action android:name="android.service.autofill.AutofillService" />-->
+<!--        </intent-filter>-->
 
-        </service>
+<!--        </service>-->
 
     </application>
 
