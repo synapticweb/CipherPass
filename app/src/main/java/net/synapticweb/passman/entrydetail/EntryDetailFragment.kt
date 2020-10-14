@@ -7,9 +7,11 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -78,6 +80,7 @@ class EntryDetailFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         setupNavigation()
         setupCopyToast()
+        setTitle()
     }
 
     private fun setupNavigation() {
@@ -116,6 +119,13 @@ class EntryDetailFragment : Fragment() {
     private fun setupCopyToast() {
         _viewModel.finishCopy.observe(viewLifecycleOwner, EventObserver {
             Toast.makeText(requireContext(), it + getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show()
+        })
+    }
+
+    private fun setTitle() {
+        _viewModel.entry.observe(viewLifecycleOwner, Observer {
+            (requireActivity() as AppCompatActivity)
+                .supportActionBar?.title = it.entryName
         })
     }
 }

@@ -36,67 +36,33 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
         }
     }
 
-    fun checkDirty(name : String,
-                   username : String?,
-                   password : String,
-                   url : String?,
-                   comment : String?) : Boolean {
-        return if (savedEntry.entryName != name || savedEntry.username != username ||
-            savedEntry.password != password || savedEntry.url != url ||
-            savedEntry.comment != comment
-        ) true
-        else
-            return false
-    }
-
     fun saveEntry(name : String,
                   username : String?,
                   password : String,
                   url : String?,
                   comment : String?,
                   entryId : Long) {
-        var dirty = false
 
         val entry = if (entryId != 0L) savedEntry
         else
             Entry()
-        if(entry.entryName != name) {
-            entry.entryName = name
-            dirty = true
-        }
-        if(entry.username != username) {
-            entry.username = username
-            dirty = true
-        }
 
-        if(entry.password != password) {
-            entry.password = password
-            dirty = true
-        }
+        entry.entryName = name
+        entry.username = username
+        entry.password = password
+        entry.url = url
+        entry.comment = comment
 
-        if(entry.url != url) {
-            entry.url = url
-            dirty = true
-        }
-
-        if(entry.comment != comment) {
-            entry.comment = comment
-            dirty = true
-        }
-
-        if(dirty) {
-            viewModelScope.launch {
-                if (entryId != 0L) {
-                    repository.updateEntry(entry)
-                    result.value = Event(R.string.addedit_save_ok)
-                }
-                else {
-                    repository.insertEntry(entry)
-                    result.value = Event(0)
-                }
+        viewModelScope.launch {
+            if (entryId != 0L) {
+                repository.updateEntry(entry)
+                result.value = Event(R.string.addedit_save_ok)
+            }
+            else {
+                repository.insertEntry(entry)
+                result.value = Event(0)
             }
         }
-        else
-            result.value = Event(R.string.addedit_nochange)
+
     }
 }

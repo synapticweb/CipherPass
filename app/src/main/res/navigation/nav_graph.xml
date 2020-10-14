@@ -77,17 +77,15 @@
             app:destination="@id/authenticateFragment" />
         <action
             android:id="@+id/action_addeditEntryFragment_to_entryDetailFragment"
+            app:popUpTo="@id/entryDetailFragment"
             app:destination="@id/entryDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/entryDetailFragment"
-        android:name="net.synapticweb.passman.entrydetail.EntryDetailFragment"
-        android:label="{title}" >
+        android:name="net.synapticweb.passman.entrydetail.EntryDetailFragment">
         <argument
             android:name="entryId"
             app:argType="long" />
-        <argument android:name="title"
-            app:argType="string" />
         <action
             android:id="@+id/action_entryDetailFragment_to_entriesListFragment"
             app:destination="@id/entriesListFragment" />

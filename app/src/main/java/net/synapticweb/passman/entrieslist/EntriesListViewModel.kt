@@ -19,14 +19,14 @@ class EntriesListViewModel @Inject constructor(private val repository: Repositor
     private val _entries : LiveData<List<Entry>> = repository.getAllEntries()
     val entries : LiveData<List<Entry>> = _entries
 
-    private val _openEntryEvent = MutableLiveData<Event<Pair<Long, String>>>()
-    val openEntryEvent : LiveData<Event<Pair<Long, String>>> = _openEntryEvent
+    private val _openEntryEvent = MutableLiveData<Event<Long>>()
+    val openEntryEvent : LiveData<Event<Long>> = _openEntryEvent
 
     private val _searchResults = MutableLiveData<Event<List<Entry>>>()
     val searchResults : MutableLiveData<Event<List<Entry>>> = _searchResults
 
-    fun openEntry(entryId : Long, title : String) {
-        _openEntryEvent.value = Event(Pair(entryId, title))
+    fun openEntry(entryId : Long) {
+        _openEntryEvent.value = Event(entryId)
     }
 
     fun search(query : String) {

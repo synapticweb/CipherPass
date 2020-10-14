@@ -27,6 +27,7 @@ class AddeditEntryFragmentTest {
         val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
         val fragmentScenario = launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+        onView(withId(R.id.id)).perform(typeText("test_username"))
         onView(withId(R.id.save)).perform(click())
 
         onView(withText(R.string.addedit_name_empty)).inRoot(isToast()).check(matches(isDisplayed()))
@@ -89,6 +90,34 @@ class AddeditEntryFragmentTest {
             assertThat(entry.url, `is`("url"))
             assertThat(entry.comment, `is`("comment"))
         }
+    }
+
+    @Test
+    fun addEdit_edit_notDirty_showsToast(): Unit = runBlocking {
+        testRule.setDb()
+
+        val item = Entry()
+        item.entryName = "account_name"
+        item.username = "username"
+        item.password = "password"
+        item.url = "url"
+        testRule.repository.insertEntry(item)
+
+        val bundle = AddeditEntryFragmentArgs(1, "account_name").toBundle()
+        val mockNav = Mockito.mock(NavController::class.java)
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
+            AddeditEntryFragment().also { fragment ->
+                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
+                    if(viewLifeCycleOwner != null)
+                        Navigation.setViewNavController(fragment.requireView(), mockNav)
+                }
+            }
+        }
+
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+        onView(withId(R.id.save)).perform(click())
+        onView(withText(R.string.addedit_nochange)).inRoot(isToast()).check(matches(isDisplayed()))
+        return@runBlocking
     }
 
     @Test

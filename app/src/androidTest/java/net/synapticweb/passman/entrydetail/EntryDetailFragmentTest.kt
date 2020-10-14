@@ -32,7 +32,7 @@ class EntryDetailFragmentTest {
         item.password = "password"
         testRule.repository.insertEntry(item)
 
-        val bundle = EntryDetailFragmentArgs(1, "account_name").toBundle()
+        val bundle = EntryDetailFragmentArgs(1).toBundle()
         val mockNav = Mockito.mock(NavController::class.java)
         val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
             EntryDetailFragment().also { fragment ->

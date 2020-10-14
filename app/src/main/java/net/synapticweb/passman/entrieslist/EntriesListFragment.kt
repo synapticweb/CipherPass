@@ -104,7 +104,7 @@ class EntriesListFragment : Fragment() {
                 searchPopup.dismiss()
 
             findNavController().navigate(
-                EntriesListFragmentDirections.actionEntriesListFragmentToEntryDetailFragment(it.first, it.second)
+                EntriesListFragmentDirections.actionEntriesListFragmentToEntryDetailFragment(it)
             )
         })
 

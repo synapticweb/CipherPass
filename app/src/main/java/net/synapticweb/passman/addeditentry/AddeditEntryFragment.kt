@@ -84,7 +84,7 @@ class AddeditEntryFragment : Fragment() {
                 true
             }
            else -> { //cînd apasă pe săgeata back. Nu am cum să determin itemId-ul.
-               manageDirty()
+               backWhenDirty()
                true
            }
         }
@@ -104,12 +104,18 @@ class AddeditEntryFragment : Fragment() {
                 requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(requireView().windowToken, 0)
 
-            if (it == R.string.addedit_nochange || it == R.string.addedit_save_ok)
-                Toast.makeText(requireContext(), getString(it), Toast.LENGTH_SHORT).show()
+            if (it == R.string.addedit_save_ok)
+                Toast.makeText(requireContext(), getString(R.string.addedit_save_ok),
+                    Toast.LENGTH_SHORT).show()
 
-            if (it == 0 || it == R.string.addedit_save_ok)
+            if (it == 0)
                 findNavController().navigate(
                     AddeditEntryFragmentDirections.actionAddeditEntryFragmentToEntriesListFragment()
+                )
+
+            else if(it == R.string.addedit_save_ok)
+                findNavController().navigate(
+                    AddeditEntryFragmentDirections.actionAddeditEntryFragmentToEntryDetailFragment(args.entryId)
                 )
         })
 
@@ -117,6 +123,15 @@ class AddeditEntryFragment : Fragment() {
 
     private fun setupFab() {
         binding.save.setOnClickListener {
+            if(!dirty) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.addedit_nochange),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
             if (binding.name.text!!.isEmpty()) {
                 Toast.makeText(
                     requireContext(),
@@ -167,7 +182,7 @@ class AddeditEntryFragment : Fragment() {
         }
     }
 
-    private fun manageDirty() {
+    private fun backWhenDirty() {
         fun goUp() {
             dirty = false
             //Aici am încerat întîi să folosesc navigația clasică cu direcții, etc. Rezultatul era
@@ -189,7 +204,7 @@ class AddeditEntryFragment : Fragment() {
 
     private fun handleBackPress() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            manageDirty()
+            backWhenDirty()
         }
     }
 }
