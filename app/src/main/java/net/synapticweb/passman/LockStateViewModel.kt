@@ -11,7 +11,6 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     : AndroidViewModel(application), LifecycleObserver {
 
     var lastBackPress : Long = 0L
-    private var sleepTime : Long = 0L
 
     val unauthorized = MutableLiveData<Event<Boolean>>()
 
@@ -22,26 +21,24 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     //Am ales să îl resetez în observerul pentru unlockSuccess.
     var startedUnlockActivity = false
 
-    private fun shouldManagePauseResume() : Boolean {
-        if(startedUnlockActivity) {
-            return false
-        }
-        val prefWrapper = PrefWrapper.getInstance(getApplication())
-        return prefWrapper.getString(APPLOCK_KEY) != APPLOCK_NOLOCK_VALUE
-    }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun onActivityPause() {
-        if(shouldManagePauseResume())
-            sleepTime = System.currentTimeMillis()
+        if(!startedUnlockActivity) {
+            val prefWrapper = PrefWrapper.getInstance(getApplication())
+            prefWrapper.setPref(SLEEP_TIME_KEY, System.currentTimeMillis().toString())
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onActivityResume() {
-        if(shouldManagePauseResume()) {
-            if (sleepTime == 0L) //nu verificăm dacă a trecut prin authenticate și nu a fost încă minimizată activitatea
+        if(!startedUnlockActivity) {
+            val prefWrapper = PrefWrapper.getInstance(getApplication())
+            val sleepTime = prefWrapper.getString(SLEEP_TIME_KEY)
+                ?: //nu verificăm dacă a trecut prin authenticate și nu a fost încă minimizată activitatea
                 return
-            if (System.currentTimeMillis() - sleepTime > 10000) {
+
+            if (System.currentTimeMillis() - sleepTime.toLong() > 10000) {
                 repository.lock()
                 unauthorized.value = Event(true)
             }
@@ -51,7 +48,8 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     override fun onCleared() {
         super.onCleared()
         repository.lock()
-        lastBackPress = 0
-        sleepTime = 0
+        lastBackPress = 0L
+        val prefWrapper = PrefWrapper.getInstance(getApplication())
+        prefWrapper.removePref(SLEEP_TIME_KEY)
     }
 }

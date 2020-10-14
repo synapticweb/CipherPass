@@ -22,3 +22,4 @@ const val TEST_PASS = "test"
 
 const val AUTH_OK = 0
 const val ENCRYPTED_PASS_KEY = "enc_pass_key"
+const val SLEEP_TIME_KEY = "sleep_time_key"
