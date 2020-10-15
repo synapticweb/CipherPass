@@ -5,18 +5,24 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.synapticweb.passman.SORT_ORDER_KEY
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.model.Entry
+import net.synapticweb.passman.model.SortOrder
 import net.synapticweb.passman.util.Event
+import net.synapticweb.passman.util.PrefWrapper
 import javax.inject.Inject
 
 
 class EntriesListViewModel @Inject constructor(private val repository: Repository, application: Application) :
     AndroidViewModel(application) {
 
-    //Dacă repository nu este inițializat getAllSecrets întoarce LiveData<null>, ceea ce îi permite observerului
-    //din fragment să apeleze fragmentul de autentificare.
-    private val _entries : LiveData<List<Entry>> = repository.getAllEntries()
+    private val _refresh = MutableLiveData(false)
+
+    private val _entries : LiveData<List<Entry>> = _refresh.switchMap {
+        repository.getAllEntries(getSortOrder())
+    }
+
     val entries : LiveData<List<Entry>> = _entries
 
     private val _openEntryEvent = MutableLiveData<Event<Long>>()
@@ -24,6 +30,10 @@ class EntriesListViewModel @Inject constructor(private val repository: Repositor
 
     private val _searchResults = MutableLiveData<Event<List<Entry>>>()
     val searchResults : MutableLiveData<Event<List<Entry>>> = _searchResults
+
+    init {
+        loadEntries()
+    }
 
     fun openEntry(entryId : Long) {
         _openEntryEvent.value = Event(entryId)
@@ -43,6 +53,20 @@ class EntriesListViewModel @Inject constructor(private val repository: Repositor
                     }
             }
         }
+    }
+
+    private fun getSortOrder() : SortOrder {
+        val prefs = PrefWrapper.getInstance(getApplication())
+        return when(prefs.getString(SORT_ORDER_KEY)) {
+            "0" -> SortOrder.CREATION_DATE
+            "1" -> SortOrder.NAME
+            "2" -> SortOrder.MODIFICATION_DATE
+            else -> SortOrder.CREATION_DATE
+        }
+    }
+
+    fun loadEntries() {
+        _refresh.value = true
     }
 
 }

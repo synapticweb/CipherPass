@@ -1,6 +1,7 @@
 package net.synapticweb.passman.model
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 
@@ -18,8 +19,8 @@ interface CryptoPassDao {
     @Query("SELECT * FROM `entries` WHERE `id`= :key")
     suspend fun getEntry(key: Long) : Entry
 
-    @Query("SELECT * FROM `entries` ORDER BY `insertion_date` DESC")
-    fun getAllEntries() : LiveData<List<Entry>>
+    @RawQuery(observedEntities = [Entry::class])
+    fun getAllEntries(query : SupportSQLiteQuery) : LiveData<List<Entry>>
 
     @Insert
     suspend fun insertHash(hash : Hash) : Long

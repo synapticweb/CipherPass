@@ -48,6 +48,7 @@ ext {
     afollestadVersion = "3.3.0"
     androidXTestCoreVersion = '1.2.0'
     androidXTestRulesVersion = '1.2.0-beta01'
+    archLifecycleVersion = '2.2.0'
     archTestingVersion = '2.0.0'
     coroutinesVersion = "1.2.1"
     daggerVersion = "2.27"
@@ -87,6 +88,11 @@ dependencies {
     //dagger:
     implementation "com.google.dagger:dagger:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+
+    //pentru funcțiile extensie transformation livedata
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$archLifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-common-java8:$archLifecycleVersion"
+
 
     //Testing:
     testImplementation 'junit:junit:4.12'

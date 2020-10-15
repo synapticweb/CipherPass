@@ -13,9 +13,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.EntriesListFragmentBinding
+import net.synapticweb.passman.model.SortOrder
 import net.synapticweb.passman.util.EventObserver
+import net.synapticweb.passman.util.PrefWrapper
 import net.synapticweb.passman.util.handleBackPressed
 
 class EntriesListFragment : Fragment() {
@@ -93,6 +97,18 @@ class EntriesListFragment : Fragment() {
                 findNavController().navigate(EntriesListFragmentDirections.
                     actionEntriesListFragmentToSettingsFragment())
                 true
+            }
+            R.id.sort -> {
+                MaterialDialog(requireContext()).show {
+                    val prefs = PrefWrapper.getInstance(requireContext())
+                    val initialSel = prefs.getString(SORT_ORDER_KEY) ?: "0"
+                    listItemsSingleChoice(R.array.sort_orders,
+                        initialSelection = initialSel.toInt()) {_, index, _ ->
+                        prefs.setPrefSync(SORT_ORDER_KEY, index.toString())
+                       _viewModel.loadEntries()
+                    }
+                }
+                false
             }
             else -> false
         }

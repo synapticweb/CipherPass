@@ -58,6 +58,7 @@
     <string name="detail_url">Url</string>
     <string name="detail_comment">Comment</string>
     <string name="detail_date_created">Date created</string>
+    <string name="detail_date_modif">Date modified</string>
     <string name="addedit_nochange">No change detected.</string>
     <string name="addedit_save_ok">Save successful.</string>
     <string name="confirm_deletion_title">Confirm deletion</string>
@@ -71,5 +72,8 @@
     <string name="url">Url</string>
     <string name="search_hint">Search entries</string>
     <string name="search_title">Search</string>
-    <string name="entries_list_filter">filter</string>
+    <string name="entries_list_sort">sort</string>
+    <string name="sort_name">Sort by name</string>
+    <string name="sort_creation">Sort by creation date</string>
+    <string name="sort_modif">Sort by modification date</string>
 </resources>

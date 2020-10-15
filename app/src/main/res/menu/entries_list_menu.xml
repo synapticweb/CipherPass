@@ -12,8 +12,8 @@
         app:showAsAction="always"
         app:actionViewClass="android.widget.SearchView" />
 
-    <item android:id="@+id/filter"
-        android:title="@string/entries_list_filter"
-        android:icon="@drawable/filter"
+    <item android:id="@+id/sort"
+        android:title="@string/entries_list_sort"
+        android:icon="@drawable/sort"
         app:showAsAction="always" />
 </menu>

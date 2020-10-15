@@ -114,11 +114,8 @@ class AddeditEntryFragment : Fragment() {
                 )
 
             else if(it == R.string.addedit_save_ok)
-                findNavController().navigate(
-                    AddeditEntryFragmentDirections.actionAddeditEntryFragmentToEntryDetailFragment(args.entryId)
-                )
+                findNavController().popBackStack()
         })
-
     }
 
     private fun setupFab() {

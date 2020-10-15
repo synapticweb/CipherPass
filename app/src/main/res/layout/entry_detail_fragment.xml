@@ -208,6 +208,37 @@
 
             </RelativeLayout>
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                style="@style/detail_field"
+                android:id="@+id/date_modif_slot"
+                >
+
+                <ImageView
+                    android:id="@+id/date_modif_img"
+                    android:src="@drawable/date_modif"
+                    style="@style/detail_start_image"/>
+
+                <TextView
+                    android:id="@+id/date_modif_caption"
+                    android:text="@string/detail_date_modif"
+                    android:layout_toEndOf="@id/date_modif_img"
+                    style="@style/detail_item_caption"
+                    android:layout_marginBottom="10dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:layout_toEndOf="@id/date_modif_img"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="10dp"
+                    android:text="@{viewModel.entry.hrModificationDate}"
+                    />
+
+
+            </RelativeLayout>
+
         </LinearLayout>
 
         </ScrollView>

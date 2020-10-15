@@ -24,4 +24,10 @@
         <item>pbkdf2</item>
     </string-array>
 
+    <string-array name="sort_orders">
+        <item>@string/sort_creation</item>
+        <item>@string/sort_name</item>
+        <item>@string/sort_modif</item>
+    </string-array>
+
 </resources>

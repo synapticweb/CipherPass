@@ -23,9 +23,15 @@ interface Repository {
 
     suspend fun getEntry(key : Long) : Entry
 
-    fun getAllEntries() : LiveData<List<Entry>>
+    fun getAllEntries(sortOrder: SortOrder) : LiveData<List<Entry>>
 
     fun removeDb()
 
     suspend fun queryDb(elements : List<String>) : List<Entry>
+}
+
+enum class SortOrder {
+    CREATION_DATE,
+    NAME,
+    MODIFICATION_DATE
 }

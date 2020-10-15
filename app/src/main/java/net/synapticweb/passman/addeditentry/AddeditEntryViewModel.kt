@@ -52,6 +52,7 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
         entry.password = password
         entry.url = url
         entry.comment = comment
+        entry.modificationDate = System.currentTimeMillis()
 
         viewModelScope.launch {
             if (entryId != 0L) {

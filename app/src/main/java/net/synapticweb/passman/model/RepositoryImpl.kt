@@ -107,8 +107,15 @@ open class RepositoryImpl @Inject constructor(
         return database.dao.getEntry(key)
     }
 
-    override fun getAllEntries(): LiveData<List<Entry>> {
-        return database.dao.getAllEntries()
+    override fun getAllEntries(sortOrder: SortOrder) : LiveData<List<Entry>> {
+        var query = "SELECT * FROM `entries` ORDER BY "
+        query = when(sortOrder) {
+            SortOrder.CREATION_DATE -> "$query`insertion_date` DESC"
+            SortOrder.NAME -> "$query`entry_name` ASC"
+            SortOrder.MODIFICATION_DATE -> "$query`modification_date` DESC"
+        }
+
+        return database.dao.getAllEntries(SimpleSQLiteQuery(query))
     }
 
     @VisibleForTesting

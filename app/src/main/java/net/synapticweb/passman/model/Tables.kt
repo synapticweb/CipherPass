@@ -29,14 +29,26 @@ data class Entry (
     var comment : String? = null,
 
     @ColumnInfo(name = "insertion_date")
-    var insertionDate : Long = System.currentTimeMillis()
+    var insertionDate : Long = System.currentTimeMillis(),
+
+    @ColumnInfo(name = "modification_date")
+    var modificationDate : Long = System.currentTimeMillis()
 ) {
     val hrInsertionDate : String
         get() {
-            val date = Date(insertionDate)
-            val format  = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
-            return format.format(date)
+            return hrDate(insertionDate)
         }
+
+    val hrModificationDate : String
+        get() {
+            return hrDate(modificationDate)
+        }
+
+    private fun hrDate(timestamp : Long) : String {
+        val date = Date(timestamp)
+        val format  = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
+        return format.format(date)
+    }
 }
 
 @Entity(tableName = "hash")
