@@ -12,12 +12,12 @@ import org.junit.runner.Description
 
 class CryptoPassTestRule : TestWatcher() {
     private lateinit var appPrefs : Map<String, *>
-    private val prefWrapper = PrefWrapper.getInstance(ApplicationProvider.getApplicationContext())
+    val prefWrapper = PrefWrapper.getInstance(ApplicationProvider.getApplicationContext())
     val dataBindingIdlingResource = DataBindingIdlingResource()
 
-    lateinit var repository: TestRepositoryImpl
-    lateinit var cipher : TestCryptoPassCipher
     val application: CryptoPassApp = ApplicationProvider.getApplicationContext()
+    val repository: TestRepositoryImpl = (application.appComponent as TestAppComponent).repository as TestRepositoryImpl
+    val cipher : TestCryptoPassCipher = (application.appComponent as TestAppComponent).cipher as TestCryptoPassCipher
 
     fun setDb(hashType : String? = null) = runBlocking {
         val actHashType = hashType ?: prefWrapper.getString(HASH_TYPE_KEY) ?: HASH_PBKDF2
@@ -30,9 +30,6 @@ class CryptoPassTestRule : TestWatcher() {
 
 
     override fun starting(description: Description?) {
-        repository = (application.appComponent as TestAppComponent).repository as TestRepositoryImpl
-        cipher = (application.appComponent as TestAppComponent).cipher as TestCryptoPassCipher
-
         appPrefs = prefWrapper.getAll()
 
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)

@@ -124,8 +124,12 @@ class EntryDetailFragment : Fragment() {
 
     private fun setTitle() {
         _viewModel.entry.observe(viewLifecycleOwner, Observer {
-            (requireActivity() as AppCompatActivity)
-                .supportActionBar?.title = it.entryName
+            val activity = requireActivity()
+            //necesar pentru că altfel în testele care folosesc launchFragmentinContainer apare eroarea:
+            //androidx.fragment.app.testing.FragmentScenario$EmptyFragmentActivity cannot be cast to
+            // androidx.appcompat.app.AppCompatActivity
+            if(activity is AppCompatActivity)
+                activity.supportActionBar?.title = it.entryName
         })
     }
 }

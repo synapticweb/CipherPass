@@ -1,11 +1,11 @@
 package net.synapticweb.passman.entrieslist
 
+import android.app.Activity
 import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import javax.inject.Inject
@@ -17,7 +17,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.EntriesListFragmentBinding
-import net.synapticweb.passman.model.SortOrder
 import net.synapticweb.passman.util.EventObserver
 import net.synapticweb.passman.util.PrefWrapper
 import net.synapticweb.passman.util.handleBackPressed
@@ -34,7 +33,7 @@ class EntriesListFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        val parentActivity : AppCompatActivity = context as AppCompatActivity
+        val parentActivity : Activity = context as Activity
         val app : CryptoPassApp = parentActivity.application as CryptoPassApp
         app.appComponent.entriesListComponent().create().inject(this)
     }

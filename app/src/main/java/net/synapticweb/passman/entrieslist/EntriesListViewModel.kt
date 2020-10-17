@@ -40,7 +40,9 @@ class EntriesListViewModel @Inject constructor(private val repository: Repositor
     }
 
     fun search(query : String) {
-        val elems = query.split("\\s+".toRegex())
+        //unul sau mai multe spații sau 0 sau mai multe caractere nonalfanumerice urmate
+        //de 1 sau mai multe spații: dacă scrie term1, term2 să nu caute după term1, .
+        val elems = query.split("[^a-zA-Z0-9]*\\s+".toRegex())
         val finalElems = mutableListOf<String>()
         for(elem in elems)
             if(elem.isNotBlank())
@@ -68,5 +70,4 @@ class EntriesListViewModel @Inject constructor(private val repository: Repositor
     fun loadEntries() {
         _refresh.value = true
     }
-
 }

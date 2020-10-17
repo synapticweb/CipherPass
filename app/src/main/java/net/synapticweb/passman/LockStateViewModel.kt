@@ -1,6 +1,7 @@
 package net.synapticweb.passman
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.Event
@@ -35,10 +36,13 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
         if(!startedUnlockActivity) {
             val prefWrapper = PrefWrapper.getInstance(getApplication())
             val sleepTime = prefWrapper.getString(SLEEP_TIME_KEY)
-                ?: //nu verificăm dacă a trecut prin authenticate și nu a fost încă minimizată activitatea
-                return
+                ?: run {
+                    Log.d(APP_TAG, "called onActivityResume without reauth.")
+                    return
+                }
 
             if (System.currentTimeMillis() - sleepTime.toLong() > 10000) {
+                Log.d(APP_TAG, "called onActivityResume with reauth.")
                 repository.lock()
                 unauthorized.value = Event(true)
             }

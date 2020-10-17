@@ -49,7 +49,7 @@ ext {
     androidXTestCoreVersion = '1.2.0'
     androidXTestRulesVersion = '1.2.0-beta01'
     archLifecycleVersion = '2.2.0'
-    archTestingVersion = '2.0.0'
+    archTestingVersion = '2.1.0'
     coroutinesVersion = "1.2.1"
     daggerVersion = "2.27"
     espressoVersion = "3.2.0"
@@ -102,9 +102,9 @@ dependencies {
     implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
     //pentru FragmentActivity - de verificat
     debugImplementation "androidx.fragment:fragment-testing:$fragmentVersion"
-    //pentru runBlockingTest:
+    //pentru runBlockingTest și maincoroutinerule
 //    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
     //pentru instanttaskexecutorrule:
-//    androidTestImplementation "androidx.arch.core:core-testing:$archTestingVersion"
+    androidTestImplementation "androidx.arch.core:core-testing:$archTestingVersion"
     androidTestImplementation "org.mockito:mockito-android:3.3.3"
 }

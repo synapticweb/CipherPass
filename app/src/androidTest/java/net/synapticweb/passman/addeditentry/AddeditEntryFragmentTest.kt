@@ -10,6 +10,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.passman.R
 import net.synapticweb.passman.model.Entry
+import net.synapticweb.passman.model.SortOrder
 import net.synapticweb.passman.util.CryptoPassTestRule
 import net.synapticweb.passman.util.isToast
 import net.synapticweb.passman.util.monitorFragment
@@ -82,7 +83,7 @@ class AddeditEntryFragmentTest {
         onView(withId(R.id.comment)).perform(typeText("comment"), closeSoftKeyboard())
         onView(withId(R.id.save)).perform(click())
 
-        val entry : Entry? = testRule.repository.getAllEntries().value?.get(0)
+        val entry : Entry? = testRule.repository.getAllEntries(SortOrder.CREATION_DATE).value?.get(0)
         if (entry != null) {
             assertThat(entry.entryName, `is`("test_name"))
             assertThat(entry.username, `is`("test_username"))

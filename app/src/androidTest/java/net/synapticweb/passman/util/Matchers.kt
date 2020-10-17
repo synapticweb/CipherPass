@@ -3,7 +3,9 @@ package net.synapticweb.passman.util
 import android.os.IBinder
 import android.view.View
 import android.view.WindowManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Root
+import androidx.test.espresso.matcher.BoundedMatcher
 import com.google.android.material.textfield.TextInputLayout
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -46,6 +48,22 @@ fun isToast(): Matcher<Root?>? {
                 }
             }
             return false
+        }
+    }
+}
+
+//https://stackoverflow.com/a/62842757/6192350
+fun hasItemAtPosition(position: Int, matcher: Matcher<View>) : Matcher<View> {
+    return object : BoundedMatcher<View, RecyclerView>(RecyclerView::class.java) {
+
+        override fun describeTo(description: Description?) {
+            description?.appendText("has item at position $position : ")
+            matcher.describeTo(description)
+        }
+
+        override fun matchesSafely(item: RecyclerView?): Boolean {
+            val viewHolder = item?.findViewHolderForAdapterPosition(position)
+            return matcher.matches(viewHolder?.itemView)
         }
     }
 }
