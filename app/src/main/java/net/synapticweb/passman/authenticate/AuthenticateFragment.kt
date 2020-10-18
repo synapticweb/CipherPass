@@ -59,7 +59,7 @@ class AuthenticateFragment : Fragment() {
                 val authIntent =
                     keyMan.createConfirmDeviceCredentialIntent(getString(R.string.app_name), getString(R.string.auth_subtitle))
                 authIntent?.also { intent ->
-                    lockState.startedUnlockActivity = true
+                    lockState.isInUnlockActivity = true
                     startActivityForResult(intent, LOCK_ACTIVITY_CODE)
                 }
                     ?: run {
@@ -87,9 +87,9 @@ class AuthenticateFragment : Fragment() {
             binding.passphraseRetype))
 
         _viewModel.authResult.observe(viewLifecycleOwner, EventObserver {
-            lockState.startedUnlockActivity = false
             when(it) {
                 AUTH_OK -> {
+                    lockState.isInUnlockActivity = false
                     binding.passphrase.text!!.clear()
                     binding.passphraseRetype.text.clear()
                     findNavController().navigate(

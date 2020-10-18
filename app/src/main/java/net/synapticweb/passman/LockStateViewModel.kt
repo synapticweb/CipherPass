@@ -1,51 +1,33 @@
 package net.synapticweb.passman
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.Event
-import net.synapticweb.passman.util.PrefWrapper
 import javax.inject.Inject
 
 class LockStateViewModel @Inject constructor(private val repository: Repository, application: Application)
     : AndroidViewModel(application), LifecycleObserver {
 
+    var sleepTime : Long = 0L
     var lastBackPress : Long = 0L
 
     val unauthorized = MutableLiveData<Event<Boolean>>()
-
-    //flag care arată că a fost pornită activitatea sistem de autentificare, deci onPause și onResume
-    //nu ar trebui să mai memoreze și să verifice timestampuri. Este setat înainte de
-    //startActivityForResult în onCreateView și după setare urmează un onResume. Nu poate fi resetat
-    //în onActivityResult pentru că după aceea urmează un al doilea onResume.
-    //Am ales să îl resetez în observerul pentru unlockSuccess.
-    var startedUnlockActivity = false
-
+    var isInUnlockActivity = false
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun onActivityPause() {
-        if(!startedUnlockActivity) {
-            val prefWrapper = PrefWrapper.getInstance(getApplication())
-            prefWrapper.setPref(SLEEP_TIME_KEY, System.currentTimeMillis().toString())
-        }
+        sleepTime = System.currentTimeMillis()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onActivityResume() {
-        if(!startedUnlockActivity) {
-            val prefWrapper = PrefWrapper.getInstance(getApplication())
-            val sleepTime = prefWrapper.getString(SLEEP_TIME_KEY)
-                ?: run {
-                    Log.d(APP_TAG, "called onActivityResume without reauth.")
-                    return
-                }
-
-            if (System.currentTimeMillis() - sleepTime.toLong() > 10000) {
-                Log.d(APP_TAG, "called onActivityResume with reauth.")
-                repository.lock()
-                unauthorized.value = Event(true)
-            }
+        //nu verificăm dacă suntem la pornirea aplicației sau dacă ne întoarcem din activitatea unlock
+        if (sleepTime == 0L || isInUnlockActivity)
+            return
+        if (System.currentTimeMillis() - sleepTime > 10000) {
+            repository.lock()
+            unauthorized.value = Event(true)
         }
     }
 
@@ -53,7 +35,10 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
         super.onCleared()
         repository.lock()
         lastBackPress = 0L
-        val prefWrapper = PrefWrapper.getInstance(getApplication())
-        prefWrapper.removePref(SLEEP_TIME_KEY)
+        sleepTime = 0L
+    }
+
+    fun isDbUnlocked() : Boolean{
+        return repository.isUnlocked()
     }
 }

@@ -19,7 +19,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         (application as CryptoPassApp).appComponent.inject(this)
         lockState = ViewModelProvider(this, viewModelFactory).get(LockStateViewModel::class.java)
-        super.onCreate(savedInstanceState)
+        super.onCreate(if(lockState.isDbUnlocked()) savedInstanceState else null)
+        //Pasăm null pentru a împiedica recrearea fragmentului entrieslist (și
+        //mai multy ca sigur a altora) în onStart după ce aplicația este distrusă de sistem ca urmare
+        //a inactivității. Dacă se întîmplă, avem crash în repository cu database uninitialized.
+        //Deoarece onStart rulează înainte de onResume, mecanismul din lockstateviewmodel nu ajunge
+        //niciodată să ruleze.
+        //vezi și https://stackoverflow.com/questions/15519214/prevent-fragment-recovery-in-android
         setContentView(R.layout.main_activity)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
 
@@ -34,5 +40,4 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
     }
-
 }
