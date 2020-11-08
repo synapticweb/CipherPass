@@ -1,14 +1,18 @@
 package net.synapticweb.passman.util
 
+import android.content.Context
 import android.text.Editable
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
+import android.util.DisplayMetrics
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import com.google.android.material.textfield.TextInputLayout
-import net.synapticweb.passman.*
+import net.synapticweb.passman.LockStateViewModel
+import net.synapticweb.passman.R
+import net.synapticweb.passman.SET_ICON_COLUMN_WIDTH
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
 import java.nio.charset.Charset
@@ -17,6 +21,7 @@ import java.security.SecureRandom
 import java.util.*
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
+
 
 fun Fragment.handleBackPressed(lockState: LockStateViewModel) {
     requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
@@ -131,4 +136,14 @@ fun setupPasswordFields(layout : TextInputLayout,
         }
     }
 
+}
+
+fun getSetIconNumColumns(context : Context) : Int {
+    val displayMetrics: DisplayMetrics = context.resources.displayMetrics
+    val screenWidthDp = displayMetrics.widthPixels / displayMetrics.density
+    return (screenWidthDp / SET_ICON_COLUMN_WIDTH + 0.5).toInt()
+}
+
+fun pxFromDp(context: Context, dp: Int): Int {
+    return (dp * context.resources.displayMetrics.density).toInt()
 }

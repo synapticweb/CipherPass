@@ -7,6 +7,7 @@ import dagger.MapKey
 import dagger.Module
 import javax.inject.Inject
 import javax.inject.Provider
+import javax.inject.Singleton
 import kotlin.reflect.KClass
 
 //https://blog.kotlin-academy.com/understanding-dagger-2-multibindings-viewmodel-8418eb372848

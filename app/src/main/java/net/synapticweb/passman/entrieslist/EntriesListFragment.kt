@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import net.synapticweb.passman.*
@@ -57,7 +58,7 @@ class EntriesListFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        setupAdapter()
+        setupRecycler()
         setupFab()
         setupNavigation()
         setupSearch()
@@ -144,9 +145,14 @@ class EntriesListFragment : Fragment() {
         }
     }
 
-    private fun setupAdapter() {
+    private fun setupRecycler() {
         adapter = EntriesAdapter(_viewModel)
         binding.entriesList.adapter = adapter
+        binding.entriesList.addItemDecoration(
+            DividerItemDecoration(
+                context,
+            DividerItemDecoration.VERTICAL)
+        )
     }
 
     private fun setupSearch() {

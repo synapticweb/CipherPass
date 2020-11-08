@@ -10,15 +10,14 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentResultListener
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.afollestad.materialdialogs.MaterialDialog
-import net.synapticweb.passman.CryptoPassApp
-import net.synapticweb.passman.LockStateViewModel
-import net.synapticweb.passman.R
+import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.AddeditEntryFragmentBinding
 import net.synapticweb.passman.util.EventObserver
 import net.synapticweb.passman.util.setupPasswordFields
@@ -69,6 +68,7 @@ class AddeditEntryFragment : Fragment() {
         setupNavigation()
         setupChangeListeners(arrayOf(binding.name, binding.id, binding.pass,
             binding.repass, binding.url, binding.comment ))
+        setupReceiveIcon()
         handleBackPress()
     }
 
@@ -116,6 +116,11 @@ class AddeditEntryFragment : Fragment() {
             else if(it == R.string.addedit_save_ok)
                 findNavController().popBackStack()
         })
+
+        binding.setIcon.setOnClickListener {
+            findNavController().navigate(AddeditEntryFragmentDirections.
+               actionAddeditEntryFragmentToSetIconFragment())
+        }
     }
 
     private fun setupFab() {
@@ -203,5 +208,13 @@ class AddeditEntryFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             backWhenDirty()
         }
+    }
+
+    private fun setupReceiveIcon() {
+        parentFragmentManager.setFragmentResultListener(SET_ICON_REQUEST_KEY,
+            viewLifecycleOwner, FragmentResultListener { _: String, bundle: Bundle ->
+                _viewModel.setIcon(bundle.getInt(SET_ICON_BUNDLE_KEY))
+                dirty = true
+        })
     }
 }

@@ -79,6 +79,9 @@
             android:id="@+id/action_addeditEntryFragment_to_entryDetailFragment"
             app:popUpTo="@id/entryDetailFragment"
             app:destination="@id/entryDetailFragment" />
+        <action
+            android:id="@+id/action_addeditEntryFragment_to_setIconFragment"
+            app:destination="@id/setIconFragment" />
     </fragment>
     <fragment
         android:id="@+id/entryDetailFragment"
@@ -95,5 +98,16 @@
         <action
             android:id="@+id/action_entryDetailFragment_to_addeditEntryFragment"
             app:destination="@id/addeditEntryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/setIconFragment"
+        android:name="net.synapticweb.passman.addeditentry.SetIconFragment"
+        android:label="SetIconFragment">
+        <action
+            android:id="@+id/action_setIconFragment_to_addeditEntryFragment"
+            app:destination="@id/addeditEntryFragment" />
+        <action
+            android:id="@+id/action_setIconFragment_to_authenticateFragment"
+            app:destination="@id/authenticateFragment" />
     </fragment>
 </navigation>

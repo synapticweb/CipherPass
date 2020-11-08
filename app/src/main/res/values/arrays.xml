@@ -30,4 +30,18 @@
         <item>@string/sort_modif</item>
     </string-array>
 
+    <integer-array name="icons">
+        <item>@drawable/item_key</item>
+        <item>@drawable/item_account</item>
+        <item>@drawable/item_balance</item>
+        <item>@drawable/item_man</item>
+        <item>@drawable/item_money</item>
+        <item>@drawable/item_shoping</item>
+        <item>@drawable/item_fb</item>
+        <item>@drawable/item_assesment</item>
+        <item>@drawable/item_apart</item>
+        <item>@drawable/item_inbox</item>
+        <item>@drawable/item_album</item>
+    </integer-array>
+
 </resources>

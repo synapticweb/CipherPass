@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.multibindings.IntoMap
 import net.synapticweb.passman.addeditentry.AddeditEntryViewModel
 import net.synapticweb.passman.di.ViewModelKey
+import javax.inject.Singleton
 
 @Module
 abstract class AddeditEntryModule {

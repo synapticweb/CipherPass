@@ -32,7 +32,10 @@ data class Entry (
     var insertionDate : Long = System.currentTimeMillis(),
 
     @ColumnInfo(name = "modification_date")
-    var modificationDate : Long = System.currentTimeMillis()
+    var modificationDate : Long = System.currentTimeMillis(),
+
+    @ColumnInfo(name = "icon_res")
+    var icon : Int = 0
 ) {
     val hrInsertionDate : String
         get() {

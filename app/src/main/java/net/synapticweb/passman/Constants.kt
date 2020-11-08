@@ -22,5 +22,7 @@ const val TEST_PASS = "test"
 
 const val AUTH_OK = 0
 const val ENCRYPTED_PASS_KEY = "enc_pass_key"
-const val SLEEP_TIME_KEY = "sleep_time_key"
 const val SORT_ORDER_KEY = "sort_order_key"
+const val SET_ICON_COLUMN_WIDTH = 55
+const val SET_ICON_REQUEST_KEY = "icon_req_key"
+const val SET_ICON_BUNDLE_KEY = "bundle_key"
