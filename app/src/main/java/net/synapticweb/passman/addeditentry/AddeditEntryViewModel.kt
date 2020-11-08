@@ -15,21 +15,23 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
                                                 application: Application) :
     AndroidViewModel(application) {
 
-    val name = MutableLiveData<String>()
     val username = MutableLiveData<String?>()
+    val name = MutableLiveData<String>()
     val password = MutableLiveData<String>()
+    val rePassword = MutableLiveData<String>()
     val url = MutableLiveData<String?>()
     val comment = MutableLiveData<String?>()
     val result = MutableLiveData<Event<Int>>()
-    lateinit var savedEntry : Entry
-    val icon = MutableLiveData(R.drawable.item_key)
+    private lateinit var savedEntry : Entry
+    val icon = MutableLiveData<Int>(R.drawable.item_key)
 
     fun populate(entryId : Long) {
         viewModelScope.launch {
             repository.getEntry(entryId). let { entry ->
                 name.value = entry.entryName
                 password.value = entry.password
-                username.value = null
+                rePassword.value = entry.password
+                username.value = entry.username
                 url.value = entry.url
                 comment.value = entry.comment
                 icon.value = entry.icon

@@ -8,7 +8,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentResultListener
 import androidx.fragment.app.activityViewModels
@@ -33,13 +32,21 @@ class AddeditEntryFragment : Fragment() {
     private val args: AddeditEntryFragmentArgs by navArgs()
     private lateinit var binding: AddeditEntryFragmentBinding
 
-    private var dirty: Boolean = false
+    private var dirty : Boolean = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val parentActivity: Activity = context as Activity
         val app: CryptoPassApp = parentActivity.application as CryptoPassApp
         app.appComponent.addEntryComponent().create().inject(this)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        //a fost nevoie să mut aici populate() deoarece onCreateView() este apelată la întoarcerea
+        //din backstack și suprascrie icoana setată de SetIconFragment.
+        if (args.entryId != 0L)
+            _viewModel.populate(args.entryId)
     }
 
     override fun onCreateView(
@@ -54,10 +61,6 @@ class AddeditEntryFragment : Fragment() {
 
         binding.lifecycleOwner = this.viewLifecycleOwner
         setHasOptionsMenu(true)
-
-        if (args.entryId != 0L)
-            _viewModel.populate(args.entryId)
-
         return binding.root
     }
 
@@ -66,7 +69,7 @@ class AddeditEntryFragment : Fragment() {
         setupPasswordFields(binding.passLayout, arrayOf(binding.pass, binding.repass))
         setupFab()
         setupNavigation()
-        setupChangeListeners(arrayOf(binding.name, binding.id, binding.pass,
+        setupOnFocusChangeListeners(arrayOf(binding.name, binding.id, binding.pass,
             binding.repass, binding.url, binding.comment ))
         setupReceiveIcon()
         handleBackPress()
@@ -172,15 +175,11 @@ class AddeditEntryFragment : Fragment() {
         }
     }
 
-    //dirty este setat doar cînd userul scrie ceva. Dacă aș fi folosit addTextChangeTextListener {code}
-    //ar fi fost apelată afterTextChanged, adică dirty ar fi fost setat la popularea cîmpurilor.
-    private fun setupChangeListeners(editTexts : Array<TextView>) {
+    private fun setupOnFocusChangeListeners(editTexts : Array<TextView>) {
         for(editText in editTexts) {
-            editText.addTextChangedListener(
-                beforeTextChanged = { _,_,_,_ ->
-                if(editText.text!!.isNotEmpty())
-                    dirty = true
-            })
+            editText.setOnFocusChangeListener { _,_ ->
+                dirty = true
+            }
         }
     }
 
