@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import net.synapticweb.passman.INSERT_SUCCES
 import net.synapticweb.passman.R
 import net.synapticweb.passman.model.Entry
 import net.synapticweb.passman.model.Repository
@@ -61,12 +62,18 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
 
         viewModelScope.launch {
             if (entryId != 0L) {
-                repository.updateEntry(entry)
-                result.value = Event(R.string.addedit_save_ok)
+                val numRows = repository.updateEntry(entry)
+                result.value = if(numRows == 1)
+                    Event(R.string.addedit_save_ok)
+                else
+                    Event(R.string.addedit_save_error)
             }
             else {
-                repository.insertEntry(entry)
-                result.value = Event(0)
+                val rowId = repository.insertEntry(entry)
+                result.value = if(rowId.toInt() == -1)
+                    Event(R.string.addedit_save_error)
+                else
+                    Event(INSERT_SUCCES)
             }
         }
     }

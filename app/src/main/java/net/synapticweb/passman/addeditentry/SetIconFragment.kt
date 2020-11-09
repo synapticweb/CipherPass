@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.SetIconFragmentBinding
+import net.synapticweb.passman.util.EventObserver
 import net.synapticweb.passman.util.getSetIconNumColumns
 import javax.inject.Inject
 
@@ -50,6 +51,7 @@ class SetIconFragment : Fragment(){
         super.onActivityCreated(savedInstanceState)
         setupRecycler()
         setupChooseIcon()
+        setupNavigation()
     }
 
     private fun setupChooseIcon() {
@@ -65,5 +67,15 @@ class SetIconFragment : Fragment(){
         val viewManager = GridLayoutManager(requireContext(), getSetIconNumColumns(requireContext()))
         binding.iconsGrid.layoutManager = viewManager
         binding.iconsGrid.adapter = adapter
+    }
+
+    private fun setupNavigation() {
+        lockState.unauthorized.observe(viewLifecycleOwner,
+            EventObserver {
+                if (it)
+                    findNavController().navigate(
+                        SetIconFragmentDirections.actionSetIconFragmentToAuthenticateFragment()
+                    )
+            })
     }
 }

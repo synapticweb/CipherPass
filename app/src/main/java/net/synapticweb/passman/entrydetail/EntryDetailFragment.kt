@@ -118,7 +118,7 @@ class EntryDetailFragment : Fragment() {
 
     private fun setupCopyToast() {
         _viewModel.finishCopy.observe(viewLifecycleOwner, EventObserver {
-            Toast.makeText(requireContext(), it + getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), it + " " + getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show()
         })
     }
 

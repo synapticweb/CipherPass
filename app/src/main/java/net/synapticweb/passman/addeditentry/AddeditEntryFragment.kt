@@ -107,11 +107,11 @@ class AddeditEntryFragment : Fragment() {
                 requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(requireView().windowToken, 0)
 
-            if (it == R.string.addedit_save_ok)
-                Toast.makeText(requireContext(), getString(R.string.addedit_save_ok),
+            if (it == R.string.addedit_save_ok || it == R.string.addedit_save_error)
+                Toast.makeText(requireContext(), getString(it),
                     Toast.LENGTH_SHORT).show()
 
-            if (it == 0)
+            if (it == INSERT_SUCCES)
                 findNavController().navigate(
                     AddeditEntryFragmentDirections.actionAddeditEntryFragmentToEntriesListFragment()
                 )
