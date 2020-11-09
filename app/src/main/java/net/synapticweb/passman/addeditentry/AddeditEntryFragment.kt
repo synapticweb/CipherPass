@@ -12,10 +12,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentResultListener
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.input.input
 import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.AddeditEntryFragmentBinding
 import net.synapticweb.passman.util.EventObserver
@@ -31,8 +33,8 @@ class AddeditEntryFragment : Fragment() {
 
     private val args: AddeditEntryFragmentArgs by navArgs()
     private lateinit var binding: AddeditEntryFragmentBinding
-
     private var dirty : Boolean = false
+    private val customFieldsData = mutableMapOf<Long, String>()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -45,6 +47,7 @@ class AddeditEntryFragment : Fragment() {
         super.onCreate(savedInstanceState)
         //a fost nevoie să mut aici populate() deoarece onCreateView() este apelată la întoarcerea
         //din backstack și suprascrie icoana setată de SetIconFragment.
+        //https://bricolsoftconsulting.com/state-preservation-in-backstack-fragments/
         if (args.entryId != 0L)
             _viewModel.populate(args.entryId)
     }
@@ -72,6 +75,8 @@ class AddeditEntryFragment : Fragment() {
         setupOnFocusChangeListeners(arrayOf(binding.name, binding.id, binding.pass,
             binding.repass, binding.url, binding.comment ))
         setupReceiveIcon()
+        setupAddNewField()
+        setupCustomFieldsRecycler()
         handleBackPress()
     }
 
@@ -214,6 +219,27 @@ class AddeditEntryFragment : Fragment() {
             viewLifecycleOwner, FragmentResultListener { _: String, bundle: Bundle ->
                 _viewModel.setIcon(bundle.getInt(SET_ICON_BUNDLE_KEY))
                 dirty = true
+        })
+    }
+
+    private fun setupAddNewField() {
+        binding.addNewField.setOnClickListener {
+            MaterialDialog(requireContext()).show {
+                input(hintRes = R.string.new_field_input_hint) { _, text ->
+                    _viewModel.createCustomField(text.toString())
+                }
+                title(R.string.new_field_input_title)
+                positiveButton(android.R.string.ok)
+                negativeButton(android.R.string.cancel)
+            }
+        }
+    }
+
+    private fun setupCustomFieldsRecycler() {
+        val adapter = CustomFieldsAdapter(_viewModel, customFieldsData)
+        binding.customFields.adapter = adapter
+        _viewModel.customFields.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
         })
     }
 }

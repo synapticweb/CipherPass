@@ -183,4 +183,24 @@ open class RepositoryImpl @Inject constructor(
         val query = SimpleSQLiteQuery(queryStem + sb.toString())
         return database.dao.queryDb(query)
     }
+
+    override suspend fun insertCustomField(field: CustomField): Long {
+        return database.dao.insertCustomField(field)
+    }
+
+    override suspend fun updateCustomField(field: CustomField): Int {
+        return database.dao.updateCustomField(field)
+    }
+
+    override suspend fun deleteCustomField(field: CustomField): Int {
+        return database.dao.deleteCustomField(field)
+    }
+
+    override suspend fun getCustomField(key: Long): CustomField {
+       return database.dao.getCustomField(key)
+    }
+
+    override fun getCustomFields(entry: Long): LiveData<List<CustomField>> {
+        return database.dao.getCustomFields(entry)
+    }
 }

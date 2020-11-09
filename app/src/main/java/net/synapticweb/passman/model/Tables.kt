@@ -54,6 +54,22 @@ data class Entry (
     }
 }
 
+@Entity(tableName = "custom_fields")
+ data class CustomField (
+    @ColumnInfo(name = "entry")
+    var entry : Long,
+
+    @ColumnInfo(name = "field_name")
+    var fieldName : String,
+
+    @ColumnInfo(name = "value")
+    var value : String = ""
+) {
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = true)
+    var id : Long = 0L
+}
+
 @Entity(tableName = "hash")
 class Hash(
     @ColumnInfo(name = "hash") var hash: String,

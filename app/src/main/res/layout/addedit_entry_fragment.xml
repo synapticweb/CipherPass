@@ -165,6 +165,19 @@ Soluția a fost 2way data binding.-->
 
                 </RelativeLayout>
 
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:id="@+id/custom_fields" />
+
+                <Button
+                    android:layout_marginTop="20dp"
+                    android:id="@+id/add_new_field"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/new_field_button" />
+
             </LinearLayout>
 
         </ScrollView>

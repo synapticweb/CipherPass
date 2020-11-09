@@ -28,6 +28,17 @@ interface Repository {
     fun removeDb()
 
     suspend fun queryDb(elements : List<String>) : List<Entry>
+
+    suspend fun insertCustomField(field : CustomField) : Long
+
+    suspend fun updateCustomField(field: CustomField) : Int
+
+    suspend fun deleteCustomField(field :  CustomField) : Int
+
+    suspend fun getCustomField(key : Long) : CustomField
+
+    fun getCustomFields(entry : Long) : LiveData<List<CustomField>>
+
 }
 
 enum class SortOrder {

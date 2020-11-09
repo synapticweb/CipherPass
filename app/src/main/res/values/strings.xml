@@ -77,4 +77,7 @@
     <string name="sort_name">Sort by name</string>
     <string name="sort_creation">Sort by creation date</string>
     <string name="sort_modif">Sort by modification date</string>
+    <string name="new_field_button">New field</string>
+    <string name="new_field_input_title">Add new field</string>
+    <string name="new_field_input_hint">Field name</string>
 </resources>

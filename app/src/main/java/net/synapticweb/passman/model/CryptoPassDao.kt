@@ -1,7 +1,6 @@
 package net.synapticweb.passman.model
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 
@@ -21,6 +20,21 @@ interface CryptoPassDao {
 
     @RawQuery(observedEntities = [Entry::class])
     fun getAllEntries(query : SupportSQLiteQuery) : LiveData<List<Entry>>
+
+    @Insert
+    suspend fun insertCustomField(field : CustomField) : Long
+
+    @Update
+    suspend fun updateCustomField(field: CustomField) : Int
+
+    @Delete
+    suspend fun deleteCustomField(field :  CustomField) : Int
+
+    @Query("SELECT * FROM `custom_fields` WHERE `id`= :key")
+    suspend fun getCustomField(key : Long) : CustomField
+
+    @Query("SELECT * FROM `custom_fields` WHERE `entry`= :key")
+    fun getCustomFields(key : Long) : LiveData<List<CustomField>>
 
     @Insert
     suspend fun insertHash(hash : Hash) : Long
