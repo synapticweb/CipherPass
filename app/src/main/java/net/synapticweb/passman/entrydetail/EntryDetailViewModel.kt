@@ -4,10 +4,7 @@ import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import net.synapticweb.passman.CryptoPassApp
 import net.synapticweb.passman.model.CustomField
@@ -23,14 +20,19 @@ class EntryDetailViewModel @Inject constructor(private val repository: Repositor
     val entry = MutableLiveData<Entry>()
     val finishDeletion = MutableLiveData<Event<Boolean>>()
     val finishCopy = MutableLiveData<Event<String>>()
-    lateinit var customFields : LiveData<List<CustomField>>
-    val loadEnded = MutableLiveData<Event<Boolean>>()
+    val entryId = MutableLiveData<Long>()
+    val customFields : LiveData<List<CustomField>> = entryId.switchMap {
+        repository.getCustomFields(it)
+    }
 
-    fun getEntry(entryId : Long) {
+    fun load(id: Long) {
+        entryId.value = id
+        getEntry(id)
+    }
+
+    private fun getEntry(entryId : Long) {
         viewModelScope.launch {
             entry.value = repository.getEntry(entryId)
-            customFields = repository.getCustomFields(entryId)
-            loadEnded.value = Event(true)
         }
     }
 

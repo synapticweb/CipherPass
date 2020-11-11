@@ -49,7 +49,7 @@ class EntryDetailFragment : Fragment() {
             fragment = this@EntryDetailFragment
         }
         binding.lifecycleOwner = viewLifecycleOwner
-        _viewModel.getEntry(args.entryId)
+        _viewModel.load(args.entryId)
         setHasOptionsMenu(true)
 
         return binding.root
@@ -138,10 +138,8 @@ class EntryDetailFragment : Fragment() {
         val adapter = CustomFieldsAdapter(_viewModel)
         binding.customFields.adapter = adapter
         binding.customFields.isNestedScrollingEnabled = false
-        _viewModel.loadEnded.observe(viewLifecycleOwner, EventObserver {
-            _viewModel.customFields.observe(viewLifecycleOwner, Observer {
-                adapter.submitList(it)
-            })
+        _viewModel.customFields.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
         })
     }
 }

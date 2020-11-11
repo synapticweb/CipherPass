@@ -25,7 +25,7 @@ import net.synapticweb.passman.util.EventObserver
 import net.synapticweb.passman.util.setupPasswordFields
 import javax.inject.Inject
 
-class AddeditEntryFragment : Fragment(), CustomFieldsFragment {
+class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -50,10 +50,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsFragment {
         //a fost nevoie să mut aici populate() deoarece onCreateView() este apelată la întoarcerea
         //din backstack și suprascrie icoana setată de SetIconFragment.
         //https://bricolsoftconsulting.com/state-preservation-in-backstack-fragments/
-        if (args.entryId != 0L)
-            _viewModel.populate(args.entryId)
-        else
-            _viewModel.initCustomFields()
+        _viewModel.populate(args.entryId)
     }
 
     override fun onCreateView(
@@ -248,10 +245,8 @@ class AddeditEntryFragment : Fragment(), CustomFieldsFragment {
         adapter = CustomFieldsAdapter(_viewModel, this)
         binding.customFields.adapter = adapter
         binding.customFields.isNestedScrollingEnabled = false
-        _viewModel.loadEnded.observe(viewLifecycleOwner, EventObserver {
-            _viewModel.customFields.observe(viewLifecycleOwner, Observer {
-                adapter.submitList(it)
-            })
+        _viewModel.customFields.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
         })
     }
 
@@ -263,6 +258,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsFragment {
     override fun removeCustomField(id: Long) {
         if(customFieldsData.containsKey(id))
             customFieldsData.remove(id)
+        dirty = true
     }
 
     private fun setupViewModelToasts() {

@@ -12,7 +12,7 @@ import net.synapticweb.passman.databinding.CustomFieldAddeditItemBinding
 
 
 class CustomFieldsAdapter(private val viewModel: AddeditEntryViewModel,
-                          private val fragment : CustomFieldsFragment) :
+                          private val fragment : CustomFieldsEditFragment) :
     ListAdapter<CustomField, ViewHolder>(CustomFieldsCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -28,7 +28,7 @@ class CustomFieldsAdapter(private val viewModel: AddeditEntryViewModel,
             RecyclerView.ViewHolder(binding.root) {
 
         fun bind(viewModel: AddeditEntryViewModel, item : CustomField,
-                 fragment : CustomFieldsFragment) {
+                 fragment : CustomFieldsEditFragment) {
             binding.fieldLayout.hint = item.fieldName
             binding.field.setText(item.value)
 
@@ -54,7 +54,7 @@ class CustomFieldsAdapter(private val viewModel: AddeditEntryViewModel,
     }
 }
 
-interface CustomFieldsFragment {
+interface CustomFieldsEditFragment {
     fun saveCustomField(id : Long, value : String)
     fun removeCustomField(id : Long)
 }
