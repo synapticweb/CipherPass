@@ -80,4 +80,5 @@
     <string name="new_field_button">New field</string>
     <string name="new_field_input_title">Add new field</string>
     <string name="new_field_input_hint">Field name</string>
+    <string name="insert_cf_error">Error inserting the custom field.</string>
 </resources>

@@ -8,6 +8,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentResultListener
 import androidx.fragment.app.activityViewModels
@@ -24,7 +25,7 @@ import net.synapticweb.passman.util.EventObserver
 import net.synapticweb.passman.util.setupPasswordFields
 import javax.inject.Inject
 
-class AddeditEntryFragment : Fragment() {
+class AddeditEntryFragment : Fragment(), CustomFieldsFragment {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -35,6 +36,7 @@ class AddeditEntryFragment : Fragment() {
     private lateinit var binding: AddeditEntryFragmentBinding
     private var dirty : Boolean = false
     private val customFieldsData = mutableMapOf<Long, String>()
+    private lateinit var adapter : CustomFieldsAdapter
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -50,6 +52,8 @@ class AddeditEntryFragment : Fragment() {
         //https://bricolsoftconsulting.com/state-preservation-in-backstack-fragments/
         if (args.entryId != 0L)
             _viewModel.populate(args.entryId)
+        else
+            _viewModel.initCustomFields()
     }
 
     override fun onCreateView(
@@ -72,7 +76,8 @@ class AddeditEntryFragment : Fragment() {
         setupPasswordFields(binding.passLayout, arrayOf(binding.pass, binding.repass))
         setupFab()
         setupNavigation()
-        setupOnFocusChangeListeners(arrayOf(binding.name, binding.id, binding.pass,
+        setupViewModelToasts()
+        setupEditTextListeners(arrayOf(binding.name, binding.id, binding.pass,
             binding.repass, binding.url, binding.comment ))
         setupReceiveIcon()
         setupAddNewField()
@@ -107,21 +112,17 @@ class AddeditEntryFragment : Fragment() {
                     )
             })
 
-        _viewModel.result.observe(viewLifecycleOwner, EventObserver {
+        _viewModel.saveResult.observe(viewLifecycleOwner, EventObserver {
             val imm: InputMethodManager =
                 requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(requireView().windowToken, 0)
-
-            if (it == R.string.addedit_save_ok || it == R.string.addedit_save_error)
-                Toast.makeText(requireContext(), getString(it),
-                    Toast.LENGTH_SHORT).show()
 
             if (it == INSERT_SUCCES)
                 findNavController().navigate(
                     AddeditEntryFragmentDirections.actionAddeditEntryFragmentToEntriesListFragment()
                 )
 
-            else if(it == R.string.addedit_save_ok)
+            else if(it == EDIT_SUCCESS)
                 findNavController().popBackStack()
         })
 
@@ -175,16 +176,23 @@ class AddeditEntryFragment : Fragment() {
                 binding.pass.text.toString(),
                 if (binding.url.text!!.isBlank()) null else binding.url.text.toString(),
                 if (binding.comment.text!!.isBlank()) null else binding.comment.text.toString(),
-                args.entryId
+                customFieldsData
             )
         }
     }
 
-    private fun setupOnFocusChangeListeners(editTexts : Array<TextView>) {
+    private fun setupEditTextListeners(editTexts : Array<TextView>) {
         for(editText in editTexts) {
-            editText.setOnFocusChangeListener { _,_ ->
-                dirty = true
+            editText.setOnFocusChangeListener { _, hasFocus ->
+                if(hasFocus)
+                    editText.tag = "got-focus"
             }
+
+            editText.addTextChangedListener(
+                afterTextChanged = {
+                    if(editText.tag == "got-focus")
+                        dirty = true
+            })
         }
     }
 
@@ -227,6 +235,7 @@ class AddeditEntryFragment : Fragment() {
             MaterialDialog(requireContext()).show {
                 input(hintRes = R.string.new_field_input_hint) { _, text ->
                     _viewModel.createCustomField(text.toString())
+                    dirty = true
                 }
                 title(R.string.new_field_input_title)
                 positiveButton(android.R.string.ok)
@@ -236,10 +245,30 @@ class AddeditEntryFragment : Fragment() {
     }
 
     private fun setupCustomFieldsRecycler() {
-        val adapter = CustomFieldsAdapter(_viewModel, customFieldsData)
+        adapter = CustomFieldsAdapter(_viewModel, this)
         binding.customFields.adapter = adapter
-        _viewModel.customFields.observe(viewLifecycleOwner, Observer {
-            adapter.submitList(it)
+        binding.customFields.isNestedScrollingEnabled = false
+        _viewModel.loadEnded.observe(viewLifecycleOwner, EventObserver {
+            _viewModel.customFields.observe(viewLifecycleOwner, Observer {
+                adapter.submitList(it)
+            })
+        })
+    }
+
+    override fun saveCustomField(id: Long, value: String) {
+        customFieldsData[id] = value
+        dirty = true
+    }
+
+    override fun removeCustomField(id: Long) {
+        if(customFieldsData.containsKey(id))
+            customFieldsData.remove(id)
+    }
+
+    private fun setupViewModelToasts() {
+        _viewModel.toastMessages.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(requireContext(), getString(it),
+                    Toast.LENGTH_SHORT).show()
         })
     }
 }

@@ -80,6 +80,7 @@ class EntryDetailFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         setupNavigation()
         setupCopyToast()
+        setupCustomFieldsRecycler()
         setTitle()
     }
 
@@ -130,6 +131,17 @@ class EntryDetailFragment : Fragment() {
             // androidx.appcompat.app.AppCompatActivity
             if(activity is AppCompatActivity)
                 activity.supportActionBar?.title = it.entryName
+        })
+    }
+
+    private fun setupCustomFieldsRecycler() {
+        val adapter = CustomFieldsAdapter(_viewModel)
+        binding.customFields.adapter = adapter
+        binding.customFields.isNestedScrollingEnabled = false
+        _viewModel.loadEnded.observe(viewLifecycleOwner, EventObserver {
+            _viewModel.customFields.observe(viewLifecycleOwner, Observer {
+                adapter.submitList(it)
+            })
         })
     }
 }

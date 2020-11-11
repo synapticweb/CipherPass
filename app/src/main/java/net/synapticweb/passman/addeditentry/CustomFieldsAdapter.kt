@@ -2,17 +2,17 @@ package net.synapticweb.passman.addeditentry
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.EditText
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import net.synapticweb.passman.databinding.CustomFieldItemBinding
 import net.synapticweb.passman.model.CustomField
 import net.synapticweb.passman.addeditentry.CustomFieldsAdapter.ViewHolder
+import net.synapticweb.passman.databinding.CustomFieldAddeditItemBinding
 
 
 class CustomFieldsAdapter(private val viewModel: AddeditEntryViewModel,
-                          private val savedData : MutableMap<Long, String>) :
+                          private val fragment : CustomFieldsFragment) :
     ListAdapter<CustomField, ViewHolder>(CustomFieldsCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -21,21 +21,24 @@ class CustomFieldsAdapter(private val viewModel: AddeditEntryViewModel,
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(viewModel, item, savedData)
+        holder.bind(viewModel, item, fragment)
     }
 
-    class ViewHolder private constructor(val binding : CustomFieldItemBinding) :
+    class ViewHolder private constructor(val binding : CustomFieldAddeditItemBinding) :
             RecyclerView.ViewHolder(binding.root) {
+
         fun bind(viewModel: AddeditEntryViewModel, item : CustomField,
-                 savedData: MutableMap<Long, String>) {
-            binding.field.setOnFocusChangeListener {field, hasFocus ->
-                if(!hasFocus)
-                    savedData[item.id] = (field as EditText).text.toString()
-            }
+                 fragment : CustomFieldsFragment) {
+            binding.fieldLayout.hint = item.fieldName
+            binding.field.setText(item.value)
+
+            binding.field.addTextChangedListener(
+                afterTextChanged = { editable ->
+                    fragment.saveCustomField(item.id, editable.toString())
+                })
 
             binding.deleteField.setOnClickListener {
-                if(savedData.containsKey(item.id))
-                    savedData.remove(item.id)
+                fragment.removeCustomField(item.id)
                 viewModel.deleteCustomField(item)
             }
             binding.executePendingBindings()
@@ -44,12 +47,18 @@ class CustomFieldsAdapter(private val viewModel: AddeditEntryViewModel,
         companion object {
             fun from(parent : ViewGroup) : ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = CustomFieldItemBinding.inflate(layoutInflater, parent, false)
+                val binding = CustomFieldAddeditItemBinding.inflate(layoutInflater, parent, false)
                 return ViewHolder(binding)
             }
         }
     }
 }
+
+interface CustomFieldsFragment {
+    fun saveCustomField(id : Long, value : String)
+    fun removeCustomField(id : Long)
+}
+
 
 class CustomFieldsCallback : DiffUtil.ItemCallback<CustomField>() {
     override fun areItemsTheSame(oldItem: CustomField, newItem: CustomField): Boolean {

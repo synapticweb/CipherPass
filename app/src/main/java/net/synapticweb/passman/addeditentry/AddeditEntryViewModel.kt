@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import net.synapticweb.passman.EDIT_SUCCESS
 import net.synapticweb.passman.INSERT_SUCCES
 import net.synapticweb.passman.NO_ENTRY_CUSTOM_FIELD_ID
 import net.synapticweb.passman.R
@@ -25,14 +26,16 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
     val rePassword = MutableLiveData<String>()
     val url = MutableLiveData<String?>()
     val comment = MutableLiveData<String?>()
-    val result = MutableLiveData<Event<Int>>()
+    val saveResult = MutableLiveData<Event<Int>>()
+    val toastMessages = MutableLiveData<Event<Int>>()
     private lateinit var savedEntry : Entry
     val icon = MutableLiveData<Int>(R.drawable.item_key)
-    private val customFieldsIds = arrayListOf<Long>()
     lateinit var customFields : LiveData<List<CustomField>>
+    val loadEnded = MutableLiveData<Event<Boolean>>()
 
     fun populate(entryId : Long) {
         viewModelScope.launch {
+            customFields = repository.getCustomFields(entryId)
             repository.getEntry(entryId). let { entry ->
                 name.value = entry.entryName
                 password.value = entry.password
@@ -42,9 +45,9 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
                 comment.value = entry.comment
                 icon.value = entry.icon
                 savedEntry = entry
-                customFields = repository.getCustomFields(entryId)
             }
         }
+        loadEnded.value = Event(true)
     }
 
     fun saveEntry(name : String,
@@ -52,9 +55,10 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
                   password : String,
                   url : String?,
                   comment : String?,
-                  entryId : Long) {
+                  customFieldsData : Map<Long, String>
+                  ) {
 
-        val entry = if (entryId != 0L) savedEntry
+        val entry = if (::savedEntry.isInitialized) savedEntry
         else
             Entry()
 
@@ -67,20 +71,40 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
         entry.icon = icon.value!!
 
         viewModelScope.launch {
-            if (entryId != 0L) {
-                val numRows = repository.updateEntry(entry)
-                result.value = if(numRows == 1)
-                    Event(R.string.addedit_save_ok)
-                else
-                    Event(R.string.addedit_save_error)
+            var rowId : Long = 0
+            var entryError = false
+            var customFieldsError = false
+
+            if (::savedEntry.isInitialized) {
+                if(repository.updateEntry(entry) == -1)
+                    entryError = true
             }
             else {
-                val rowId = repository.insertEntry(entry)
-                result.value = if(rowId.toInt() == -1)
-                    Event(R.string.addedit_save_error)
-                else
-                    Event(INSERT_SUCCES)
+                rowId = repository.insertEntry(entry)
+                if(rowId.toInt() == -1)
+                    entryError = true
             }
+
+            for(customField in customFieldsData) {
+                val field = repository.getCustomField(customField.key)
+                field.value = customField.value
+                if(!::savedEntry.isInitialized)
+                    field.entry = rowId
+                if(repository.updateCustomField(field) != 1)
+                    customFieldsError = true
+            }
+
+            if(entryError || customFieldsError) {
+                toastMessages.value = Event(R.string.addedit_save_error)
+                return@launch
+            }
+
+            if(::savedEntry.isInitialized) {
+                saveResult.value = Event(EDIT_SUCCESS)
+                toastMessages.value = Event(R.string.addedit_save_ok)
+            }
+            else
+                saveResult.value = Event(INSERT_SUCCES)
         }
     }
 
@@ -93,17 +117,24 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
             savedEntry.id
         else NO_ENTRY_CUSTOM_FIELD_ID
         val field = CustomField(entry, fieldName)
+
         viewModelScope.launch {
          val rowId = repository.insertCustomField(field)
-            if(rowId.toInt() != -1)
-                customFieldsIds.add(rowId)
+            if(rowId.toInt() == -1)
+                toastMessages.value = Event(R.string.insert_cf_error)
         }
+    }
 
-        if(!::customFields.isInitialized)
+    fun initCustomFields() {
+        if(!::customFields.isInitialized) {
             customFields = repository.getCustomFields(NO_ENTRY_CUSTOM_FIELD_ID)
+            loadEnded.value = Event(true)
+        }
     }
 
     fun deleteCustomField(field : CustomField) {
-
+        viewModelScope.launch {
+            repository.deleteCustomField(field)
+        }
     }
 }

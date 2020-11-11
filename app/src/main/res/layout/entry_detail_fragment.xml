@@ -177,6 +177,12 @@
 
             </RelativeLayout>
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/custom_fields"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 style="@style/detail_field"
