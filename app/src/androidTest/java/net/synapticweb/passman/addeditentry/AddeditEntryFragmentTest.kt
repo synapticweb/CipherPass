@@ -28,7 +28,7 @@ class AddeditEntryFragmentTest {
         val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
         val fragmentScenario = launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
-        onView(withId(R.id.id)).perform(typeText("test_username"))
+        onView(withId(R.id.username)).perform(typeText("test_username"))
         onView(withId(R.id.save)).perform(click())
 
         onView(withText(R.string.addedit_name_empty)).inRoot(isToast()).check(matches(isDisplayed()))
@@ -40,7 +40,7 @@ class AddeditEntryFragmentTest {
         val fragmentScenario = launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
         onView(withId(R.id.name)).perform(typeText("test_name"))
-        onView(withId(R.id.id)).perform(typeText("test_username"))
+        onView(withId(R.id.username)).perform(typeText("test_username"))
         onView(withId(R.id.save)).perform(click())
 
         onView(withText(R.string.addedit_pass_empty)).inRoot(isToast()).check(matches(isDisplayed()))
@@ -52,7 +52,7 @@ class AddeditEntryFragmentTest {
         val fragmentScenario = launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
         onView(withId(R.id.name)).perform(typeText("test_name"))
-        onView(withId(R.id.id)).perform(typeText("test_username"))
+        onView(withId(R.id.username)).perform(typeText("test_username"))
         onView(withId(R.id.pass)).perform(typeText("test_pass"))
         onView(withId(R.id.repass)).perform(typeText("test_pass2"))
         onView(withId(R.id.save)).perform(click())
@@ -76,7 +76,7 @@ class AddeditEntryFragmentTest {
 
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
         onView(withId(R.id.name)).perform(typeText("test_name"))
-        onView(withId(R.id.id)).perform(typeText("test_username"))
+        onView(withId(R.id.username)).perform(typeText("test_username"))
         onView(withId(R.id.pass)).perform(typeText("test_pass"))
         onView(withId(R.id.repass)).perform(typeText("test_pass"))
         onView(withId(R.id.url)).perform(typeText("url"), closeSoftKeyboard())
@@ -144,7 +144,7 @@ class AddeditEntryFragmentTest {
         }
 
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
-        onView(withId(R.id.id)).perform(replaceText("username_changed"), closeSoftKeyboard())
+        onView(withId(R.id.username)).perform(replaceText("username_changed"), closeSoftKeyboard())
         onView(withId(R.id.pass)).perform(replaceText("password_changed"), closeSoftKeyboard())
         onView(withId(R.id.repass)).perform(replaceText("password_changed"), closeSoftKeyboard())
         onView(withId(R.id.comment)).perform(typeText("comment"), closeSoftKeyboard())

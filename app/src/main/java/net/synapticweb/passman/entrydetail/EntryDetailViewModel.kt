@@ -5,7 +5,9 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import androidx.lifecycle.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.synapticweb.passman.CryptoPassApp
 import net.synapticweb.passman.model.CustomField
 import net.synapticweb.passman.model.Entry
@@ -36,11 +38,17 @@ class EntryDetailViewModel @Inject constructor(private val repository: Repositor
         }
     }
 
-    fun deleteEntry() {
+    fun deleteEntry() { //todo: error handling
         entry.value?.let {
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
+                val customFields = repository.getCustomFieldsSync(it.id)
+                for(field in customFields)
+                    repository.deleteCustomField(field)
                 repository.deleteEntry(it)
-                finishDeletion.value = Event(true)
+
+                withContext(Dispatchers.Main) {
+                    finishDeletion.value = Event(true)
+                }
             }
         }
     }

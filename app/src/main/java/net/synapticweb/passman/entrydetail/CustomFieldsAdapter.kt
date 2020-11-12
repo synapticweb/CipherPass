@@ -1,15 +1,19 @@
 package net.synapticweb.passman.entrydetail
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import net.synapticweb.passman.R
 import net.synapticweb.passman.databinding.CustomFieldDetailItemBinding
 import net.synapticweb.passman.model.CustomField
 import net.synapticweb.passman.entrydetail.CustomFieldsAdapter.ViewHolder
 
-class CustomFieldsAdapter(private val viewModel: EntryDetailViewModel) :
+class CustomFieldsAdapter(private val viewModel: EntryDetailViewModel,
+                          private val context : Context
+) :
     ListAdapter<CustomField, ViewHolder>(CustomFieldsCallback()){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -18,16 +22,19 @@ class CustomFieldsAdapter(private val viewModel: EntryDetailViewModel) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(viewModel, item)
+        holder.bind(viewModel, item, context)
     }
 
     class ViewHolder private constructor(val binding : CustomFieldDetailItemBinding) :
             RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(viewModel: EntryDetailViewModel, item : CustomField) {
+        fun bind(viewModel: EntryDetailViewModel, item : CustomField, context: Context) {
             binding.viewModel = viewModel
             binding.caption.text = item.fieldName
-            binding.value.text = item.value
+            binding.value.text = if(item.value.isBlank())
+                context.resources.getString(R.string.value_not_set)
+            else
+                item.value
         }
 
         companion object {

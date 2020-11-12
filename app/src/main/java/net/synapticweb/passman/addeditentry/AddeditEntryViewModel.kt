@@ -2,11 +2,8 @@ package net.synapticweb.passman.addeditentry
 
 import android.app.Application
 import androidx.lifecycle.*
-import kotlinx.coroutines.launch
-import net.synapticweb.passman.EDIT_SUCCESS
-import net.synapticweb.passman.INSERT_SUCCES
-import net.synapticweb.passman.NO_ENTRY_CUSTOM_FIELD_ID
-import net.synapticweb.passman.R
+import kotlinx.coroutines.*
+import net.synapticweb.passman.*
 import net.synapticweb.passman.model.CustomField
 import net.synapticweb.passman.model.Entry
 import net.synapticweb.passman.model.Repository
@@ -24,8 +21,8 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
     }
 
     val name = MutableLiveData<String>()
-    val password = MutableLiveData<String>()
-    val rePassword = MutableLiveData<String>()
+    val password = MutableLiveData<String?>()
+    val rePassword = MutableLiveData<String?>()
     val url = MutableLiveData<String?>()
     val comment = MutableLiveData<String?>()
     val saveResult = MutableLiveData<Event<Int>>()
@@ -58,10 +55,10 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
 
     fun saveEntry(name : String,
                   username : String?,
-                  password : String,
+                  password : String?,
                   url : String?,
                   comment : String?,
-                  customFieldsData : Map<Long, String>
+                  customFieldsData : Map<Long, Pair<String, Boolean>>
                   ) {
 
         val entry = if (isEdit()) savedEntry
@@ -93,11 +90,20 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
 
             for(customField in customFieldsData) {
                 val field = repository.getCustomField(customField.key)
-                field.value = customField.value
+                if(customField.value.second) {
+                    if(repository.deleteCustomField(field) != 1) {
+                        customFieldsError = true
+                        break
+                    }
+                    continue
+                }
+                field.value = customField.value.first
                 if(!isEdit())
                     field.entry = rowId
-                if(repository.updateCustomField(field) != 1)
+                if(repository.updateCustomField(field) != 1) {
                     customFieldsError = true
+                    break
+                }
             }
 
             if(entryError || customFieldsError) {
@@ -131,9 +137,13 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
         }
     }
 
-    fun deleteCustomField(field : CustomField) {
-        viewModelScope.launch {
-            repository.deleteCustomField(field)
+    fun cleanCustomFields() {
+        if(!isEdit()) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val customFields = repository.getCustomFieldsSync(NO_ENTRY_CUSTOM_FIELD_ID)
+                for (field in customFields)
+                    repository.deleteCustomField(field)
+            }
         }
     }
 }

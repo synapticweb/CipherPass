@@ -203,4 +203,8 @@ open class RepositoryImpl @Inject constructor(
     override fun getCustomFields(entry: Long): LiveData<List<CustomField>> {
         return database.dao.getCustomFields(entry)
     }
+
+    override fun getCustomFieldsSync(entry: Long): List<CustomField> {
+        return database.dao.getCustomFieldsSync(entry)
+    }
 }

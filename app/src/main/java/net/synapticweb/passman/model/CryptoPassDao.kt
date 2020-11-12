@@ -36,6 +36,9 @@ interface CryptoPassDao {
     @Query("SELECT * FROM `custom_fields` WHERE `entry`= :key")
     fun getCustomFields(key : Long) : LiveData<List<CustomField>>
 
+    @Query("SELECT * FROM `custom_fields` WHERE `entry`= :key")
+    fun getCustomFieldsSync(key : Long) : List<CustomField>
+
     @Insert
     suspend fun insertHash(hash : Hash) : Long
 

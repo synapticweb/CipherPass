@@ -11,9 +11,14 @@ import net.synapticweb.passman.addeditentry.CustomFieldsAdapter.ViewHolder
 import net.synapticweb.passman.databinding.CustomFieldAddeditItemBinding
 
 
-class CustomFieldsAdapter(private val viewModel: AddeditEntryViewModel,
-                          private val fragment : CustomFieldsEditFragment) :
+class CustomFieldsAdapter(private val fragment : CustomFieldsEditFragment) :
     ListAdapter<CustomField, ViewHolder>(CustomFieldsCallback()) {
+
+    fun deleteItem(item: CustomField) {
+        val list = currentList.toMutableList()
+        list.remove(item)
+        submitList(list)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
@@ -21,25 +26,25 @@ class CustomFieldsAdapter(private val viewModel: AddeditEntryViewModel,
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(viewModel, item, fragment)
+        holder.bind(item, fragment, this)
     }
 
     class ViewHolder private constructor(val binding : CustomFieldAddeditItemBinding) :
             RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(viewModel: AddeditEntryViewModel, item : CustomField,
-                 fragment : CustomFieldsEditFragment) {
+        fun bind(item : CustomField, fragment : CustomFieldsEditFragment,
+                 adapter: CustomFieldsAdapter) {
             binding.fieldLayout.hint = item.fieldName
             binding.field.setText(item.value)
 
             binding.field.addTextChangedListener(
                 afterTextChanged = { editable ->
-                    fragment.saveCustomField(item.id, editable.toString())
+                    fragment.saveField(item.id, editable.toString())
                 })
 
             binding.deleteField.setOnClickListener {
-                fragment.removeCustomField(item.id)
-                viewModel.deleteCustomField(item)
+                fragment.markFieldForDeletion(item.id)
+                adapter.deleteItem(item)
             }
             binding.executePendingBindings()
         }
@@ -55,8 +60,8 @@ class CustomFieldsAdapter(private val viewModel: AddeditEntryViewModel,
 }
 
 interface CustomFieldsEditFragment {
-    fun saveCustomField(id : Long, value : String)
-    fun removeCustomField(id : Long)
+    fun saveField(id : Long, value : String)
+    fun markFieldForDeletion(id : Long)
 }
 
 

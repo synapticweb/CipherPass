@@ -20,7 +20,7 @@ data class Entry (
     var username : String? = null,
 
     @ColumnInfo(name = "password")
-    var password : String = "",
+    var password : String? = "",
 
     @ColumnInfo(name = "url")
     var url : String? = null,

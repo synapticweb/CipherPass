@@ -35,7 +35,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
     private val args: AddeditEntryFragmentArgs by navArgs()
     private lateinit var binding: AddeditEntryFragmentBinding
     private var dirty : Boolean = false
-    private val customFieldsData = mutableMapOf<Long, String>()
+    private val customFieldsData = mutableMapOf<Long, Pair<String, Boolean>>()
     private lateinit var adapter : CustomFieldsAdapter
 
     override fun onAttach(context: Context) {
@@ -74,7 +74,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
         setupFab()
         setupNavigation()
         setupViewModelToasts()
-        setupEditTextListeners(arrayOf(binding.name, binding.id, binding.pass,
+        setupEditTextListeners(arrayOf(binding.name, binding.username, binding.pass,
             binding.repass, binding.url, binding.comment ))
         setupReceiveIcon()
         setupAddNewField()
@@ -90,6 +90,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
        return when(item.itemId) {
             R.id.close -> {
+                _viewModel.cleanCustomFields()
                 findNavController().popBackStack()
                 true
             }
@@ -149,15 +150,6 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
                 return@setOnClickListener
             }
 
-            if (binding.pass.text!!.isEmpty()) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.addedit_pass_empty),
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@setOnClickListener
-            }
-
             if (binding.pass.text!!.toString() != binding.repass.text!!.toString()) {
                 Toast.makeText(
                     requireContext(),
@@ -169,8 +161,8 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
 
             _viewModel.saveEntry(
                 binding.name.text.toString(),
-                if (binding.id.text!!.isBlank()) null else binding.id.text.toString(),
-                binding.pass.text.toString(),
+                if (binding.username.text!!.isBlank()) null else binding.username.text.toString(),
+                if (binding.pass.text!!.isBlank()) null else binding.pass.text.toString(),
                 if (binding.url.text!!.isBlank()) null else binding.url.text.toString(),
                 if (binding.comment.text!!.isBlank()) null else binding.comment.text.toString(),
                 customFieldsData
@@ -195,6 +187,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
 
     private fun backWhenDirty() {
         fun goUp() {
+            _viewModel.cleanCustomFields()
             dirty = false
             //Aici am încerat întîi să folosesc navigația clasică cu direcții, etc. Rezultatul era
             //că eram prins într-un ciclu infinit între addedit și detail.
@@ -242,7 +235,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
     }
 
     private fun setupCustomFieldsRecycler() {
-        adapter = CustomFieldsAdapter(_viewModel, this)
+        adapter = CustomFieldsAdapter(this)
         binding.customFields.adapter = adapter
         binding.customFields.isNestedScrollingEnabled = false
         _viewModel.customFields.observe(viewLifecycleOwner, Observer {
@@ -250,14 +243,19 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
         })
     }
 
-    override fun saveCustomField(id: Long, value: String) {
-        customFieldsData[id] = value
+    override fun saveField(id: Long, value: String) {
+        customFieldsData[id] = Pair(value, false)
         dirty = true
     }
 
-    override fun removeCustomField(id: Long) {
-        if(customFieldsData.containsKey(id))
-            customFieldsData.remove(id)
+    override fun markFieldForDeletion(id: Long) {
+        if(customFieldsData.containsKey(id)) {
+            val text = customFieldsData[id]!!.first
+            customFieldsData[id] = Pair(text, true)
+        }
+        else
+            customFieldsData[id] = Pair("", true)
+
         dirty = true
     }
 

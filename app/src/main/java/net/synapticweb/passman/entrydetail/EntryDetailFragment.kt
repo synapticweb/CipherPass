@@ -135,7 +135,7 @@ class EntryDetailFragment : Fragment() {
     }
 
     private fun setupCustomFieldsRecycler() {
-        val adapter = CustomFieldsAdapter(_viewModel)
+        val adapter = CustomFieldsAdapter(_viewModel, requireContext())
         binding.customFields.adapter = adapter
         binding.customFields.isNestedScrollingEnabled = false
         _viewModel.customFields.observe(viewLifecycleOwner, Observer {
