@@ -159,4 +159,19 @@ class AddeditEntryFragmentTest {
         assertThat(entry.comment, `is`("comment"))
     }
 
+    @Test
+    fun customFields_newEntry_addField() {
+        testRule.setDb()
+        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
+        val fragmentScenario =
+            launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
+        onView(withId(R.id.add_new_field)).perform(click())
+        onView(withId(R.id.field_name_input)).perform(typeText("custom_field"), closeSoftKeyboard())
+        onView(withText(android.R.string.ok)).perform(click())
+
+        onView(withHint("custom_field")).check(matches(isDisplayed()))
+    }
+
 }

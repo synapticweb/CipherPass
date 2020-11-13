@@ -29,6 +29,7 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
     val toastMessages = MutableLiveData<Event<Int>>()
     private lateinit var savedEntry : Entry
     val icon = MutableLiveData<Int>(R.drawable.item_key)
+    val newFields = arrayListOf<Long>()
 
     private fun isEdit() : Boolean {
         return entryId.value != 0L
@@ -131,18 +132,19 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
         val field = CustomField(entry, fieldName)
 
         viewModelScope.launch {
-         val rowId = repository.insertCustomField(field)
+            val rowId = repository.insertCustomField(field)
             if(rowId.toInt() == -1)
                 toastMessages.value = Event(R.string.insert_cf_error)
+            else
+                newFields.add(rowId)
         }
     }
 
     fun cleanCustomFields() {
-        if(!isEdit()) {
-            viewModelScope.launch(Dispatchers.IO) {
-                val customFields = repository.getCustomFieldsSync(NO_ENTRY_CUSTOM_FIELD_ID)
-                for (field in customFields)
-                    repository.deleteCustomField(field)
+        viewModelScope.launch(Dispatchers.IO) {
+            for(key in newFields) {
+                val field = repository.getCustomField(key)
+                repository.deleteCustomField(field)
             }
         }
     }

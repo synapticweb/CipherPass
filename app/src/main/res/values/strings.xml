@@ -82,4 +82,5 @@
     <string name="new_field_input_hint">Field name</string>
     <string name="insert_cf_error">Error inserting the custom field.</string>
     <string name="value_not_set">Value not set</string>
+    <string name="protected_field">Protected</string>
 </resources>

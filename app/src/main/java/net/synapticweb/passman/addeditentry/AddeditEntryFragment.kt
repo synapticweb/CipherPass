@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -18,7 +19,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.input.input
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.actions.getActionButton
+import com.afollestad.materialdialogs.callbacks.onPreShow
+import com.afollestad.materialdialogs.customview.customView
 import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.AddeditEntryFragmentBinding
 import net.synapticweb.passman.util.EventObserver
@@ -223,12 +227,24 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
     private fun setupAddNewField() {
         binding.addNewField.setOnClickListener {
             MaterialDialog(requireContext()).show {
-                input(hintRes = R.string.new_field_input_hint) { _, text ->
-                    _viewModel.createCustomField(text.toString())
+                customView(R.layout.add_custom_field_dialog)
+                title(R.string.new_field_input_title)
+                onPreShow { dialog ->
+                    val positive = dialog.getActionButton(WhichButton.POSITIVE)
+                    positive.isEnabled = false
+                    val editText = dialog.findViewById<EditText>(R.id.field_name_input)
+                    editText.addTextChangedListener(
+                        afterTextChanged = { editable ->
+                            if (editable != null) {
+                                positive.isEnabled = !editable.isBlank()
+                            }
+                        })
+                }
+                positiveButton(android.R.string.ok) { dialog ->
+                    val text = dialog.findViewById<EditText>(R.id.field_name_input).text.toString()
+                    _viewModel.createCustomField(text)
                     dirty = true
                 }
-                title(R.string.new_field_input_title)
-                positiveButton(android.R.string.ok)
                 negativeButton(android.R.string.cancel)
             }
         }
