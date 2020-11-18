@@ -236,6 +236,7 @@ class AddeditEntryFragmentTest {
 
         onView(withId(R.id.custom_fields)).perform(actionOnItemAtPosition
         <CustomFieldsAdapter.ViewHolder>(0, RecyclerViewActions.clickChildViewWithId(R.id.delete_field)))
+        onView(withText(android.R.string.ok)).perform(click())
         delay(200)
         onView(withHint("custom_field")).check(doesNotExist())
 
@@ -357,7 +358,7 @@ class AddeditEntryFragmentTest {
         entry.entryName = "account_name"
         testRule.repository.insertEntry(entry)
 
-        var customField = CustomField(1, "field_name", "field_value")
+        var customField = CustomField(1, "field_name", false, "field_value")
         testRule.repository.insertCustomField(customField)
 
         val bundle = AddeditEntryFragmentArgs(1, "account_name").toBundle()
@@ -387,7 +388,7 @@ class AddeditEntryFragmentTest {
         entry.entryName = "account_name"
         testRule.repository.insertEntry(entry)
 
-        var customField = CustomField(1, "field_name", "field_value")
+        var customField = CustomField(1, "field_name", false, "field_value")
         testRule.repository.insertCustomField(customField)
 
         val bundle = AddeditEntryFragmentArgs(1, "account_name").toBundle()
@@ -415,5 +416,37 @@ class AddeditEntryFragmentTest {
 
         customField = testRule.repository.getCustomField(1)
         assertThat(customField.value, `is`("field_value"))
+    }
+
+    @Test
+    fun editEntry_deleteField_saveRetain() = runBlocking {
+        testRule.setDb()
+        val entry = Entry()
+        entry.entryName = "account_name"
+        testRule.repository.insertEntry(entry)
+
+        var customField = CustomField(1, "field_name", false, "field_value")
+        testRule.repository.insertCustomField(customField)
+
+        val bundle = AddeditEntryFragmentArgs(1, "account_name").toBundle()
+        val mockNav = Mockito.mock(NavController::class.java)
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
+            AddeditEntryFragment().also { fragment ->
+                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
+                    if(viewLifeCycleOwner != null)
+                        Navigation.setViewNavController(fragment.requireView(), mockNav)
+                }
+            }
+        }
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
+        onView(withId(R.id.custom_fields)).perform(actionOnItemAtPosition
+        <CustomFieldsAdapter.ViewHolder>(0, RecyclerViewActions.clickChildViewWithId(R.id.delete_field)))
+        onView(withText(android.R.string.ok)).perform(click())
+
+        onView(withId(R.id.save)).perform(click())
+
+        customField = testRule.repository.getCustomField(1)
+        assertNull(customField)
     }
 }

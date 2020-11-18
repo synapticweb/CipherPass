@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
+        <import type="android.view.View" />
+        <import type="android.text.InputType" />
         <variable
             name="viewModel"
             type="net.synapticweb.passman.entrydetail.EntryDetailViewModel" />
+        <variable
+            name="fragment"
+            type="net.synapticweb.passman.entrydetail.EntryDetailFragment" />
+        <variable
+            name="item"
+            type="net.synapticweb.passman.model.CustomField" />
     </data>
 
     <RelativeLayout
@@ -17,11 +25,25 @@
             android:layout_toStartOf="@id/copy_button"
             android:id="@+id/caption"/>
 
-        <TextView
+        <EditText
             style="@style/detail_item_text"
+            android:editable="false"
+            android:focusable="false"
+            android:background="@android:color/transparent"
             android:layout_alignParentStart="true"
             android:layout_toStartOf="@id/copy_button"
+            android:inputType="@{item.isProtected ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD : InputType.TYPE_TEXT_VARIATION_NORMAL}"
             android:id="@+id/value"/>
+
+        <ImageButton
+            android:id="@+id/value_show"
+            android:layout_alignParentEnd="false"
+            android:src="@drawable/eye"
+            style="@style/detail_button"
+            android:layout_toStartOf="@id/copy_button"
+            android:onClick="@{() -> fragment.togglePassword(value, valueShow)}"
+            android:visibility="@{item.isProtected ? View.VISIBLE : View.GONE }"
+            />
 
         <ImageButton
             android:id="@+id/copy_button"

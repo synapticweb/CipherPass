@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.text.InputType" />
+        <import type="com.google.android.material.textfield.TextInputLayout" />
+        <variable
+            name="item"
+            type="net.synapticweb.passman.model.CustomField" />
+    </data>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,12 +21,13 @@
             android:layout_weight="8.5"
             android:id="@+id/field_layout"
             android:layout_height="wrap_content"
+            app:endIconMode="@{item.isProtected ? TextInputLayout.END_ICON_PASSWORD_TOGGLE : TextInputLayout.END_ICON_NONE}"
             >
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
+                android:inputType="@{item.isProtected ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD : InputType.TYPE_TEXT_VARIATION_NORMAL}"
                 android:id="@+id/field" />
 
         </com.google.android.material.textfield.TextInputLayout>

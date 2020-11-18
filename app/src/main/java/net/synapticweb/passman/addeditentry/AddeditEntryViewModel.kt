@@ -126,11 +126,11 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
         icon.value = iconRes
     }
 
-    fun createCustomField(fieldName : String) {
+    fun createCustomField(fieldName : String, isProtected : Boolean) {
         val entry = if(isEdit())
             savedEntry.id
         else NO_ENTRY_CUSTOM_FIELD_ID
-        val field = CustomField(entry, fieldName)
+        val field = CustomField(entry, fieldName, isProtected)
 
         viewModelScope.launch {
             val rowId = repository.insertCustomField(field)

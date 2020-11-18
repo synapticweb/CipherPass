@@ -62,6 +62,9 @@ data class Entry (
     @ColumnInfo(name = "field_name")
     var fieldName : String,
 
+    @ColumnInfo(name = "is_protected")
+    var isProtected : Boolean = false,
+
     @ColumnInfo(name = "value")
     var value : String = ""
 ) {

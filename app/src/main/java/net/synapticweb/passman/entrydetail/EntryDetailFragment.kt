@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.*
+import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -100,14 +102,14 @@ class EntryDetailFragment : Fragment() {
         })
     }
 
-    fun setupTogglePassword() {
-        if(binding.password.transformationMethod is PasswordTransformationMethod) {
-            binding.password.transformationMethod = HideReturnsTransformationMethod.getInstance()
-            binding.passwordShow.setImageResource(R.drawable.eye_cut)
+    fun togglePassword(password : EditText, icon : ImageButton) {
+        if(password.transformationMethod is PasswordTransformationMethod) {
+            password.transformationMethod = HideReturnsTransformationMethod.getInstance()
+            icon.setImageResource(R.drawable.eye_cut)
         }
         else {
-            binding.password.transformationMethod = PasswordTransformationMethod.getInstance()
-            binding.passwordShow.setImageResource(R.drawable.eye)
+            password.transformationMethod = PasswordTransformationMethod.getInstance()
+            icon.setImageResource(R.drawable.eye)
         }
     }
 
@@ -135,7 +137,7 @@ class EntryDetailFragment : Fragment() {
     }
 
     private fun setupCustomFieldsRecycler() {
-        val adapter = CustomFieldsAdapter(_viewModel, requireContext())
+        val adapter = CustomFieldsAdapter(_viewModel, this)
         binding.customFields.adapter = adapter
         binding.customFields.isNestedScrollingEnabled = false
         _viewModel.customFields.observe(viewLifecycleOwner, Observer {

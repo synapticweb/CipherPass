@@ -26,25 +26,25 @@ class CustomFieldsAdapter(private val fragment : CustomFieldsEditFragment) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(item, fragment, this)
+        holder.bind(item, fragment)
     }
 
     class ViewHolder private constructor(val binding : CustomFieldAddeditItemBinding) :
             RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item : CustomField, fragment : CustomFieldsEditFragment,
-                 adapter: CustomFieldsAdapter) {
+        fun bind(item : CustomField, fragment : CustomFieldsEditFragment) {
+            binding.item = item
             binding.fieldLayout.hint = item.fieldName
             binding.field.setText(item.value)
 
+//            binding.fieldLayout.isPasswordVisibilityToggleEnabled = true
             binding.field.addTextChangedListener(
                 afterTextChanged = { editable ->
                     fragment.saveField(item.id, editable.toString())
                 })
 
             binding.deleteField.setOnClickListener {
-                fragment.markFieldForDeletion(item.id)
-                adapter.deleteItem(item)
+                fragment.manageDeletion(item)
             }
             binding.executePendingBindings()
         }
@@ -61,7 +61,7 @@ class CustomFieldsAdapter(private val fragment : CustomFieldsEditFragment) :
 
 interface CustomFieldsEditFragment {
     fun saveField(id : Long, value : String)
-    fun markFieldForDeletion(id : Long)
+    fun manageDeletion(item : CustomField)
 }
 
 

@@ -100,7 +100,7 @@
                     android:src="@drawable/eye"
                     style="@style/detail_button"
                     android:layout_toStartOf="@id/password_copy"
-                    android:onClick="@{() -> fragment.setupTogglePassword()}"
+                    android:onClick="@{() -> fragment.togglePassword(password, passwordShow)}"
                     />
 
                 <ImageButton

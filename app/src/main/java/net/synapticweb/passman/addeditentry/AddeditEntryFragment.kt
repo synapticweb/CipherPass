@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -25,6 +26,7 @@ import com.afollestad.materialdialogs.callbacks.onPreShow
 import com.afollestad.materialdialogs.customview.customView
 import net.synapticweb.passman.*
 import net.synapticweb.passman.databinding.AddeditEntryFragmentBinding
+import net.synapticweb.passman.model.CustomField
 import net.synapticweb.passman.util.EventObserver
 import net.synapticweb.passman.util.setupPasswordFields
 import javax.inject.Inject
@@ -242,7 +244,8 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
                 }
                 positiveButton(android.R.string.ok) { dialog ->
                     val text = dialog.findViewById<EditText>(R.id.field_name_input).text.toString()
-                    _viewModel.createCustomField(text)
+                    val isProtected = dialog.findViewById<CheckBox>(R.id.protected_field).isChecked
+                    _viewModel.createCustomField(text, isProtected)
                     dirty = true
                 }
                 negativeButton(android.R.string.cancel)
@@ -264,15 +267,23 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
         dirty = true
     }
 
-    override fun markFieldForDeletion(id: Long) {
-        if(customFieldsData.containsKey(id)) {
-            val text = customFieldsData[id]!!.first
-            customFieldsData[id] = Pair(text, true)
-        }
-        else
-            customFieldsData[id] = Pair("", true)
+    override fun manageDeletion(item : CustomField) {
+        MaterialDialog(requireContext()).show {
+            title(R.string.delete_custom_field_title)
+            message(R.string.delete_custom_field_message)
+            positiveButton {
+                if(customFieldsData.containsKey(item.id)) {
+                    val text = customFieldsData[item.id]!!.first
+                    customFieldsData[item.id] = Pair(text, true)
+                }
+                else
+                    customFieldsData[item.id] = Pair("", true)
 
-        dirty = true
+                dirty = true
+                adapter.deleteItem(item)
+            }
+            negativeButton {}
+        }
     }
 
     private fun setupViewModelToasts() {
