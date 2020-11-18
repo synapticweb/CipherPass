@@ -31,49 +31,14 @@ class AddeditEntryFragmentTest {
     @get:Rule
     val testRule = CryptoPassTestRule()
 
-    private fun createCustomField(name : String) {
-        onView(withId(R.id.add_new_field)).perform(click())
-        onView(withId(R.id.field_name_input)).perform(typeText(name), closeSoftKeyboard())
-        onView(withText(android.R.string.ok)).perform(click())
-    }
-
-    private fun createScenarioWithNavController(entryId: Long, title : String) :
-            FragmentScenario<AddeditEntryFragment> {
-        val bundle = AddeditEntryFragmentArgs(entryId, title).toBundle()
-        val mockNav = Mockito.mock(NavController::class.java)
-        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
-            AddeditEntryFragment().also { fragment ->
-                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
-                    if(viewLifeCycleOwner != null)
-                        Navigation.setViewNavController(fragment.requireView(), mockNav)
-                }
-            }
-        }
-        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
-        return fragmentScenario
-    }
-
-    private fun createScenarioWithoutNavController(entryId: Long, title : String) :
-            FragmentScenario<AddeditEntryFragment> {
-        val bundle = AddeditEntryFragmentArgs(entryId, title).toBundle()
-        val fragmentScenario =
-            launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
-        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
-        return fragmentScenario
-    }
-
-    private fun closeFragment(scenario: FragmentScenario<AddeditEntryFragment>) {
-        val context = ApplicationProvider.getApplicationContext<TestCryptoPassApp>()
-        val closeMenuItem = ActionMenuItem(context, 0, R.id.close, 0, 0, null)
-        scenario.onFragment { fragment ->
-            fragment.onOptionsItemSelected(closeMenuItem)
-        }
-    }
-
     @Test
     fun addEntry_nameEmpty_showToast() {
         testRule.setDb()
-        createScenarioWithoutNavController(0, "New entry")
+        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
+        val fragmentScenario =
+            launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
         onView(withId(R.id.username)).perform(typeText("test_username"))
         onView(withId(R.id.save)).perform(click())
 
@@ -84,7 +49,11 @@ class AddeditEntryFragmentTest {
     @Test
     fun addEdit_passwdNoMatch_showToast() {
         testRule.setDb()
-        createScenarioWithoutNavController(0, "New entry")
+        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
+        val fragmentScenario =
+            launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
         onView(withId(R.id.name)).perform(typeText("test_name"))
         onView(withId(R.id.username)).perform(typeText("test_username"))
         onView(withId(R.id.pass)).perform(typeText("test_pass"))
@@ -97,7 +66,18 @@ class AddeditEntryFragmentTest {
     @Test
     fun addEdit_goodInputSave_recordInDb() {
         testRule.setDb()
-        createScenarioWithNavController(0, "New entry")
+        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
+        val mockNav = Mockito.mock(NavController::class.java)
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
+            AddeditEntryFragment().also { fragment ->
+                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
+                    if(viewLifeCycleOwner != null)
+                        Navigation.setViewNavController(fragment.requireView(), mockNav)
+                }
+            }
+        }
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
         onView(withId(R.id.name)).perform(typeText("test_name"))
         onView(withId(R.id.username)).perform(typeText("test_username"))
         onView(withId(R.id.pass)).perform(typeText("test_pass"))
@@ -127,7 +107,17 @@ class AddeditEntryFragmentTest {
         item.url = "url"
         testRule.repository.insertEntry(item)
 
-        createScenarioWithNavController(0, "New entry")
+        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
+        val mockNav = Mockito.mock(NavController::class.java)
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
+            AddeditEntryFragment().also { fragment ->
+                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
+                    if(viewLifeCycleOwner != null)
+                        Navigation.setViewNavController(fragment.requireView(), mockNav)
+                }
+            }
+        }
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
         onView(withId(R.id.save)).perform(click())
         onView(withText(R.string.addedit_nochange)).inRoot(isToast()).check(matches(isDisplayed()))
@@ -145,7 +135,17 @@ class AddeditEntryFragmentTest {
         item.url = "url"
         testRule.repository.insertEntry(item)
 
-        createScenarioWithNavController(1, "account_name")
+        val bundle = AddeditEntryFragmentArgs(1, "account_name").toBundle()
+        val mockNav = Mockito.mock(NavController::class.java)
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
+            AddeditEntryFragment().also { fragment ->
+                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
+                    if(viewLifeCycleOwner != null)
+                        Navigation.setViewNavController(fragment.requireView(), mockNav)
+                }
+            }
+        }
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
         onView(withId(R.id.username)).perform(replaceText("username_changed"), closeSoftKeyboard())
         onView(withId(R.id.pass)).perform(replaceText("password_changed"), closeSoftKeyboard())
@@ -166,8 +166,14 @@ class AddeditEntryFragmentTest {
     @Test
     fun newEntry_addField() = runBlocking {
         testRule.setDb()
-        createScenarioWithoutNavController(0, "New entry")
-        createCustomField("custom_field")
+        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
+        val fragmentScenario =
+            launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
+        onView(withId(R.id.add_new_field)).perform(click())
+        onView(withId(R.id.field_name_input)).perform(typeText("custom_field"), closeSoftKeyboard())
+        onView(withText(android.R.string.ok)).perform(click())
 
         onView(withHint("custom_field")).check(matches(isDisplayed()))
         val customField = testRule.repository.getCustomField(1)
@@ -182,13 +188,31 @@ class AddeditEntryFragmentTest {
     fun newEntry_addField_close_cleanDb() = runBlocking {
         testRule.setDb()
 
-        val fragmentScenario = createScenarioWithNavController(0, "New entry")
-        createCustomField("custom_field")
+        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
+        val mockNav = Mockito.mock(NavController::class.java)
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
+            AddeditEntryFragment().also { fragment ->
+                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
+                    if(viewLifeCycleOwner != null)
+                        Navigation.setViewNavController(fragment.requireView(), mockNav)
+                }
+            }
+        }
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
+        onView(withId(R.id.add_new_field)).perform(click())
+        onView(withId(R.id.field_name_input)).perform(typeText("custom_field"), closeSoftKeyboard())
+        onView(withText(android.R.string.ok)).perform(click())
 
         onView(withHint("custom_field")).check(matches(isDisplayed()))
         var customField = testRule.repository.getCustomField(1)
         assertNotNull(customField)
-        closeFragment(fragmentScenario)
+
+        val context = ApplicationProvider.getApplicationContext<TestCryptoPassApp>()
+        val closeMenuItem = ActionMenuItem(context, 0, R.id.close, 0, 0, null)
+        fragmentScenario.onFragment { fragment ->
+            fragment.onOptionsItemSelected(closeMenuItem)
+        }
 
         delay(400)
 
@@ -199,8 +223,15 @@ class AddeditEntryFragmentTest {
     @Test
     fun newEntry_addField_delete_dissapears_staysInDb() = runBlocking {
         testRule.setDb()
-        createScenarioWithoutNavController(0, "New entry")
-        createCustomField("custom_field")
+        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
+        val fragmentScenario =
+            launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
+        onView(withId(R.id.add_new_field)).perform(click())
+        onView(withId(R.id.field_name_input)).perform(typeText("custom_field"), closeSoftKeyboard())
+        onView(withText(android.R.string.ok)).perform(click())
+
         onView(withHint("custom_field")).check(matches(isDisplayed()))
 
         onView(withId(R.id.custom_fields)).perform(actionOnItemAtPosition
@@ -215,8 +246,21 @@ class AddeditEntryFragmentTest {
     @Test
     fun newEntry_addField_save_retain() = runBlocking {
         testRule.setDb()
-        createScenarioWithNavController(0, "New entry")
-        createCustomField("custom_field")
+        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
+        val mockNav = Mockito.mock(NavController::class.java)
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
+            AddeditEntryFragment().also { fragment ->
+                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
+                    if(viewLifeCycleOwner != null)
+                        Navigation.setViewNavController(fragment.requireView(), mockNav)
+                }
+            }
+        }
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
+        onView(withId(R.id.add_new_field)).perform(click())
+        onView(withId(R.id.field_name_input)).perform(typeText("custom_field"), closeSoftKeyboard())
+        onView(withText(android.R.string.ok)).perform(click())
 
         var customField = testRule.repository.getCustomField(1)
         assertNotNull(customField)
@@ -242,8 +286,20 @@ class AddeditEntryFragmentTest {
         entry.username = "username"
         testRule.repository.insertEntry(entry)
 
-        createScenarioWithNavController(1, "account_name")
-        createCustomField("custom_field")
+        val bundle = AddeditEntryFragmentArgs(1, "account_name").toBundle()
+        val mockNav = Mockito.mock(NavController::class.java)
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
+            AddeditEntryFragment().also { fragment ->
+                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
+                    if(viewLifeCycleOwner != null)
+                        Navigation.setViewNavController(fragment.requireView(), mockNav)
+                }
+            }
+        }
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+        onView(withId(R.id.add_new_field)).perform(click())
+        onView(withId(R.id.field_name_input)).perform(typeText("custom_field"), closeSoftKeyboard())
+        onView(withText(android.R.string.ok)).perform(click())
 
         var customField = testRule.repository.getCustomField(1)
         assertNotNull(customField)
@@ -266,9 +322,27 @@ class AddeditEntryFragmentTest {
         entry.username = "username"
         testRule.repository.insertEntry(entry)
 
-        val fragmentScenario = createScenarioWithNavController(1, "account_name")
-        createCustomField("custom_field")
-        closeFragment(fragmentScenario)
+        val bundle = AddeditEntryFragmentArgs(1, "account_name").toBundle()
+        val mockNav = Mockito.mock(NavController::class.java)
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
+            AddeditEntryFragment().also { fragment ->
+                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
+                    if(viewLifeCycleOwner != null)
+                        Navigation.setViewNavController(fragment.requireView(), mockNav)
+                }
+            }
+        }
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
+        onView(withId(R.id.add_new_field)).perform(click())
+        onView(withId(R.id.field_name_input)).perform(typeText("custom_field"), closeSoftKeyboard())
+        onView(withText(android.R.string.ok)).perform(click())
+
+        val context = ApplicationProvider.getApplicationContext<TestCryptoPassApp>()
+        val closeMenuItem = ActionMenuItem(context, 0, R.id.close, 0, 0, null)
+        fragmentScenario.onFragment { fragment ->
+            fragment.onOptionsItemSelected(closeMenuItem)
+        }
 
         delay(400)
 
@@ -286,7 +360,18 @@ class AddeditEntryFragmentTest {
         var customField = CustomField(1, "field_name", "field_value")
         testRule.repository.insertCustomField(customField)
 
-        createScenarioWithNavController(1, "account_name")
+        val bundle = AddeditEntryFragmentArgs(1, "account_name").toBundle()
+        val mockNav = Mockito.mock(NavController::class.java)
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
+            AddeditEntryFragment().also { fragment ->
+                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
+                    if(viewLifeCycleOwner != null)
+                        Navigation.setViewNavController(fragment.requireView(), mockNav)
+                }
+            }
+        }
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
         onView(withHint("field_name")).perform(replaceText("field_value_modified"),
             closeSoftKeyboard())
 
@@ -305,11 +390,26 @@ class AddeditEntryFragmentTest {
         var customField = CustomField(1, "field_name", "field_value")
         testRule.repository.insertCustomField(customField)
 
-        val fragmentScenario = createScenarioWithNavController(1, "account_name")
+        val bundle = AddeditEntryFragmentArgs(1, "account_name").toBundle()
+        val mockNav = Mockito.mock(NavController::class.java)
+        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
+            AddeditEntryFragment().also { fragment ->
+                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
+                    if(viewLifeCycleOwner != null)
+                        Navigation.setViewNavController(fragment.requireView(), mockNav)
+                }
+            }
+        }
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
         onView(withHint("field_name")).perform(replaceText("field_value_modified"),
             closeSoftKeyboard())
 
-        closeFragment(fragmentScenario)
+        val context = ApplicationProvider.getApplicationContext<TestCryptoPassApp>()
+        val closeMenuItem = ActionMenuItem(context, 0, R.id.close, 0, 0, null)
+        fragmentScenario.onFragment { fragment ->
+            fragment.onOptionsItemSelected(closeMenuItem)
+        }
 
         delay(400)
 
