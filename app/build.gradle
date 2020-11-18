@@ -111,4 +111,6 @@ dependencies {
     //pentru instanttaskexecutorrule:
     androidTestImplementation "androidx.arch.core:core-testing:$archTestingVersion"
     androidTestImplementation "org.mockito:mockito-android:3.3.3"
+
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$espressoVersion"
 }

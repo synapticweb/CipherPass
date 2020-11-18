@@ -7,13 +7,16 @@ import androidx.navigation.Navigation
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.*
 import junit.framework.Assert.assertNull
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.passman.R
 import net.synapticweb.passman.TestCryptoPassApp
+import net.synapticweb.passman.model.CustomField
 import net.synapticweb.passman.model.Entry
 import net.synapticweb.passman.util.CryptoPassTestRule
+import net.synapticweb.passman.util.hasItemAtPosition
 import net.synapticweb.passman.util.monitorFragment
 import org.junit.Rule
 import org.junit.Test
@@ -51,5 +54,30 @@ class EntryDetailFragmentTest {
         }
         onView(withText(context.getString(android.R.string.ok))).perform(click())
         assertNull(testRule.repository.getEntry(1))
+    }
+
+    @Test
+    fun addCustomField_showInDetail() : Unit =  runBlocking {
+        testRule.setDb()
+        val entry = Entry()
+        entry.entryName = "account_name"
+        entry.username = "username"
+        testRule.repository.insertEntry(entry)
+
+        val customField = CustomField(1, "field_name", "field_value")
+        testRule.repository.insertCustomField(customField)
+
+        val bundle = EntryDetailFragmentArgs(1).toBundle()
+        val fragmentScenario = launchFragmentInContainer<EntryDetailFragment>(bundle, R.style.AppTheme)
+
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+        onView(withText("username")).check(matches(isDisplayed()))
+
+        onView(withId(R.id.custom_fields)).check(
+            matches(hasItemAtPosition(0, hasDescendant(withText("field_name")))))
+
+        onView(withId(R.id.custom_fields)).check(
+            matches(hasItemAtPosition(0, hasDescendant(withText("field_value")))))
+        return@runBlocking
     }
 }

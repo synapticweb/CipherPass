@@ -8,6 +8,7 @@ import net.synapticweb.passman.model.CustomField
 import net.synapticweb.passman.model.Entry
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.Event
+import net.synapticweb.passman.util.wrapEspressoIdlingResource
 import javax.inject.Inject
 
 class AddeditEntryViewModel @Inject constructor(private val repository: Repository,
@@ -29,7 +30,7 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
     val toastMessages = MutableLiveData<Event<Int>>()
     private lateinit var savedEntry : Entry
     val icon = MutableLiveData<Int>(R.drawable.item_key)
-    val newFields = arrayListOf<Long>()
+    private val newFields = arrayListOf<Long>()
 
     private fun isEdit() : Boolean {
         return entryId.value != 0L
@@ -141,10 +142,12 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
     }
 
     fun cleanCustomFields() {
-        viewModelScope.launch(Dispatchers.IO) {
-            for(key in newFields) {
-                val field = repository.getCustomField(key)
-                repository.deleteCustomField(field)
+        wrapEspressoIdlingResource {
+            viewModelScope.launch(Dispatchers.IO) {
+                for (key in newFields) {
+                    val field = repository.getCustomField(key)
+                    repository.deleteCustomField(field)
+                }
             }
         }
     }
