@@ -51,6 +51,10 @@ class CustomFieldsAdapter(private val fragment : CustomFieldsEditFragment) :
             binding.deleteField.setOnClickListener {
                 fragment.manageDeletion(item)
             }
+
+            binding.editField.setOnClickListener {
+                fragment.manageEdit(item)
+            }
             binding.executePendingBindings()
         }
 
@@ -67,6 +71,7 @@ class CustomFieldsAdapter(private val fragment : CustomFieldsEditFragment) :
 interface CustomFieldsEditFragment {
     fun saveField(id : Long, value : String)
     fun manageDeletion(item : CustomField)
+    fun manageEdit(item : CustomField)
 }
 
 

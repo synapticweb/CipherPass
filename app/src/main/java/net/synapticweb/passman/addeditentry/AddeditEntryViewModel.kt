@@ -151,4 +151,13 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
             }
         }
     }
+
+    fun editCustomField(id: Long, fieldName: String, isProtected: Boolean) {
+        viewModelScope.launch {
+            val field = repository.getCustomField(id)
+            field.fieldName = fieldName
+            field.isProtected = isProtected
+            repository.updateCustomField(field)
+        }
+    }
 }
