@@ -18,7 +18,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_marginStart="10dp"
             android:layout_width="0dp"
-            android:layout_weight="8.5"
+            android:layout_weight="8"
             android:id="@+id/field_layout"
             android:layout_height="wrap_content"
             app:endIconMode="@{item.isProtected ? TextInputLayout.END_ICON_PASSWORD_TOGGLE : TextInputLayout.END_ICON_NONE}"
@@ -33,13 +33,28 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <ImageView
-            android:layout_marginStart="10dp"
-            android:layout_weight="1.5"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/delete_field"
-            android:src="@drawable/bin"
+            android:layout_height="28dp"
+            android:layout_weight="0.75"
+            android:id="@+id/edit_field"
+            android:src="@drawable/edit"
             android:layout_gravity="center_vertical"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="10dp"
+            app:tint="#444"
+            />
+
+        <ImageView
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="0.75"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
+            android:id="@+id/delete_field"
+            android:src="@drawable/delete"
+            android:layout_gravity="center_vertical"
+            app:tint="#444"
             />
 
     </LinearLayout>

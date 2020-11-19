@@ -37,9 +37,15 @@ class CustomFieldsAdapter(private val fragment : CustomFieldsEditFragment) :
             binding.fieldLayout.hint = item.fieldName
             binding.field.setText(item.value)
 
+            binding.field.setOnFocusChangeListener { _, hasFocus ->
+                if(hasFocus)
+                    binding.field.tag = "got-focus"
+            }
+
             binding.field.addTextChangedListener(
                 afterTextChanged = { editable ->
-                    fragment.saveField(item.id, editable.toString())
+                    if(binding.field.tag == "got-focus")
+                        fragment.saveField(item.id, editable.toString())
                 })
 
             binding.deleteField.setOnClickListener {
