@@ -169,7 +169,7 @@ open class RepositoryImpl @Inject constructor(
     }
 
     override suspend fun queryDb(elements: List<String>) : List<Entry> {
-        val queryStem = "SELECT * FROM `entries` JOIN `entries_fts` ON `id`=`docid` WHERE `entries_fts` MATCH "
+        val queryStem = "SELECT * FROM `entries` WHERE `id` IN (SELECT `docid` FROM `entries_fts` WHERE `entries_fts` MATCH %s) OR `id` IN (SELECT `entry` FROM `custom_fields` JOIN `custom_fields_fts` ON `id`=`docid` WHERE `custom_fields_fts` MATCH %s)"
 
         val sb = StringBuilder()
         sb.append("'")
@@ -180,7 +180,7 @@ open class RepositoryImpl @Inject constructor(
         }
         sb.append("'")
 
-        val query = SimpleSQLiteQuery(queryStem + sb.toString())
+        val query = SimpleSQLiteQuery(queryStem.format(sb.toString(), sb.toString()))
         return database.dao.queryDb(query)
     }
 

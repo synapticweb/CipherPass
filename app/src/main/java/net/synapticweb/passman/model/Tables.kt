@@ -104,3 +104,13 @@ class EntryFts {
     @ColumnInfo(name = "comment")
     var comment : String? = null
 }
+
+@Fts4(contentEntity = CustomField::class)
+@Entity(tableName = "custom_fields_fts")
+class CustomFieldFts {
+    @ColumnInfo(name = "field_name")
+    var fieldName : String = ""
+
+    @ColumnInfo(name = "value")
+    var value : String = ""
+}

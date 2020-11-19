@@ -37,7 +37,6 @@ class CustomFieldsAdapter(private val fragment : CustomFieldsEditFragment) :
             binding.fieldLayout.hint = item.fieldName
             binding.field.setText(item.value)
 
-//            binding.fieldLayout.isPasswordVisibilityToggleEnabled = true
             binding.field.addTextChangedListener(
                 afterTextChanged = { editable ->
                     fragment.saveField(item.id, editable.toString())
