@@ -41,7 +41,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
     private val args: AddeditEntryFragmentArgs by navArgs()
     private lateinit var binding: AddeditEntryFragmentBinding
     private var dirty : Boolean = false
-    private val customFieldsData = mutableMapOf<Long, Pair<String, Boolean>>()
+    private val customFieldsData = mutableMapOf<Long, String>()
     private lateinit var adapter : CustomFieldsAdapter
 
     override fun onAttach(context: Context) {
@@ -267,24 +267,16 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
     }
 
     override fun saveField(id: Long, value: String) {
-        customFieldsData[id] = Pair(value, false)
+        customFieldsData[id] = value
         dirty = true
     }
 
-    override fun manageDeletion(item : CustomField) {
+    override fun manageDeletion(itemId : Long) {
         MaterialDialog(requireContext()).show {
             title(R.string.delete_custom_field_title)
             message(R.string.delete_custom_field_message)
             positiveButton {
-                if(customFieldsData.containsKey(item.id)) {
-                    val text = customFieldsData[item.id]!!.first
-                    customFieldsData[item.id] = Pair(text, true)
-                }
-                else
-                    customFieldsData[item.id] = Pair("", true)
-
-                dirty = true
-                adapter.deleteItem(item)
+                _viewModel.deleteCustomField(itemId)
             }
             negativeButton {}
         }

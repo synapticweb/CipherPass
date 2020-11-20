@@ -60,7 +60,7 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
                   password : String?,
                   url : String?,
                   comment : String?,
-                  customFieldsData : Map<Long, Pair<String, Boolean>>
+                  customFieldsData : Map<Long, String>
                   ) {
 
         val entry = if (isEdit()) savedEntry
@@ -92,14 +92,8 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
 
             for(customField in customFieldsData) {
                 val field = repository.getCustomField(customField.key)
-                if(customField.value.second) {
-                    if(repository.deleteCustomField(field) != 1) {
-                        customFieldsError = true
-                        break
-                    }
-                    continue
-                }
-                field.value = customField.value.first
+
+                field.value = customField.value
                 if(!isEdit())
                     field.entry = rowId
                 if(repository.updateCustomField(field) != 1) {
@@ -158,6 +152,13 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
             field.fieldName = fieldName
             field.isProtected = isProtected
             repository.updateCustomField(field)
+        }
+    }
+
+    fun deleteCustomField(id: Long) {
+        viewModelScope.launch {
+            val field = repository.getCustomField(id)
+            repository.deleteCustomField(field)
         }
     }
 }

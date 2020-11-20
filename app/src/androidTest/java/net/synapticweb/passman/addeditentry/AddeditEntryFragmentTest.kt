@@ -26,6 +26,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
 import androidx.fragment.app.testing.FragmentScenario
+import org.hamcrest.CoreMatchers.not
 
 class AddeditEntryFragmentTest {
     @get:Rule
@@ -164,7 +165,7 @@ class AddeditEntryFragmentTest {
 
 
     @Test
-    fun newEntry_addField() = runBlocking {
+    fun newEntry_addField_showExistsInDb() = runBlocking {
         testRule.setDb()
         val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
         val fragmentScenario =
@@ -218,30 +219,6 @@ class AddeditEntryFragmentTest {
 
         customField = testRule.repository.getCustomField(1)
         assertNull(customField)
-    }
-
-    @Test
-    fun newEntry_addField_delete_dissapears_staysInDb() = runBlocking {
-        testRule.setDb()
-        val bundle = AddeditEntryFragmentArgs(0, "New entry").toBundle()
-        val fragmentScenario =
-            launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
-        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
-
-        onView(withId(R.id.add_new_field)).perform(click())
-        onView(withId(R.id.field_name_input)).perform(typeText("custom_field"), closeSoftKeyboard())
-        onView(withText(android.R.string.ok)).perform(click())
-
-        onView(withHint("custom_field")).check(matches(isDisplayed()))
-
-        onView(withId(R.id.custom_fields)).perform(actionOnItemAtPosition
-        <CustomFieldsAdapter.ViewHolder>(0, RecyclerViewActions.clickChildViewWithId(R.id.delete_field)))
-        onView(withText(android.R.string.ok)).perform(click())
-        delay(200)
-        onView(withHint("custom_field")).check(doesNotExist())
-
-        val customField = testRule.repository.getCustomField(1)
-        assertNotNull(customField)
     }
 
     @Test
@@ -352,7 +329,7 @@ class AddeditEntryFragmentTest {
     }
 
     @Test
-    fun editEntry_editField_saveRetain() = runBlocking {
+    fun editEntry_editFieldValue_saveDb() = runBlocking {
         testRule.setDb()
         val entry = Entry()
         entry.entryName = "account_name"
@@ -373,7 +350,7 @@ class AddeditEntryFragmentTest {
         }
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withHint("field_name")).perform(replaceText("field_value_modified"),
+        onView(withHint("field_name")).perform(replaceText(""), typeText("field_value_modified"),
             closeSoftKeyboard())
 
         onView(withId(R.id.save)).perform(click())
@@ -419,7 +396,7 @@ class AddeditEntryFragmentTest {
     }
 
     @Test
-    fun editEntry_deleteField_saveRetain() = runBlocking {
+    fun editEntry_deleteField_saveDb() = runBlocking {
         testRule.setDb()
         val entry = Entry()
         entry.entryName = "account_name"
@@ -429,24 +406,45 @@ class AddeditEntryFragmentTest {
         testRule.repository.insertCustomField(customField)
 
         val bundle = AddeditEntryFragmentArgs(1, "account_name").toBundle()
-        val mockNav = Mockito.mock(NavController::class.java)
-        val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
-            AddeditEntryFragment().also { fragment ->
-                fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
-                    if(viewLifeCycleOwner != null)
-                        Navigation.setViewNavController(fragment.requireView(), mockNav)
-                }
-            }
-        }
+        val fragmentScenario = launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
         onView(withId(R.id.custom_fields)).perform(actionOnItemAtPosition
         <CustomFieldsAdapter.ViewHolder>(0, RecyclerViewActions.clickChildViewWithId(R.id.delete_field)))
         onView(withText(android.R.string.ok)).perform(click())
 
-        onView(withId(R.id.save)).perform(click())
-
+        onView(withHint("custom_field")).check(doesNotExist())
         customField = testRule.repository.getCustomField(1)
         assertNull(customField)
+    }
+
+    @Test
+    fun editEntry_editFieldNameProtected_saveDb() = runBlocking {
+        testRule.setDb()
+
+        testRule.setDb()
+        val entry = Entry()
+        entry.entryName = "account_name"
+        testRule.repository.insertEntry(entry)
+
+        var customField = CustomField(1, "field_name", false, "field_value")
+        testRule.repository.insertCustomField(customField)
+
+        val bundle = AddeditEntryFragmentArgs(1, "account_name").toBundle()
+        val fragmentScenario = launchFragmentInContainer<AddeditEntryFragment>(bundle, R.style.AppTheme)
+        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
+
+        onView(withId(R.id.custom_fields)).perform(actionOnItemAtPosition
+        <CustomFieldsAdapter.ViewHolder>(0, RecyclerViewActions.clickChildViewWithId(R.id.edit_field)))
+
+        onView(withId(R.id.field_name_input)).perform(replaceText("field_name_modified"), closeSoftKeyboard())
+        onView(withId(R.id.protected_field)).perform(click())
+        onView(withText(android.R.string.ok)).perform(click())
+
+        onView(withHint("field_name_modified")).check(matches(isDisplayed()))
+
+        customField = testRule.repository.getCustomField(1)
+        assertThat(customField.fieldName, `is`("field_name_modified"))
+        assertThat(customField.isProtected, `is`(true))
     }
 }

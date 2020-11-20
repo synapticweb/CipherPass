@@ -84,6 +84,6 @@
     <string name="value_not_set">Value not set</string>
     <string name="protected_field">Protected</string>
     <string name="delete_custom_field_title">Delete field</string>
-    <string name="delete_custom_field_message">Delete this custom field?</string>
+    <string name="delete_custom_field_message">Delete this custom field? (Recovery is not possible.)</string>
     <string name="edit_custom_field">Edit custom field</string>
 </resources>

@@ -64,7 +64,7 @@ class EntryDetailFragmentTest {
         entry.username = "username"
         testRule.repository.insertEntry(entry)
 
-        val customField = CustomField(1, "field_name", "field_value")
+        val customField = CustomField(1, "field_name", false, "field_value")
         testRule.repository.insertCustomField(customField)
 
         val bundle = EntryDetailFragmentArgs(1).toBundle()

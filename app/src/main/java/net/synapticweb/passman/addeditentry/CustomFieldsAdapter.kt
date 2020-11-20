@@ -14,12 +14,6 @@ import net.synapticweb.passman.databinding.CustomFieldAddeditItemBinding
 class CustomFieldsAdapter(private val fragment : CustomFieldsEditFragment) :
     ListAdapter<CustomField, ViewHolder>(CustomFieldsCallback()) {
 
-    fun deleteItem(item: CustomField) {
-        val list = currentList.toMutableList()
-        list.remove(item)
-        submitList(list)
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
     }
@@ -49,7 +43,7 @@ class CustomFieldsAdapter(private val fragment : CustomFieldsEditFragment) :
                 })
 
             binding.deleteField.setOnClickListener {
-                fragment.manageDeletion(item)
+                fragment.manageDeletion(item.id)
             }
 
             binding.editField.setOnClickListener {
@@ -70,7 +64,7 @@ class CustomFieldsAdapter(private val fragment : CustomFieldsEditFragment) :
 
 interface CustomFieldsEditFragment {
     fun saveField(id : Long, value : String)
-    fun manageDeletion(item : CustomField)
+    fun manageDeletion(itemId : Long)
     fun manageEdit(item : CustomField)
 }
 
