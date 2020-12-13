@@ -10,5 +10,5 @@ dialog cu progres la creare/editare
 custom fields
 *clipboard timeout
 *backup and export db
-error handling la editare și ștergere
+#error handling la editare și ștergere
 completare settings

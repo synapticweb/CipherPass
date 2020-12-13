@@ -101,10 +101,12 @@ class EntriesListFragment : Fragment() {
             R.id.sort -> {
                 MaterialDialog(requireContext()).show {
                     val prefs = PrefWrapper.getInstance(requireContext())
-                    val initialSel = prefs.getString(SORT_ORDER_KEY) ?: "0"
-                    listItemsSingleChoice(R.array.sort_orders,
-                        initialSelection = initialSel.toInt()) {_, index, _ ->
-                        prefs.setPrefSync(SORT_ORDER_KEY, index.toString())
+                    val initialSel = prefs.getString(SORT_ORDER_KEY) ?: SORT_CREATION_DESC
+                    val sortOrders = resources.getStringArray(R.array.sort_orders)
+
+                    listItemsSingleChoice(R.array.sort_order_names,
+                        initialSelection = sortOrders.indexOf(initialSel)) {_, index, _ ->
+                        prefs.setPrefSync(SORT_ORDER_KEY, sortOrders[index])
                        _viewModel.loadEntries()
                     }
                 }

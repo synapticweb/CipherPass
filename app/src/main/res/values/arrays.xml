@@ -24,10 +24,22 @@
         <item>pbkdf2</item>
     </string-array>
 
+    <string-array name="sort_order_names">
+        <item>@string/sort_creation_asc</item>
+        <item>@string/sort_creation_desc</item>
+        <item>@string/sort_name_asc</item>
+        <item>@string/sort_name_desc</item>
+        <item>@string/sort_modif_asc</item>
+        <item>@string/sort_modif_desc</item>
+    </string-array>
+
     <string-array name="sort_orders">
-        <item>@string/sort_creation</item>
-        <item>@string/sort_name</item>
-        <item>@string/sort_modif</item>
+        <item>SORT_CREATION_ASC</item>
+        <item>SORT_CREATION_DESC</item>
+        <item>SORT_NAME_ASC</item>
+        <item>SORT_NAME_DESC</item>
+        <item>SORT_MODIF_ASC</item>
+        <item>SORT_MODIF_DESC</item>
     </string-array>
 
     <integer-array name="icons">

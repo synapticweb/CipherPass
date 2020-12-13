@@ -23,7 +23,7 @@ interface Repository {
 
     suspend fun getEntry(key : Long) : Entry
 
-    fun getAllEntries(sortOrder: SortOrder) : LiveData<List<Entry>>
+    fun getAllEntries(sortOrder: String) : LiveData<List<Entry>>
 
     fun removeDb()
 
@@ -41,10 +41,4 @@ interface Repository {
 
     fun getCustomFieldsSync(entry : Long) : List<CustomField>
 
-}
-
-enum class SortOrder {
-    CREATION_DATE,
-    NAME,
-    MODIFICATION_DATE
 }

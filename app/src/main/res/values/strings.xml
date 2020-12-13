@@ -74,9 +74,12 @@
     <string name="search_hint">Search entries</string>
     <string name="search_title">Search</string>
     <string name="entries_list_sort">sort</string>
-    <string name="sort_name">Sort by name</string>
-    <string name="sort_creation">Sort by creation date</string>
-    <string name="sort_modif">Sort by modification date</string>
+    <string name="sort_name_asc">Sort by name ascending</string>
+    <string name="sort_name_desc">Sort by name descending</string>
+    <string name="sort_creation_asc">Sort by creation date ascending</string>
+    <string name="sort_creation_desc">Sort by creation date descending</string>
+    <string name="sort_modif_asc">Sort by modification date ascending</string>
+    <string name="sort_modif_desc">Sort by modification date descending</string>
     <string name="new_field_button">New field</string>
     <string name="new_field_input_title">Add new field</string>
     <string name="new_field_input_hint">Field name</string>

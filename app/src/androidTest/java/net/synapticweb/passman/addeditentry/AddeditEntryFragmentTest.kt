@@ -16,17 +16,15 @@ import junit.framework.Assert.assertNull
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.passman.R
+import net.synapticweb.passman.SORT_CREATION_DESC
 import net.synapticweb.passman.TestCryptoPassApp
 import net.synapticweb.passman.model.CustomField
 import net.synapticweb.passman.model.Entry
-import net.synapticweb.passman.model.SortOrder
 import net.synapticweb.passman.util.*
 import org.hamcrest.core.Is.`is`
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
-import androidx.fragment.app.testing.FragmentScenario
-import org.hamcrest.CoreMatchers.not
 
 class AddeditEntryFragmentTest {
     @get:Rule
@@ -87,7 +85,7 @@ class AddeditEntryFragmentTest {
         onView(withId(R.id.comment)).perform(typeText("comment"), closeSoftKeyboard())
         onView(withId(R.id.save)).perform(click())
 
-        val entry : Entry? = testRule.repository.getAllEntries(SortOrder.CREATION_DATE).value?.get(0)
+        val entry : Entry? = testRule.repository.getAllEntries(SORT_CREATION_DESC).value?.get(0)
         if (entry != null) {
             assertThat(entry.entryName, `is`("test_name"))
             assertThat(entry.username, `is`("test_username"))

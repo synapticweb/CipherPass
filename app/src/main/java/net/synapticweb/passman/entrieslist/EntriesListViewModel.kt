@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.synapticweb.passman.SORT_CREATION_DESC
 import net.synapticweb.passman.SORT_ORDER_KEY
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.model.Entry
@@ -20,7 +21,9 @@ class EntriesListViewModel @Inject constructor(private val repository: Repositor
     private val _refresh = MutableLiveData(false)
 
     private val _entries : LiveData<List<Entry>> = _refresh.switchMap {
-        repository.getAllEntries(getSortOrder())
+        val prefs = PrefWrapper.getInstance(getApplication())
+        val sortOrder = prefs.getString(SORT_ORDER_KEY) ?: SORT_CREATION_DESC
+        repository.getAllEntries(sortOrder)
     }
 
     val entries : LiveData<List<Entry>> = _entries
@@ -40,6 +43,10 @@ class EntriesListViewModel @Inject constructor(private val repository: Repositor
     }
 
     fun search(query : String) {
+        if(query.length < 3) {
+            _searchResults.value = Event(arrayListOf())
+            return
+        }
         //unul sau mai multe spații sau 0 sau mai multe caractere nonalfanumerice urmate
         //de 1 sau mai multe spații: dacă scrie term1, term2 să nu caute după term1, .
         val elems = query.split("[^a-zA-Z0-9]*\\s+".toRegex())
@@ -54,16 +61,6 @@ class EntriesListViewModel @Inject constructor(private val repository: Repositor
                         _searchResults.value = Event(it)
                     }
             }
-        }
-    }
-
-    private fun getSortOrder() : SortOrder {
-        val prefs = PrefWrapper.getInstance(getApplication())
-        return when(prefs.getString(SORT_ORDER_KEY)) {
-            "0" -> SortOrder.CREATION_DATE
-            "1" -> SortOrder.NAME
-            "2" -> SortOrder.MODIFICATION_DATE
-            else -> SortOrder.CREATION_DATE
         }
     }
 
