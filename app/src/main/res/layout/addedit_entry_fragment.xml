@@ -122,6 +122,7 @@ Soluția a fost 2way data binding.-->
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/url"
+                        android:inputType="text"
                         android:text="@={viewModel.url}"
                         />
 

@@ -9,7 +9,6 @@ import net.synapticweb.passman.SORT_CREATION_DESC
 import net.synapticweb.passman.SORT_ORDER_KEY
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.model.Entry
-import net.synapticweb.passman.model.SortOrder
 import net.synapticweb.passman.util.Event
 import net.synapticweb.passman.util.PrefWrapper
 import javax.inject.Inject

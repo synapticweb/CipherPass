@@ -1,3 +1,4 @@
+buton amprenta first view
 fără string la parolele conturilor
 #*dată modificare cont
 grupuri

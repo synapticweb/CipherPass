@@ -27,6 +27,7 @@
 
         <EditText
             style="@style/detail_item_text"
+            android:typeface="monospace"
             android:editable="false"
             android:focusable="false"
             android:background="@android:color/transparent"

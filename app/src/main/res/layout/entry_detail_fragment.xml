@@ -135,6 +135,7 @@
                     android:layout_toEndOf="@id/url_img"
                     android:layout_toStartOf="@id/url_copy"
                     style="@style/detail_item_text"
+                    android:autoLink="web"
                     android:text="@{viewModel.entry.url}"/>
 
 
