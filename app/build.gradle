@@ -59,6 +59,7 @@ ext {
     roomVersion = "2.3.0-alpha01"
     sqlcipherVersion = "4.4.0"
     sqliteVersion = "2.1.0"
+    workVersion = "2.4.0"
 }
 
 dependencies {
@@ -71,6 +72,7 @@ dependencies {
     implementation "com.afollestad.material-dialogs:core:$afollestadVersion"
     implementation "com.afollestad.material-dialogs:input:$afollestadVersion"
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    implementation "androidx.work:work-runtime-ktx:$workVersion"
 
     //fragment:
     implementation "androidx.fragment:fragment-ktx:$fragmentVersion"

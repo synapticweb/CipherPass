@@ -5,6 +5,8 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import androidx.lifecycle.*
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -13,6 +15,7 @@ import net.synapticweb.passman.model.CustomField
 import net.synapticweb.passman.model.Entry
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.Event
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class EntryDetailViewModel @Inject constructor(private val repository: Repository,
@@ -58,6 +61,10 @@ class EntryDetailViewModel @Inject constructor(private val repository: Repositor
                     getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText(null, data)
         clipboard.setPrimaryClip(clip)
+        val timeoutRequest = OneTimeWorkRequestBuilder<CleanClipboard>()
+            .setInitialDelay(10, TimeUnit.SECONDS)
+            .build()
+        WorkManager.getInstance(getApplication()).enqueue(timeoutRequest)
         finishCopy.value = Event(dataName.toString())
     }
 }
