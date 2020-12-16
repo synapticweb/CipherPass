@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CryptoPass</string>
+    <string name="app_name">CipherPass</string>
     <string name="pass_notset_caption">Please set a passphrase to encrypt the database. The passphrase should be at least 6 characters long. Choose a random sequence of characters, not a dictionary word and do not write it down. If you lose it, you won\'t be able to recover your data. </string>
     <string name="pass_not_set_send_pass">Set passphrase</string>
     <string name="pass_set_send_pass">Unlock database</string>
@@ -41,7 +41,6 @@
     <string name="hash_change_success">The hash function was successfully changed</string>
     <string name="hash_change_error">Error changing the hash function.</string>
     <string name="enter_pass">Enter password:</string>
-    <string name="autofill_service_label">CryptoPass Autofill Service</string>
     <string name="new_entry">New entry</string>
     <string name="addedit_name">Entry name</string>
     <string name="addedit_id">Username</string>

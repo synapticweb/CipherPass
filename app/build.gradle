@@ -9,13 +9,13 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        applicationId "net.synapticweb.passman"
+        applicationId "net.synapticweb.cipherpass"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "net.synapticweb.passman.util.CustomTestRunner"
+        testInstrumentationRunner "net.synapticweb.cipherpass.util.CustomTestRunner"
     }
 
     buildTypes {

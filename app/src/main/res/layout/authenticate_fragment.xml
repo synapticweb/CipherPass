@@ -8,7 +8,7 @@
 
         <variable
             name="viewModel"
-            type="net.synapticweb.passman.authenticate.AuthenticateViewModel" />
+            type="net.synapticweb.cipherpass.authenticate.AuthenticateViewModel" />
     </data>
 
     <RelativeLayout

@@ -3,10 +3,10 @@
     <data>
         <variable
             name="viewModel"
-            type="net.synapticweb.passman.entrieslist.EntriesListViewModel" />
+            type="net.synapticweb.cipherpass.entrieslist.EntriesListViewModel" />
         <variable
             name="entry"
-            type="net.synapticweb.passman.model.Entry" />
+            type="net.synapticweb.cipherpass.model.Entry" />
     </data>
 
     <LinearLayout

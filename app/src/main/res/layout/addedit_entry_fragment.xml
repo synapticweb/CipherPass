@@ -4,7 +4,7 @@
     <data>
         <variable
             name="viewModel"
-            type="net.synapticweb.passman.addeditentry.AddeditEntryViewModel" />
+            type="net.synapticweb.cipherpass.addeditentry.AddeditEntryViewModel" />
     </data>
 
     <RelativeLayout

@@ -6,7 +6,7 @@
         <import type="com.google.android.material.textfield.TextInputLayout" />
         <variable
             name="item"
-            type="net.synapticweb.passman.model.CustomField" />
+            type="net.synapticweb.cipherpass.model.CustomField" />
     </data>
     <LinearLayout
         android:layout_width="match_parent"

@@ -5,13 +5,13 @@
         <import type="android.text.InputType" />
         <variable
             name="viewModel"
-            type="net.synapticweb.passman.entrydetail.EntryDetailViewModel" />
+            type="net.synapticweb.cipherpass.entrydetail.EntryDetailViewModel" />
         <variable
             name="fragment"
-            type="net.synapticweb.passman.entrydetail.EntryDetailFragment" />
+            type="net.synapticweb.cipherpass.entrydetail.EntryDetailFragment" />
         <variable
             name="item"
-            type="net.synapticweb.passman.model.CustomField" />
+            type="net.synapticweb.cipherpass.model.CustomField" />
     </data>
 
     <RelativeLayout

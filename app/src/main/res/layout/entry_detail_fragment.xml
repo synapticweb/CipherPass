@@ -5,10 +5,10 @@
         <import type="android.view.View" />
         <variable
             name="fragment"
-            type="net.synapticweb.passman.entrydetail.EntryDetailFragment" />
+            type="net.synapticweb.cipherpass.entrydetail.EntryDetailFragment" />
         <variable
             name="viewModel"
-            type="net.synapticweb.passman.entrydetail.EntryDetailViewModel" />
+            type="net.synapticweb.cipherpass.entrydetail.EntryDetailViewModel" />
     </data>
 
     <FrameLayout

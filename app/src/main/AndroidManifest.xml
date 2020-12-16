@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.synapticweb.passman">
+    package="net.synapticweb.cipherpass">
 
     <application
         android:allowBackup="true"
@@ -8,9 +8,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name="net.synapticweb.passman.CryptoPassApp">
+        android:name="net.synapticweb.cipherpass.CipherPassApp">
 
-        <activity android:name="net.synapticweb.passman.MainActivity">
+        <activity android:name="net.synapticweb.cipherpass.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
