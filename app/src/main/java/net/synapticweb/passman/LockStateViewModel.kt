@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.*
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.Event
+import net.synapticweb.passman.util.PrefWrapper
 import javax.inject.Inject
 
 class LockStateViewModel @Inject constructor(private val repository: Repository, application: Application)
@@ -17,17 +18,28 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun onActivityPause() {
-        sleepTime = System.currentTimeMillis()
+        val prefWrapper = PrefWrapper.getInstance(getApplication())
+        val isTimeoutDisabled = prefWrapper.
+            getString(BACKGROUND_TIMEOUT_KEY) == BACKGROUND_TIMEOUT_DISABLED
+        val isNoAuth = prefWrapper.getString(APPLOCK_KEY) == APPLOCK_NOLOCK_VALUE
+        if(isNoAuth || isTimeoutDisabled)
+            sleepTime = System.currentTimeMillis()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onActivityResume() {
-        //nu verificăm dacă suntem la pornirea aplicației sau dacă ne întoarcem din activitatea unlock
-        if (sleepTime == 0L || isInUnlockActivity)
-            return
-        if (System.currentTimeMillis() - sleepTime > 10000) {
-            repository.lock()
-            unauthorized.value = Event(true)
+        val prefWrapper = PrefWrapper.getInstance(getApplication())
+        val timeout = prefWrapper.getString(BACKGROUND_TIMEOUT_KEY)
+        val isNoAuth = prefWrapper.getString(APPLOCK_KEY) == APPLOCK_NOLOCK_VALUE
+        //nu verificăm dacă suntem la pornirea aplicației, dacă ne întoarcem din activitatea unlock,
+        //dacă este dezactivat sau dacă aplicația nu necesită autentificare.
+        timeout?. let {
+            if (sleepTime == 0L || isInUnlockActivity || it == BACKGROUND_TIMEOUT_DISABLED || isNoAuth)
+                return
+            if (System.currentTimeMillis() - sleepTime > it.toLong() * 1000) {
+                repository.lock()
+                unauthorized.value = Event(true)
+            }
         }
     }
 

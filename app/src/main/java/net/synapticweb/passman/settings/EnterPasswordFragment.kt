@@ -16,17 +16,17 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.passman.CryptoPassApp
 import net.synapticweb.passman.R
-import net.synapticweb.passman.databinding.SystemLockFragmentBinding
+import net.synapticweb.passman.databinding.EnterPasswordFragmentBinding
 import net.synapticweb.passman.util.editableToCharArray
 
 import javax.inject.Inject
 
-class SystemLockFragment : Fragment() {
+class EnterPasswordFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory : ViewModelProvider.Factory
     private val viewModelFrg by viewModels<SystemLockViewModel> {viewModelFactory}
 
-    private val args : SystemLockFragmentArgs by navArgs()
+    private val args : EnterPasswordFragmentArgs by navArgs()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -43,7 +43,7 @@ class SystemLockFragment : Fragment() {
         val fragment = this
         viewModelFrg.prefValue = args.prefEntryValue
 
-        val viewDataBinding = SystemLockFragmentBinding.inflate(inflater, container, false).apply {
+        val viewDataBinding = EnterPasswordFragmentBinding.inflate(inflater, container, false).apply {
             viewModel = viewModelFrg
             lifecycleOwner = fragment
             arguments = args
@@ -74,7 +74,7 @@ class SystemLockFragment : Fragment() {
 
         viewModelFrg.finish.observe(viewLifecycleOwner, Observer {
             findNavController().
-            navigate(SystemLockFragmentDirections.actionSystemLockFragmentToSettingsFragment())
+            navigate(EnterPasswordFragmentDirections.actionSystemLockFragmentToSettingsFragment())
         })
 
         viewDataBinding.passphrase.addTextChangedListener {

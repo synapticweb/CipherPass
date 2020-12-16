@@ -2,7 +2,7 @@ package net.synapticweb.passman.settings.di
 
 import dagger.Subcomponent
 import net.synapticweb.passman.settings.SettingsFragment
-import net.synapticweb.passman.settings.SystemLockFragment
+import net.synapticweb.passman.settings.EnterPasswordFragment
 
 @Subcomponent(modules = [SettingsModule::class, SystemLockModule::class])
 interface SettingsComponent {
@@ -12,5 +12,5 @@ interface SettingsComponent {
     }
 
     fun inject(fragment: SettingsFragment)
-    fun inject(fragment: SystemLockFragment)
+    fun inject(fragment: EnterPasswordFragment)
 }

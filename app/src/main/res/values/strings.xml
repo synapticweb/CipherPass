@@ -10,10 +10,10 @@
     <string name="pass_no_match">The passphrases entered do not match.</string>
     <string name="pass_empty">Passphrase cannot be empty</string>
     <string name="one_more_backpress">Press the back button one more time to exit.</string>
-    <string name="applock_key_title">Lock type</string>
-    <string name="applock_key_passwd">Passphrase</string>
-    <string name="applock_key_system">System provided lock</string>
-    <string name="applock_key_none">No lock</string>
+    <string name="applock_key_title">Authentication type</string>
+    <string name="applock_key_passwd">Ask for password</string>
+    <string name="applock_key_system">Use system authentication</string>
+    <string name="applock_key_none">No authentication</string>
     <string name="settings_menu_item">Settings</string>
     <string name="settings_insert_pass_title">Passphrase required</string>
     <string name="settings_insert_pass_message">Please insert your passphrase:</string>
@@ -34,6 +34,7 @@
     <string name="change_pass_error">Error while changing password.</string>
     <string name="act_pass_empty">Actual password cannot be empty.</string>
     <string name="hash_func_key">Hash function</string>
+    <string name="hash_func_summary">The cryptographic function used for storing the app password.</string>
     <string name="hash_func_md5">MD5 (fast - low security)</string>
     <string name="hash_func_sha">SHA512 (fast - medium security)</string>
     <string name="hash_func_PBKDF2">PBKDF2 (slow - good security)</string>
@@ -90,10 +91,23 @@
     <string name="delete_custom_field_message">Delete this custom field? (Recovery is not possible.)</string>
     <string name="edit_custom_field">Edit custom field</string>
     <string name="clipboard_timeout">Clipboard timeout</string>
+    <string name="clipboard_timeout_summary">Time before clearing clipboard after copying an item.</string>
     <string name="ctout_15">15 seconds</string>
     <string name="ctout_30">30 seconds</string>
     <string name="ctout_60">1 minute</string>
     <string name="ctout_180">3 minutes</string>
     <string name="ctout_300">5 minutes</string>
     <string name="ctout_disabled">Disabled</string>
+    <string name="background_timeout">Background timeout</string>
+    <string name="background_timeout_summary">Time before requring authentication when the app is in background.</string>
+    <string name="bt_30">30 seconds</string>
+    <string name="bt_60">1 minute</string>
+    <string name="bt_300">5 minutes</string>
+    <string name="bt_600">10 minutes</string>
+    <string name="bt_900">15 minutes</string>
+    <string name="bt_1800">30 minutes</string>
+    <string name="bt_disabled">Disabled</string>
+    <string name="settings_fragment_title">Settings</string>
+    <string name="enter_password_title">Provide your password</string>
+    <string name="set_icon_fragment_title">Set entry icon</string>
 </resources>

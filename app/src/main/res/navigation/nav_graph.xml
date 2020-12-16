@@ -32,7 +32,7 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="net.synapticweb.passman.settings.SettingsFragment"
-        android:label="SettingsFragment" >
+        android:label="@string/settings_fragment_title" >
         <action
             android:id="@+id/action_settingsFragment_to_entriesListFragment"
             app:destination="@id/entriesListFragment" />
@@ -45,8 +45,8 @@
     </fragment>
     <fragment
         android:id="@+id/systemLockFragment"
-        android:name="net.synapticweb.passman.settings.SystemLockFragment"
-        android:label="SystemLockFragment" >
+        android:name="net.synapticweb.passman.settings.EnterPasswordFragment"
+        android:label="@string/enter_password_title" >
         <action
             android:id="@+id/action_systemLockFragment_to_settingsFragment"
             app:destination="@id/settingsFragment"
@@ -102,7 +102,7 @@
     <fragment
         android:id="@+id/setIconFragment"
         android:name="net.synapticweb.passman.addeditentry.SetIconFragment"
-        android:label="SetIconFragment">
+        android:label="@string/set_icon_fragment_title">
         <action
             android:id="@+id/action_setIconFragment_to_addeditEntryFragment"
             app:destination="@id/addeditEntryFragment" />

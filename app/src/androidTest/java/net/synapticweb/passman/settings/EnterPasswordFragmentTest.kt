@@ -20,7 +20,7 @@ import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 
-class SystemLockFragmentTest {
+class EnterPasswordFragmentTest {
     @get:Rule
     val testRule = CryptoPassTestRule()
     private val prefWrapper = PrefWrapper.getInstance(ApplicationProvider.getApplicationContext())
@@ -28,7 +28,7 @@ class SystemLockFragmentTest {
     @Test
     fun emptyPass_Error() {
         val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
-        val fragmentScenario = launchFragmentInContainer<SystemLockFragment>(bundle, R.style.AppTheme)
+        val fragmentScenario = launchFragmentInContainer<EnterPasswordFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
         onView(withId(R.id.action_button)).perform(click())
 
@@ -40,7 +40,7 @@ class SystemLockFragmentTest {
     fun badPass_Error() {
         testRule.setDb()
         val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
-        val fragmentScenario = launchFragmentInContainer<SystemLockFragment>(bundle, R.style.AppTheme)
+        val fragmentScenario = launchFragmentInContainer<EnterPasswordFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
         onView(withId(R.id.passphrase)).perform(typeText("test1"), closeSoftKeyboard())
@@ -58,7 +58,7 @@ class SystemLockFragmentTest {
         val mockNav = mock(NavController::class.java)
         val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
         val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
-            SystemLockFragment().also { fragment ->
+            EnterPasswordFragment().also { fragment ->
                 fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
                     if(viewLifeCycleOwner != null)
                         Navigation.setViewNavController(fragment.requireView(), mockNav)
@@ -94,7 +94,7 @@ class SystemLockFragmentTest {
         val mockNav = mock(NavController::class.java)
         val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
         val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
-            SystemLockFragment().also { fragment ->
+            EnterPasswordFragment().also { fragment ->
                 fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
                     if(viewLifeCycleOwner != null)
                         Navigation.setViewNavController(fragment.requireView(), mockNav)
@@ -129,7 +129,7 @@ class SystemLockFragmentTest {
         val mockNav = mock(NavController::class.java)
         val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
         val fragmentScenario = launchFragmentInContainer(bundle, R.style.AppTheme) {
-            SystemLockFragment().also { fragment ->
+            EnterPasswordFragment().also { fragment ->
                 fragment.viewLifecycleOwnerLiveData.observeForever { viewLifeCycleOwner ->
                     if(viewLifeCycleOwner != null)
                         Navigation.setViewNavController(fragment.requireView(), mockNav)
@@ -159,7 +159,7 @@ class SystemLockFragmentTest {
         prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
 
         val bundle = SystemLockFragmentArgs(APPLOCK_SYSTEM_VALUE).toBundle()
-        val fragmentScenario = launchFragmentInContainer<SystemLockFragment>(bundle, R.style.AppTheme)
+        val fragmentScenario = launchFragmentInContainer<EnterPasswordFragment>(bundle, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
         onView(withId(R.id.passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())

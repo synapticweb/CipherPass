@@ -12,6 +12,7 @@
     <ListPreference
         android:key="hash"
         android:title="@string/hash_func_key"
+        android:summary="@string/hash_func_summary"
         android:entries="@array/hash_func_entries"
         android:entryValues="@array/hash_func_values"
         android:defaultValue="pbkdf2" />
@@ -25,6 +26,16 @@
         android:title="@string/clipboard_timeout"
         android:entries="@array/clipboard_timeout_entries"
         android:entryValues="@array/clipboard_timeout_values"
+        android:summary="@string/clipboard_timeout_summary"
+        android:defaultValue="30">
+    </ListPreference>
+
+    <ListPreference
+        android:key="background_timeout"
+        android:title="@string/background_timeout"
+        android:summary="@string/background_timeout_summary"
+        android:entries="@array/background_timeout_entries"
+        android:entryValues="@array/background_timeout_values"
         android:defaultValue="30">
     </ListPreference>
 

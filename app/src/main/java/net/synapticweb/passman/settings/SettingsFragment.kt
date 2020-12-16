@@ -64,7 +64,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         val hashFunction = findPreference<ListPreference>(HASH_TYPE_KEY)
-        hashFunction?.summary = hashFunction?.entry
 
         val hashFuncEntries = requireActivity().resources.getStringArray(R.array.hash_func_entries)
         val hashFuncValues = requireActivity().resources.getStringArray(R.array.hash_func_values)
@@ -74,10 +73,5 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 changeHash(preference as ListPreference, hashFuncEntries[index], newValue as String)
                 false
             }
-
-        val clipboardTimeout = findPreference<ListPreference>(CLIPBOARD_TIMEOUT_KEY)
-        clipboardTimeout?.setSummaryProvider { preference ->
-            (preference as ListPreference).entry
-        }
     }
 }

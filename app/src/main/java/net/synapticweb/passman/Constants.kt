@@ -40,3 +40,6 @@ const val SORT_MODIF_DESC = "SORT_MODIF_DESC"
 const val CLIPBOARD_LABEL_KEY = "net.synapticweb.passman.clipboard_key"
 const val CLIPBOARD_TIMEOUT_KEY = "clipboard_timeout"
 const val CLIPBOARD_TIMEOUT_DISABLED = "disabled"
+
+const val BACKGROUND_TIMEOUT_KEY = "background_timeout"
+const val BACKGROUND_TIMEOUT_DISABLED = "disabled"

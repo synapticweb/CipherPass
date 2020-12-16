@@ -65,7 +65,6 @@ fun SettingsFragment.changeHash(preference: ListPreference, newHashName : String
                     if (it) {
                         PrefWrapper.getInstance(requireContext()).
                             setPref(HASH_TYPE_KEY, newHashType)
-                        preference.summary = newHashName
                         preference.value = newHashType
                         Toast.makeText(
                             requireContext(),

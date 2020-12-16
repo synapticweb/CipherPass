@@ -74,4 +74,24 @@
         <item>disabled</item>
     </string-array>
 
+    <string-array name="background_timeout_entries">
+        <item>@string/bt_30</item>
+        <item>@string/bt_60</item>
+        <item>@string/bt_300</item>
+        <item>@string/bt_600</item>
+        <item>@string/bt_900</item>
+        <item>@string/bt_1800</item>
+        <item>@string/bt_disabled</item>
+    </string-array>
+
+    <string-array name="background_timeout_values">
+        <item>30</item>
+        <item>60</item>
+        <item>300</item>
+        <item>600</item>
+        <item>900</item>
+        <item>1800</item>
+        <item>disabled</item>
+    </string-array>
+
 </resources>
