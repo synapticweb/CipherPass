@@ -74,5 +74,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 changeHash(preference as ListPreference, hashFuncEntries[index], newValue as String)
                 false
             }
+
+        val clipboardTimeout = findPreference<ListPreference>(CLIPBOARD_TIMEOUT_KEY)
+        clipboardTimeout?.setSummaryProvider { preference ->
+            (preference as ListPreference).entry
         }
+    }
 }

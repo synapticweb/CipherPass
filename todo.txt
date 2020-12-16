@@ -8,8 +8,8 @@ log cu timber
 #*cautare
 db remote
 dialog cu progres la creare/editare
-custom fields
-*clipboard timeout
+#custom fields
+#*clipboard timeout
 *backup and export db
 #error handling la editare și ștergere
 completare settings

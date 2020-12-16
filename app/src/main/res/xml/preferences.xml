@@ -19,4 +19,13 @@
     <Preference
         android:key="changepass"
         android:title="@string/change_pass"/>
+
+    <ListPreference
+        android:key="clipboard_timeout"
+        android:title="@string/clipboard_timeout"
+        android:entries="@array/clipboard_timeout_entries"
+        android:entryValues="@array/clipboard_timeout_values"
+        android:defaultValue="30">
+    </ListPreference>
+
 </androidx.preference.PreferenceScreen>

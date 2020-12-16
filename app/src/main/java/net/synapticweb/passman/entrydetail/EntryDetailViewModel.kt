@@ -10,11 +10,15 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.synapticweb.passman.CLIPBOARD_LABEL_KEY
+import net.synapticweb.passman.CLIPBOARD_TIMEOUT_DISABLED
+import net.synapticweb.passman.CLIPBOARD_TIMEOUT_KEY
 import net.synapticweb.passman.CryptoPassApp
 import net.synapticweb.passman.model.CustomField
 import net.synapticweb.passman.model.Entry
 import net.synapticweb.passman.model.Repository
 import net.synapticweb.passman.util.Event
+import net.synapticweb.passman.util.PrefWrapper
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -59,12 +63,20 @@ class EntryDetailViewModel @Inject constructor(private val repository: Repositor
     fun copy(data : CharSequence, dataName : CharSequence) {
         val clipboard = getApplication<CryptoPassApp>().
                     getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText(null, data)
+        val clip = ClipData.newPlainText(CLIPBOARD_LABEL_KEY, data)
         clipboard.setPrimaryClip(clip)
-        val timeoutRequest = OneTimeWorkRequestBuilder<CleanClipboard>()
-            .setInitialDelay(10, TimeUnit.SECONDS)
-            .build()
-        WorkManager.getInstance(getApplication()).enqueue(timeoutRequest)
+        val prefWrapper = PrefWrapper.getInstance(getApplication())
+        val clipboardTimeout = prefWrapper.getString(CLIPBOARD_TIMEOUT_KEY)
+
+        clipboardTimeout?. let {
+            if(it != CLIPBOARD_TIMEOUT_DISABLED) {
+                val cleanClipboard = OneTimeWorkRequestBuilder<CleanClipboard>()
+                    .setInitialDelay(it.toLong(), TimeUnit.SECONDS)
+                    .build()
+                WorkManager.getInstance(getApplication()).enqueue(cleanClipboard)
+            }
+        }
+
         finishCopy.value = Event(dataName.toString())
     }
 }

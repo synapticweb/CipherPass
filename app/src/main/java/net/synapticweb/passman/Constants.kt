@@ -36,3 +36,7 @@ const val SORT_NAME_ASC = "SORT_NAME_ASC"
 const val SORT_NAME_DESC = "SORT_NAME_DESC"
 const val SORT_MODIF_ASC = "SORT_MODIF_ASC"
 const val SORT_MODIF_DESC = "SORT_MODIF_DESC"
+
+const val CLIPBOARD_LABEL_KEY = "net.synapticweb.passman.clipboard_key"
+const val CLIPBOARD_TIMEOUT_KEY = "clipboard_timeout"
+const val CLIPBOARD_TIMEOUT_DISABLED = "disabled"
