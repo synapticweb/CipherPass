@@ -277,6 +277,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
             message(R.string.delete_custom_field_message)
             positiveButton {
                 _viewModel.deleteCustomField(itemId)
+                dirty = true
             }
             negativeButton {}
         }
@@ -297,6 +298,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
                 val fieldName = dialog.findViewById<EditText>(R.id.field_name_input).text.toString()
                 val isProtected = dialog.findViewById<CheckBox>(R.id.protected_field).isChecked
                 _viewModel.editCustomField(item.id, fieldName, isProtected)
+                dirty = true
             }
 
             negativeButton {}
