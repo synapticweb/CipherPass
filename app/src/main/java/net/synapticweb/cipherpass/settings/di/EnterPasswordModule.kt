@@ -5,12 +5,12 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 import net.synapticweb.cipherpass.di.ViewModelKey
-import net.synapticweb.cipherpass.settings.SystemLockViewModel
+import net.synapticweb.cipherpass.settings.EnterPasswordViewModel
 
 @Module
-abstract class SystemLockModule {
+abstract class EnterPasswordModule {
     @Binds
     @IntoMap
-    @ViewModelKey(SystemLockViewModel::class)
-    abstract fun bindViewModel(viewModel : SystemLockViewModel) : ViewModel
+    @ViewModelKey(EnterPasswordViewModel::class)
+    abstract fun bindViewModel(viewModel : EnterPasswordViewModel) : ViewModel
 }

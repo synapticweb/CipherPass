@@ -4,7 +4,7 @@ import dagger.Subcomponent
 import net.synapticweb.cipherpass.settings.SettingsFragment
 import net.synapticweb.cipherpass.settings.EnterPasswordFragment
 
-@Subcomponent(modules = [SettingsModule::class, SystemLockModule::class])
+@Subcomponent(modules = [SettingsModule::class, EnterPasswordModule::class])
 interface SettingsComponent {
     @Subcomponent.Factory
     interface Factory {

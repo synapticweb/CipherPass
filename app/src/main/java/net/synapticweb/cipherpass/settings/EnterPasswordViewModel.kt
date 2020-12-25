@@ -11,9 +11,9 @@ import net.synapticweb.cipherpass.util.*
 import java.util.*
 import javax.inject.Inject
 
-class SystemLockViewModel @Inject constructor(private val repository: Repository,
-                                              private val cipher : CPCipher,
-                                              application: Application) :
+class EnterPasswordViewModel @Inject constructor(private val repository: Repository,
+                                                 private val cipher : CPCipher,
+                                                 application: Application) :
     AndroidViewModel(application) {
 
     val working = MutableLiveData<Boolean>()

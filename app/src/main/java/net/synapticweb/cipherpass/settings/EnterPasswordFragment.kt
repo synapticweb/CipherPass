@@ -24,7 +24,7 @@ import javax.inject.Inject
 class EnterPasswordFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory : ViewModelProvider.Factory
-    private val viewModelFrg by viewModels<SystemLockViewModel> {viewModelFactory}
+    private val viewModelFrg by viewModels<EnterPasswordViewModel> {viewModelFactory}
 
     private val args : EnterPasswordFragmentArgs by navArgs()
 
