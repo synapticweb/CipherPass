@@ -5,23 +5,29 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
+import androidx.databinding.BindingAdapter
 import androidx.fragment.app.viewModels
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.cipherpass.*
 import net.synapticweb.cipherpass.databinding.AuthenticateFragmentBinding
 import net.synapticweb.cipherpass.util.*
 import java.util.*
 import javax.inject.Inject
+
+const val SCROLL_HEIGHT_FACTOR = 1.1
 
 class AuthenticateFragment : Fragment() {
     @Inject
@@ -48,6 +54,8 @@ class AuthenticateFragment : Fragment() {
         binding = AuthenticateFragmentBinding.inflate(inflater, container, false).apply {
             viewModel = _viewModel
             lifecycleOwner = fragment
+            val displayMetrics: DisplayMetrics = requireContext().resources.displayMetrics
+            scrollHeight = (displayMetrics.heightPixels * SCROLL_HEIGHT_FACTOR).toInt()
         }
         setupSendPass()
 
@@ -141,4 +149,41 @@ class AuthenticateFragment : Fragment() {
             _viewModel.getPassphrase()
         }
     }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        val appbarImage = requireActivity().findViewById<ImageView>(R.id.appbar_image)
+        val ctLayout = requireActivity().findViewById<CollapsingToolbarLayout>(R.id.ct_layout)
+        appbarImage?.let {
+            val params = it.layoutParams
+            params.height = pxFromDp(requireContext(), 200)
+            it.layoutParams = params
+        }
+
+        ctLayout?.let {
+            it.isTitleEnabled = true
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        val appbarImage = requireActivity().findViewById<ImageView>(R.id.appbar_image)
+        val ctLayout = requireActivity().findViewById<CollapsingToolbarLayout>(R.id.ct_layout)
+        appbarImage?.let {
+            val params = it.layoutParams
+            params.height = 0
+            it.layoutParams = params
+        }
+
+        ctLayout?.let {
+            it.isTitleEnabled = false
+        }
+    }
+}
+
+@BindingAdapter("bind:custom_height")
+fun setLayoutHeight(view: View, height : Int) {
+    val params = view.layoutParams
+    params.height = height
+    view.layoutParams = params
 }

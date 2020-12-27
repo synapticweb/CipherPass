@@ -23,7 +23,8 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
             getString(BACKGROUND_TIMEOUT_KEY) == BACKGROUND_TIMEOUT_DISABLED
         val isNoAuth = prefWrapper.getString(APPLOCK_KEY) == APPLOCK_NOLOCK_VALUE
         if(isNoAuth || isTimeoutDisabled)
-            sleepTime = System.currentTimeMillis()
+            return
+        sleepTime = System.currentTimeMillis()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)

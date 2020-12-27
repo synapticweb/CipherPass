@@ -1,93 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/tools">
 
     <data>
         <import type="android.view.View" />
+
+        <variable
+            name="scrollHeight"
+            type="Integer" />
 
         <variable
             name="viewModel"
             type="net.synapticweb.cipherpass.authenticate.AuthenticateViewModel" />
     </data>
 
-    <RelativeLayout
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            bind:custom_height="@{scrollHeight}"
+            android:layout_height="wrap_content">
+
         <LinearLayout
+            android:paddingTop="180dp"
+            android:paddingBottom="50dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            tools:ignore="UselessParent"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <TextView
+                android:id="@+id/pass_notset_caption"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/pass_notset_caption"
-                android:text="@string/pass_notset_caption"
                 android:layout_margin="20dp"
-                android:visibility="@{viewModel.passSet ? View.GONE : View.VISIBLE}"/>
+                android:text="@string/pass_notset_caption"
+                android:visibility="@{viewModel.passSet ? View.GONE : View.VISIBLE}" />
 
-<!-- https://stackoverflow.com/questions/3685790/how-to-switch-between-hide-and-view-password -->
+            <!-- https://stackoverflow.com/questions/3685790/how-to-switch-between-hide-and-view-password -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/pass_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/pass_layout"
-                android:hint="@string/passphrase_hint"
                 android:layout_marginStart="40dp"
                 android:layout_marginEnd="40dp"
+                android:hint="@string/passphrase_hint"
                 app:passwordToggleEnabled="true">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:layout_gravity="start"
-                android:id="@+id/passphrase"
-                android:layout_marginBottom="10dp"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/passphrase"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginBottom="10dp"
+                    android:inputType="textPassword" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
 
             <EditText
+                android:id="@+id/passphrase_retype"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
-                android:layout_marginEnd="40dp"
-                android:inputType="textPassword"
                 android:layout_gravity="start"
-                android:hint="@string/passphrase_retype_hint"
-                android:id="@+id/passphrase_retype"
+                android:layout_marginStart="40dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginEnd="40dp"
                 android:layout_marginBottom="10dp"
-                android:visibility="@{viewModel.passSet ? View.GONE : View.VISIBLE}"
-                android:autofillHints="@string/passphrase_retype_hint" />
+                android:autofillHints="@string/passphrase_retype_hint"
+                android:hint="@string/passphrase_retype_hint"
+                android:inputType="textPassword"
+                android:visibility="@{viewModel.passSet ? View.GONE : View.VISIBLE}" />
 
             <ProgressBar
+                android:id="@+id/progress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="50dp"
-                android:maxWidth="50dp"
+                android:layout_gravity="center_horizontal"
                 android:layout_margin="15dp"
                 android:indeterminate="true"
-                android:layout_gravity="center_horizontal"
-                android:visibility="@{viewModel.working ? View.VISIBLE : View.GONE}"
-                android:id="@+id/progress" />
+                android:maxWidth="50dp"
+                android:minHeight="50dp"
+                android:visibility="@{viewModel.working ? View.VISIBLE : View.GONE}" />
 
             <Button
+                android:id="@+id/send_pass"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/send_pass"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:enabled="@{viewModel.working ? false : true}"
-                android:text="@{viewModel.passSet ? @string/pass_set_send_pass : @string/pass_not_set_send_pass}"
-                />
+                android:text="@{viewModel.passSet ? @string/pass_set_send_pass : @string/pass_not_set_send_pass}" />
 
         </LinearLayout>
 
-    </RelativeLayout>
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
 
 </layout>

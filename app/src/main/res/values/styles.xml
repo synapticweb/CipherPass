@@ -1,6 +1,6 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -51,6 +51,26 @@
         <item name="android:layout_alignParentEnd">true</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:background">@drawable/md_transparent</item>
+    </style>
+
+    <!--https://stackoverflow.com/a/26852454/6192350
+     https://stackoverflow.com/a/33339119/6192350-->
+    <!--Controlează culoarea butoanelor, inclusiv back arrow:-->
+    <style name="toolbarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="colorControlNormal">#fff</item>
+    </style>
+
+    <!--Controlează culoarea textului titlului:-->
+    <style name="toolbarStyle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="titleTextColor">#fff</item>
+    </style>
+
+    <style name="ctStyleCollapsed" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">#fff</item>
+    </style>
+
+    <style name="ctStyleExpanded" parent="ctStyleCollapsed">
+        <item name="android:textSize">30sp</item>
     </style>
 
 </resources>
