@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.viewModels
@@ -152,32 +153,17 @@ class AuthenticateFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val appbarImage = requireActivity().findViewById<ImageView>(R.id.appbar_image)
-        val ctLayout = requireActivity().findViewById<CollapsingToolbarLayout>(R.id.ct_layout)
-        appbarImage?.let {
-            val params = it.layoutParams
-            params.height = pxFromDp(requireContext(), 200)
-            it.layoutParams = params
-        }
-
-        ctLayout?.let {
-            it.isTitleEnabled = true
-        }
+        val appToolbar = requireActivity().findViewById<Toolbar>(R.id.app_toolbar)
+        val authToolbar = requireActivity().findViewById<Toolbar>(R.id.auth_toolbar)
+        appToolbar.visibility = View.GONE
+        (requireActivity() as AppCompatActivity).setSupportActionBar(authToolbar)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        val appbarImage = requireActivity().findViewById<ImageView>(R.id.appbar_image)
-        val ctLayout = requireActivity().findViewById<CollapsingToolbarLayout>(R.id.ct_layout)
-        appbarImage?.let {
-            val params = it.layoutParams
-            params.height = 0
-            it.layoutParams = params
-        }
-
-        ctLayout?.let {
-            it.isTitleEnabled = false
-        }
+        val appToolbar = requireActivity().findViewById<Toolbar>(R.id.app_toolbar)
+        appToolbar.visibility = View.VISIBLE
+        (requireActivity() as AppCompatActivity).setSupportActionBar(appToolbar)
     }
 }
 

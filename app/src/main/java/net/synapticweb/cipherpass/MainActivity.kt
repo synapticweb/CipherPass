@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_activity)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
 
-        setSupportActionBar(findViewById(R.id.toolbar))
+        setSupportActionBar(findViewById(R.id.app_toolbar))
         val navController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration = AppBarConfiguration(setOf(R.id.authenticateFragment, R.id.entriesListFragment))
         setupActionBarWithNavController(navController, appBarConfiguration)
