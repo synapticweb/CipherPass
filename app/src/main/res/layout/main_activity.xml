@@ -48,10 +48,28 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:orientation="vertical">
+<!--    <LinearLayout android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_marginTop="?attr/actionBarSize"-->
+<!--        android:orientation="vertical">-->
+
+<!--        <fragment-->
+<!--            android:id="@+id/nav_host_fragment"-->
+<!--            android:name="androidx.navigation.fragment.NavHostFragment"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+
+<!--            app:defaultNavHost="true"-->
+<!--            app:navGraph="@navigation/nav_graph" />-->
+
+<!--    </LinearLayout>-->
+
+    <!-- Fără fillViewPort framelayouturile din fragmente nu se extind pe tot ecranul.-->
+    <androidx.core.widget.NestedScrollView
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <fragment
             android:id="@+id/nav_host_fragment"
@@ -62,6 +80,6 @@
             app:defaultNavHost="true"
             app:navGraph="@navigation/nav_graph" />
 
-    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

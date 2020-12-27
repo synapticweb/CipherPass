@@ -27,7 +27,7 @@ import net.synapticweb.cipherpass.util.*
 import java.util.*
 import javax.inject.Inject
 
-const val SCROLL_HEIGHT_FACTOR = 1.1
+const val SCROLL_HEIGHT_FACTOR = 0.75
 
 class AuthenticateFragment : Fragment() {
     @Inject
