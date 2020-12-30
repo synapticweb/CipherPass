@@ -1,6 +1,6 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -59,6 +59,11 @@
 
     <style name="appToolbarPopup" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:background">@android:color/white</item>
+    </style>
+
+    <!--https://stackoverflow.com/a/57985955/6192350 -->
+    <style name="authInput" >
+        <item name="colorAccent">@color/colorPrimary</item>
     </style>
 
 </resources>

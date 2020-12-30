@@ -10,6 +10,9 @@
             type="net.synapticweb.cipherpass.authenticate.AuthenticateViewModel" />
     </data>
 
+    <!-- https://android.jlelse.eu/scrolling-behavior-for-appbars-in-android-41aff9c5c468
+    https://www.journaldev.com/13927/android-collapsingtoolbarlayout-example-->
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -71,6 +74,7 @@
             <!-- https://stackoverflow.com/questions/3685790/how-to-switch-between-hide-and-view-password -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/pass_layout"
+                app:theme="@style/authInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="40dp"
@@ -90,6 +94,7 @@
 
 
             <EditText
+                app:theme="@style/authInput"
                 android:id="@+id/passphrase_retype"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -114,14 +119,32 @@
                 android:minHeight="50dp"
                 android:visibility="@{viewModel.working ? View.VISIBLE : View.GONE}" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                app:cornerRadius="8dp"
+                app:rippleColor="#33AAAAAA"
+                app:strokeColor="@color/colorPrimary"
+                app:strokeWidth="2dp"
                 android:id="@+id/send_pass"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:enabled="@{viewModel.working ? false : true}"
-                android:text="@{viewModel.passSet ? @string/pass_set_send_pass : @string/pass_not_set_send_pass}" />
+                android:text="@{viewModel.passSet ? @string/pass_set_send_pass : @string/pass_not_set_send_pass}"
+                android:textColor="@color/colorPrimary"
+                />
+
+            <ImageView
+                android:id="@+id/system_auth"
+                android:layout_marginTop="10dp"
+                android:layout_width="50dp"
+                android:scaleType="centerCrop"
+                android:layout_height="50dp"
+                android:src="@drawable/fingerprint"
+                android:layout_gravity="center_horizontal"
+                android:visibility="@{viewModel.applockPref.equals(`system`) ? View.VISIBLE : View.GONE}" />
 
         </LinearLayout>
 

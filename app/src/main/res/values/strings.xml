@@ -2,7 +2,7 @@
     <string name="app_name">CipherPass</string>
     <string name="pass_notset_caption">Please set a passphrase to encrypt the database. The passphrase should be at least 6 characters long. Choose a random sequence of characters, not a dictionary word and do not write it down. If you lose it, you won\'t be able to recover your data. </string>
     <string name="pass_not_set_send_pass">Set passphrase</string>
-    <string name="pass_set_send_pass">Unlock database</string>
+    <string name="pass_set_send_pass">UNLOCK DATABASE</string>
     <string name="passphrase_hint">Passphrase</string>
     <string name="pass_incorect">The passphrase you entered is not valid.</string>
     <string name="error_setting_pass">An error occurred while setting the password.</string>
@@ -24,7 +24,7 @@
     <string name="system_lock_file_write_fail">There was an error processing your request.</string>
     <string name="system_lock_not_available">Only available on Android 6 and newer.</string>
     <string name="system_lock_device_not_secure">To use this feature, you have to secure your device with a password, pin or pattern.</string>
-    <string name="system_lock_unavailable">The system provided lock functionality is unavailable.</string>
+    <string name="system_lock_unavailable">The system provided authentification is unavailable.</string>
     <string name="auth_subtitle">Authentication required</string>
     <string name="change_pass">Change password</string>
     <string name="act_pass_hint">Actual passphrase</string>

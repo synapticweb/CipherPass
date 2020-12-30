@@ -53,22 +53,8 @@ class AuthenticateFragment : Fragment() {
         setupSendPass()
 
         when(_viewModel.getApplockPref()) {
-            APPLOCK_SYSTEM_VALUE -> {
-                val keyMan =
-                    requireActivity().getSystemService(Context.KEYGUARD_SERVICE) as
-                            KeyguardManager
-                val authIntent =
-                    keyMan.createConfirmDeviceCredentialIntent(getString(R.string.app_name), getString(R.string.auth_subtitle))
-                authIntent?.also { intent ->
-                    lockState.isInUnlockActivity = true
-                    startActivityForResult(intent, LOCK_ACTIVITY_CODE)
-                }
-                    ?: run {
-                        //necesar pentru că încă nu s-a încheiat onCreateView()
-                        Snackbar.make(requireActivity().findViewById(android.R.id.content), getString(R.string.system_lock_unavailable),
-                            Snackbar.LENGTH_LONG).show()
-                    }
-            }
+            APPLOCK_SYSTEM_VALUE -> showSystemAuthDialog()
+
             APPLOCK_NOLOCK_VALUE -> {
                 binding.passLayout.visibility = View.GONE
                 binding.sendPass.visibility = View.GONE
@@ -80,7 +66,8 @@ class AuthenticateFragment : Fragment() {
             if(it != null)
                 _viewModel.authenticate(it)
             else
-                Snackbar.make(requireActivity().findViewById(android.R.id.content), getString(R.string.system_lock_unavailable),
+                Snackbar.make(requireActivity().findViewById(android.R.id.content),
+                        getString(R.string.system_lock_unavailable),
                     Snackbar.LENGTH_LONG).show()
         })
 
@@ -111,6 +98,7 @@ class AuthenticateFragment : Fragment() {
         }
 
         handleBackPressed(lockState)
+        setupSystemAuth()
         return binding.root
     }
 
@@ -139,6 +127,7 @@ class AuthenticateFragment : Fragment() {
         if(requestCode == LOCK_ACTIVITY_CODE && resultCode == Activity.RESULT_OK) {
             binding.passLayout.visibility = View.GONE
             binding.sendPass.visibility = View.GONE
+            binding.systemAuth.visibility = View.GONE
             _viewModel.getPassphrase()
         }
     }
@@ -156,5 +145,28 @@ class AuthenticateFragment : Fragment() {
         val appToolbar = requireActivity().findViewById<Toolbar>(R.id.app_toolbar)
         appToolbar.visibility = View.VISIBLE
         (requireActivity() as AppCompatActivity).setSupportActionBar(appToolbar)
+    }
+
+    private fun setupSystemAuth() {
+        binding.systemAuth.setOnClickListener {
+            showSystemAuthDialog()
+        }
+    }
+
+    private fun showSystemAuthDialog() {
+        val keyMan =
+            requireActivity().getSystemService(Context.KEYGUARD_SERVICE) as
+                    KeyguardManager
+        val authIntent =
+            keyMan.createConfirmDeviceCredentialIntent(getString(R.string.app_name), getString(R.string.auth_subtitle))
+        authIntent?.also { intent ->
+            lockState.isInUnlockActivity = true
+            startActivityForResult(intent, LOCK_ACTIVITY_CODE)
+        }
+            ?: run {
+                //necesar pentru că încă nu s-a încheiat onCreateView()
+                Snackbar.make(requireActivity().findViewById(android.R.id.content), getString(R.string.system_lock_unavailable),
+                    Snackbar.LENGTH_LONG).show()
+            }
     }
 }
