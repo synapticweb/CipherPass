@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import net.synapticweb.cipherpass.APPLOCK_KEY
 import net.synapticweb.cipherpass.APPLOCK_PASSWD_VALUE
+import net.synapticweb.cipherpass.DO_NOT_SHOW_WARNING
 import net.synapticweb.cipherpass.ENCRYPTED_PASS_KEY
 import net.synapticweb.cipherpass.model.Repository
 import net.synapticweb.cipherpass.util.*
@@ -18,10 +19,12 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
                                             application: Application) :
     AndroidViewModel(application) {
 
-    val passWorking = MutableLiveData<Boolean>()
-    val passFinish = MutableLiveData<Event<Boolean>>()
+    val working = MutableLiveData<Boolean>()
+    val finish = MutableLiveData<Event<Boolean>>()
     val passInvalid = MutableLiveData<Event<Boolean>>()
     val passNoMatch = MutableLiveData<Event<Boolean>>()
+    val writeSettingsFail = MutableLiveData<Event<Boolean>>()
+
     private val prefWrapper = PrefWrapper.getInstance(getApplication())
 
     fun hasEncryptedPass() : Boolean {
@@ -32,31 +35,31 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
     }
 
-    private fun weakAuthentication() : Boolean {
+    private fun hasWeakAuthentication() : Boolean {
         return prefWrapper.getString(APPLOCK_KEY) != APPLOCK_PASSWD_VALUE
     }
 
     fun changePass(actualPass : CharArray, newPass : CharArray, reNewPass : CharArray) {
         viewModelScope.launch {
-            passWorking.value = true
+            working.value = true
             if(!newPass.contentEquals(reNewPass)) {
                 passNoMatch.value = Event(true)
-                passWorking.value = false
+                working.value = false
                 return@launch
             }
 
             wrapEspressoIdlingResource {
                 if(!repository.isPassValid(actualPass)) {
                     passInvalid.value = Event(true)
-                    passWorking.value = false
+                    working.value = false
                     return@launch
                 }
 
-                if (weakAuthentication() && !cipher.encryptPassToSettings(newPass)) {
+                if (hasWeakAuthentication() && !cipher.encryptPassToSettings(newPass)) {
                         deleteEncryptedPass()
                    prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
-                    passFinish.value = Event(false)
-                    passWorking.value = false
+                    finish.value = Event(false)
+                    working.value = false
                     return@launch
                 }
 
@@ -65,14 +68,14 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
                         prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
                         deleteEncryptedPass()
                     }
-                    passFinish.value = Event(false)
-                    passWorking.value = false
+                    finish.value = Event(false)
+                    working.value = false
                     return@launch
                 }
             }
 
-            passFinish.value = Event(repository.reKey(newPass))
-            passWorking.value = false
+            finish.value = Event(repository.reKey(newPass))
+            working.value = false
             Arrays.fill(actualPass, 0.toChar())
             Arrays.fill(newPass, 0.toChar())
             Arrays.fill(reNewPass, 0.toChar())
@@ -81,23 +84,56 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
 
     fun changeHash(password : CharArray, hashType : String) {
         viewModelScope .launch {
-            passWorking.value = true
+            working.value = true
             wrapEspressoIdlingResource {
                 if(!repository.isPassValid(password)) {
                     passInvalid.value = Event(true)
-                    passWorking.value = false
+                    working.value = false
                     return@launch
                 }
 
                 if(!repository.createPassHash(password, hashType)) {
-                    passFinish.value = Event(false)
-                    passWorking.value = false
+                    finish.value = Event(false)
+                    working.value = false
                     return@launch
                 }
             }
-            passFinish.value = Event(true)
-            passWorking.value = false
+            finish.value = Event(true)
+            working.value = false
             Arrays.fill(password, 0.toChar())
         }
+    }
+
+    fun changeAuthentication(passphrase : CharArray, authType : String) {
+        viewModelScope.launch {
+            working.value = true
+            val result = wrapEspressoIdlingResource {
+                repository.isPassValid(passphrase)
+            }
+
+            if (!result) {
+                passInvalid.value = Event(true)
+                working.value = false
+                return@launch
+            }
+
+            val encryptionResult = wrapEspressoIdlingResource {
+                cipher.encryptPassToSettings(passphrase)
+            }
+            if(!encryptionResult) {
+                writeSettingsFail.value = Event(true)
+                working.value = false
+                return@launch
+            }
+
+            prefWrapper.setPrefSync(APPLOCK_KEY, authType)
+            working.value = false
+            finish.value = Event(true)
+        }
+    }
+
+    fun shouldShowWarning() : Boolean {
+        return !cipher.isStorageHardwareBacked() &&
+                !(prefWrapper.getBoolean(DO_NOT_SHOW_WARNING) ?: false)
     }
 }

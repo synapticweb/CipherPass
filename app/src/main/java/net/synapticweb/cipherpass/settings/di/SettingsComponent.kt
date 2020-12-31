@@ -2,9 +2,8 @@ package net.synapticweb.cipherpass.settings.di
 
 import dagger.Subcomponent
 import net.synapticweb.cipherpass.settings.SettingsFragment
-import net.synapticweb.cipherpass.settings.EnterPasswordFragment
 
-@Subcomponent(modules = [SettingsModule::class, EnterPasswordModule::class])
+@Subcomponent(modules = [SettingsModule::class])
 interface SettingsComponent {
     @Subcomponent.Factory
     interface Factory {
@@ -12,5 +11,4 @@ interface SettingsComponent {
     }
 
     fun inject(fragment: SettingsFragment)
-    fun inject(fragment: EnterPasswordFragment)
 }

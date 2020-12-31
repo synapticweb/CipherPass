@@ -8,7 +8,11 @@ import android.util.DisplayMetrics
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.actions.getActionButton
 import com.google.android.material.textfield.TextInputLayout
 import net.synapticweb.cipherpass.LockStateViewModel
 import net.synapticweb.cipherpass.R
@@ -150,4 +154,16 @@ fun pxFromDp(context: Context, dp: Int): Int {
 
 fun dpFromPx(context: Context, px : Int) : Int {
     return (px / context.resources.displayMetrics.density).toInt()
+}
+
+fun disablePositiveWhenBlank(dialog : MaterialDialog, editTextId : Int) {
+    val positive = dialog.getActionButton(WhichButton.POSITIVE)
+    positive.isEnabled = false
+    val editText = dialog.findViewById<EditText>(editTextId)
+    editText.addTextChangedListener(
+        afterTextChanged = { editable ->
+            if (editable != null) {
+                positive.isEnabled = !editable.isBlank()
+            }
+        })
 }

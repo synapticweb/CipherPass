@@ -109,4 +109,6 @@
     <string name="settings_fragment_title">Settings</string>
     <string name="enter_password_title">Provide your password</string>
     <string name="set_icon_fragment_title">Set entry icon</string>
+    <string name="warning_title">Warning</string>
+    <string name="stop_showing">Do not show again</string>
 </resources>

@@ -4,19 +4,22 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
+import com.afollestad.materialdialogs.callbacks.onPreShow
 import com.afollestad.materialdialogs.customview.customView
 import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.cipherpass.*
 import net.synapticweb.cipherpass.databinding.ChangePassDialogBinding
+import net.synapticweb.cipherpass.databinding.EnterPassDialogBinding
 import net.synapticweb.cipherpass.databinding.PasswdValidatorDialogBinding
 import net.synapticweb.cipherpass.util.*
 
@@ -45,8 +48,8 @@ fun SettingsFragment.changeHash(preference: ListPreference, newHashName : String
                 return@positiveButton
             }
 
-            viewModelFrg.passWorking.removeObservers(viewLifecycleOwner)
-            viewModelFrg.passWorking.observe(viewLifecycleOwner, Observer {
+            viewModelFrg.working.removeObservers(viewLifecycleOwner)
+            viewModelFrg.working.observe(viewLifecycleOwner, Observer {
                 getActionButton(WhichButton.POSITIVE).isEnabled = !it
             })
 
@@ -57,8 +60,8 @@ fun SettingsFragment.changeHash(preference: ListPreference, newHashName : String
                         getString(R.string.pass_incorect)
                 })
 
-            viewModelFrg.passFinish.removeObservers(viewLifecycleOwner)
-            viewModelFrg.passFinish.observe(viewLifecycleOwner,
+            viewModelFrg.finish.removeObservers(viewLifecycleOwner)
+            viewModelFrg.finish.observe(viewLifecycleOwner,
                 EventObserver {
                     binding.passphrase.text!!.clear()
                     dismiss()
@@ -135,12 +138,12 @@ fun SettingsFragment.changePass() {
             binding.newPassLayout.error = null
         }
 
-        viewModelFrg.passWorking.observe(viewLifecycleOwner, Observer {
+        viewModelFrg.working.observe(viewLifecycleOwner, Observer {
             getActionButton(WhichButton.POSITIVE).isEnabled = !it
         })
 
-        viewModelFrg.passFinish.removeObservers(viewLifecycleOwner)
-        viewModelFrg.passFinish.observe(viewLifecycleOwner, EventObserver {
+        viewModelFrg.finish.removeObservers(viewLifecycleOwner)
+        viewModelFrg.finish.observe(viewLifecycleOwner, EventObserver {
             binding.actualPassphrase.text!!.clear()
             binding.newPassphrase.text!!.clear()
             binding.newPassphraseRetype.text!!.clear()
@@ -167,8 +170,9 @@ fun SettingsFragment.changeAuthentication(preference: Preference, newValue : Str
     val appLockEntries = requireActivity().resources.getStringArray(R.array.applock_entries)
     val appLockValues = requireActivity().resources.getStringArray(R.array.applock_values)
 
-    when(newValue) {
-        appLockValues[0] -> { viewModelFrg.deleteEncryptedPass() //pashphrase
+    when(newValue) { //pashphrase
+        appLockValues[0] -> {
+            viewModelFrg.deleteEncryptedPass()
             preference.summary = appLockEntries[0]
             return true
         }
@@ -188,10 +192,7 @@ fun SettingsFragment.changeAuthentication(preference: Preference, newValue : Str
             }
 
             return if(!viewModelFrg.hasEncryptedPass()) {
-                findNavController().navigate(
-                    SettingsFragmentDirections.actionSettingsFragmentToSystemLockFragment(
-                        APPLOCK_SYSTEM_VALUE
-                    ))
+                createDialogForAuthChange(preference, appLockEntries[1], appLockValues[1])
                 false
             } else {
                 preference.summary = appLockEntries[1]
@@ -202,9 +203,7 @@ fun SettingsFragment.changeAuthentication(preference: Preference, newValue : Str
         //no lock
         appLockValues[2] -> {
             return  if(!viewModelFrg.hasEncryptedPass()) {
-                findNavController().navigate(
-                    SettingsFragmentDirections.
-                    actionSettingsFragmentToSystemLockFragment(APPLOCK_NOLOCK_VALUE))
+                createDialogForAuthChange(preference, appLockEntries[2], appLockValues[2])
                 false
             }
             else {
@@ -213,5 +212,83 @@ fun SettingsFragment.changeAuthentication(preference: Preference, newValue : Str
             }
         }
         else -> return false
+    }
+}
+
+fun SettingsFragment.createDialogForAuthChange(preference: Preference, authName: String,
+                                               authenticationType : String) {
+    val binding : EnterPassDialogBinding =
+        EnterPassDialogBinding.inflate(
+            LayoutInflater.from(requireContext())
+        ).apply {
+            viewModel = viewModelFrg
+            authType = authenticationType
+            lifecycleOwner = this@createDialogForAuthChange
+        }
+
+    binding.passphrase.addTextChangedListener {
+        binding.passLayout.error = null
+    }
+
+    viewModelFrg.passInvalid.removeObservers(viewLifecycleOwner)
+    viewModelFrg.passInvalid.observe(viewLifecycleOwner, EventObserver {
+        binding.passLayout.error = getString(R.string.pass_incorect)
+    })
+
+    MaterialDialog(requireContext()).show {
+        noAutoDismiss()
+        title(
+            if(viewModelFrg.shouldShowWarning())
+                R.string.warning_title
+            else
+                R.string.enter_password_title
+        )
+        customView(null, binding.root)
+        onPreShow { dialog ->
+            if(binding.passLayout.isVisible)
+                disablePositiveWhenBlank(dialog, R.id.passphrase)
+        }
+
+        viewModelFrg.working.removeObservers(viewLifecycleOwner)
+        viewModelFrg.working.observe(viewLifecycleOwner, Observer {
+            getActionButton(WhichButton.POSITIVE).isEnabled = !it
+        })
+
+        viewModelFrg.finish.removeObservers(viewLifecycleOwner)
+        viewModelFrg.finish.observe(viewLifecycleOwner, EventObserver {
+            preference.summary = authName
+            (preference as ListPreference).value = authenticationType
+            dismiss()
+        })
+
+        viewModelFrg.writeSettingsFail.removeObservers(viewLifecycleOwner)
+        viewModelFrg.writeSettingsFail.observe(viewLifecycleOwner, EventObserver {
+            dismiss()
+            Snackbar.make(requireView(), getString(R.string.system_lock_file_write_fail),
+                Snackbar.LENGTH_SHORT).show()
+        })
+
+        positiveButton(android.R.string.ok) { dialog ->
+            if(viewModelFrg.shouldShowWarning()) {
+                if(binding.stopShowingWarning.isChecked)
+                    PrefWrapper.getInstance(requireContext()).setPref(DO_NOT_SHOW_WARNING, true)
+
+                binding.softStorageWarning.visibility = View.GONE
+                binding.stopShowingWarningBox.visibility = View.GONE
+                binding.passLayout.visibility = View.VISIBLE
+                disablePositiveWhenBlank(dialog, R.id.passphrase)
+                title(R.string.enter_password_title)
+            }
+            else {
+                binding.passphrase.text?.let {
+                    viewModelFrg.changeAuthentication(editableToCharArray(it), authenticationType)
+                    it.clear()
+                }
+            }
+        }
+
+        negativeButton(android.R.string.cancel) {
+            dismiss()
+        }
     }
 }

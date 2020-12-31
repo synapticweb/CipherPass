@@ -43,3 +43,4 @@ const val CLIPBOARD_TIMEOUT_DISABLED = "disabled"
 
 const val BACKGROUND_TIMEOUT_KEY = "background_timeout"
 const val BACKGROUND_TIMEOUT_DISABLED = "disabled"
+const val DO_NOT_SHOW_WARNING = "do_ not_show_warning"

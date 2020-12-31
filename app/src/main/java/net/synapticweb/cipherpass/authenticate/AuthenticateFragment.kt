@@ -8,9 +8,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -86,16 +86,13 @@ class AuthenticateFragment : Fragment() {
                 }
 
                 R.string.pass_incorect ->
-                    binding.passLayout.error = getString(R.string.pass_incorect)
+                    Toast.makeText(requireContext(), getString(it), Toast.LENGTH_SHORT).show()
 
                 R.string.error_setting_pass -> Snackbar.make(requireView(),
                     getString(R.string.error_setting_pass), Snackbar.LENGTH_SHORT).show()
             }
         })
 
-        binding.passphrase.addTextChangedListener {
-            binding.passLayout.error = null
-        }
 
         handleBackPressed(lockState)
         setupSystemAuth()
@@ -105,14 +102,16 @@ class AuthenticateFragment : Fragment() {
     private fun setupSendPass() {
         binding.sendPass.setOnClickListener {
             if (binding.passphrase.text!!.isEmpty()) {
-                binding.passLayout.error = getString(R.string.pass_empty)
+                Toast.makeText(requireContext(), getString(R.string.pass_empty), Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
             }
             val pass = editableToCharArray(binding.passphrase.text!!)
             val rePass = editableToCharArray(binding.passphraseRetype.text)
 
             if (!_viewModel.isPassSet() && !pass.contentEquals(rePass)) {
-                binding.passLayout.error = getString(R.string.pass_no_match)
+                Toast.makeText(requireContext(), getString(R.string.pass_no_match), Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
             }
 
