@@ -22,21 +22,6 @@ class ChangeHashTest {
     private val prefWrapper = PrefWrapper.getInstance(ApplicationProvider.getApplicationContext())
 
     @Test
-    fun emptyPass_error() {
-        val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
-        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
-
-        Espresso.onView(ViewMatchers.withText("Hash function")).perform(ViewActions.click())
-        Espresso.onView(ViewMatchers.withText("SHA512 (fast - medium security)")).perform(ViewActions.click())
-        Thread.sleep(100)
-        Espresso.onView(ViewMatchers.withText("OK")).perform(ViewActions.click())
-
-        Espresso.onView(ViewMatchers.withId(R.id.pass_layout)).check(
-            ViewAssertions.matches(hasTextInputLayoutErrorText(testRule.application.getString(R.string.pass_empty)))
-        )
-    }
-
-    @Test
     fun badPass_error() {
         testRule.setDb()
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)

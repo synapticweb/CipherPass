@@ -25,7 +25,7 @@ import net.synapticweb.cipherpass.util.*
 import java.util.*
 
 
-fun SettingsFragment.changeHash(preference: ListPreference, newHashName : String, newHashType : String)  {
+fun SettingsFragment.changeHash(preference: ListPreference, newHashType : String)  {
     val binding : PasswdValidatorDialogBinding =
         PasswdValidatorDialogBinding.inflate(
             LayoutInflater.from(requireContext())
@@ -39,16 +39,15 @@ fun SettingsFragment.changeHash(preference: ListPreference, newHashName : String
         title(null, getString(R.string.enter_pass))
         customView(null, binding.root)
 
+        onPreShow { dialog ->
+            disablePositiveWhenEmpty(dialog, R.id.passphrase)
+        }
+
         binding.passphrase.addTextChangedListener {
             binding.passLayout.error = null
         }
 
         positiveButton(android.R.string.ok) {
-            if(binding.passphrase.text!!.isEmpty()) {
-                binding.passLayout.error = getString(R.string.pass_empty)
-                return@positiveButton
-            }
-
             viewModelFrg.working.removeObservers(viewLifecycleOwner)
             viewModelFrg.working.observe(viewLifecycleOwner, Observer {
                 getActionButton(WhichButton.POSITIVE).isEnabled = !it
@@ -104,7 +103,7 @@ fun SettingsFragment.changePass() {
         customView(null, binding.root)
 
         onPreShow { dialog ->
-            disablePositiveWhenBlank(dialog, R.id.actual_passphrase)
+            disablePositiveWhenEmpty(dialog, R.id.actual_passphrase)
         }
 
         setupPasswordFields(
@@ -248,7 +247,7 @@ fun SettingsFragment.createDialogForAuthChange(preference: Preference, authName:
         customView(null, binding.root)
         onPreShow { dialog ->
             if(binding.passLayout.isVisible)
-                disablePositiveWhenBlank(dialog, R.id.passphrase)
+                disablePositiveWhenEmpty(dialog, R.id.passphrase)
         }
 
         viewModelFrg.working.removeObservers(viewLifecycleOwner)
@@ -278,7 +277,7 @@ fun SettingsFragment.createDialogForAuthChange(preference: Preference, authName:
                 binding.softStorageWarning.visibility = View.GONE
                 binding.stopShowingWarningBox.visibility = View.GONE
                 binding.passLayout.visibility = View.VISIBLE
-                disablePositiveWhenBlank(dialog, R.id.passphrase)
+                disablePositiveWhenEmpty(dialog, R.id.passphrase)
                 title(R.string.enter_password_title)
             }
             else {

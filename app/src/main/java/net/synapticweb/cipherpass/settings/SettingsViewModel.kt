@@ -22,7 +22,6 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
     val working = MutableLiveData<Boolean>()
     val finish = MutableLiveData<Event<Boolean>>()
     val passInvalid = MutableLiveData<Event<Boolean>>()
-    val passNoMatch = MutableLiveData<Event<Boolean>>()
     val writeSettingsFail = MutableLiveData<Event<Boolean>>()
 
     private val prefWrapper = PrefWrapper.getInstance(getApplication())
@@ -52,8 +51,8 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
                 //introducem în setări parola criptată doar dacă avem weak auth. Dacă scrierea
                 //eșuează, scnhimbăm la auth cu parolă și nu mai facem nimic.
                 if (hasWeakAuthentication() && !cipher.encryptPassToSettings(newPass)) {
-                        deleteEncryptedPass()
-                   prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+                    deleteEncryptedPass()
+                    prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
                     finish.value = Event(false)
                     working.value = false
                     return@launch

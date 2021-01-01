@@ -4,6 +4,11 @@
     <item
         android:id="@+id/show_settings"
         android:title="@string/settings_menu_item"/>
+    <item android:id="@+id/sort"
+        android:title="@string/entries_list_sort"
+        android:icon="@drawable/sort"
+        />
+
     <!--Dacă folosesc showasAction="collapseActionView|ifRoom" la search îmi apare săgeata back.-->
     <item
         android:id="@+id/search"
@@ -12,8 +17,10 @@
         app:showAsAction="always"
         app:actionViewClass="android.widget.SearchView" />
 
-    <item android:id="@+id/sort"
-        android:title="@string/entries_list_sort"
-        android:icon="@drawable/sort"
-        app:showAsAction="always" />
+    <item android:id="@+id/lock"
+        android:title="@string/lock_title"
+        android:icon="@drawable/lock"
+        app:showAsAction="always"/>
+
+
 </menu>

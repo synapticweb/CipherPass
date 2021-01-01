@@ -156,7 +156,7 @@ fun dpFromPx(context: Context, px : Int) : Int {
     return (px / context.resources.displayMetrics.density).toInt()
 }
 
-fun disablePositiveWhenBlank(dialog : MaterialDialog, editTextId : Int) {
+fun disablePositiveWhenEmpty(dialog : MaterialDialog, editTextId : Int) {
     val positive = dialog.getActionButton(WhichButton.POSITIVE)
     positive.isEnabled = false
     val editText = dialog.findViewById<EditText>(editTextId)

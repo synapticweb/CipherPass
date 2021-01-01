@@ -89,6 +89,9 @@ class EntriesListFragment : Fragment() {
             })
         }
 
+        val prefWrapper = PrefWrapper.getInstance(requireContext())
+        if(prefWrapper.getString(APPLOCK_KEY) == APPLOCK_NOLOCK_VALUE)
+            menu.findItem(R.id.lock).isVisible = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -110,6 +113,10 @@ class EntriesListFragment : Fragment() {
                        _viewModel.loadEntries()
                     }
                 }
+                false
+            }
+            R.id.lock -> {
+                lockState.lockAndReauth()
                 false
             }
             else -> false

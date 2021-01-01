@@ -73,7 +73,8 @@
     <string name="url">Url</string>
     <string name="search_hint">Search entries</string>
     <string name="search_title">Search</string>
-    <string name="entries_list_sort">sort</string>
+    <string name="entries_list_sort">Sort order</string>
+    <string name="lock_title">Lock database</string>
     <string name="sort_name_asc">Sort by name ascending</string>
     <string name="sort_name_desc">Sort by name descending</string>
     <string name="sort_creation_asc">Sort by creation date ascending</string>

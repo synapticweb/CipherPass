@@ -26,7 +26,7 @@ import net.synapticweb.cipherpass.*
 import net.synapticweb.cipherpass.databinding.AddeditEntryFragmentBinding
 import net.synapticweb.cipherpass.model.CustomField
 import net.synapticweb.cipherpass.util.EventObserver
-import net.synapticweb.cipherpass.util.disablePositiveWhenBlank
+import net.synapticweb.cipherpass.util.disablePositiveWhenEmpty
 import net.synapticweb.cipherpass.util.setupPasswordFields
 import javax.inject.Inject
 
@@ -231,7 +231,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
                 customView(R.layout.add_custom_field_dialog)
                 title(R.string.new_field_input_title)
                 onPreShow { dialog ->
-                   disablePositiveWhenBlank(dialog, R.id.field_name_input)
+                   disablePositiveWhenEmpty(dialog, R.id.field_name_input)
                 }
                 positiveButton(android.R.string.ok) { dialog ->
                     val text = dialog.findViewById<EditText>(R.id.field_name_input).text.toString()
@@ -275,7 +275,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
             title(R.string.edit_custom_field)
             customView(R.layout.add_custom_field_dialog)
             onPreShow { dialog ->
-                disablePositiveWhenBlank(dialog, R.id.field_name_input)
+                disablePositiveWhenEmpty(dialog, R.id.field_name_input)
                 val fieldName = dialog.findViewById<EditText>(R.id.field_name_input)
                 fieldName.setText(item.fieldName)
                 val isProtected = dialog.findViewById<CheckBox>(R.id.protected_field)

@@ -38,8 +38,7 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
             if (sleepTime == 0L || isInUnlockActivity || it == BACKGROUND_TIMEOUT_DISABLED || isNoAuth)
                 return
             if (System.currentTimeMillis() - sleepTime > it.toLong() * 1000) {
-                repository.lock()
-                unauthorized.value = Event(true)
+                lockAndReauth()
             }
         }
     }
@@ -53,5 +52,10 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
 
     fun isDbUnlocked() : Boolean{
         return repository.isUnlocked()
+    }
+
+    fun lockAndReauth() {
+        repository.lock()
+        unauthorized.value = Event(true)
     }
 }
