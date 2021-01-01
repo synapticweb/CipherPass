@@ -93,7 +93,7 @@ fun SettingsFragment.changeHash(preference: ListPreference, newHashType : String
 fun SettingsFragment.changePass() {
     MaterialDialog(requireContext()).show {
         noAutoDismiss()
-        title(R.string.change_pass)
+        title(R.string.change_pass_title)
         val binding = ChangePassDialogBinding.inflate(
             LayoutInflater.from(requireContext())) .apply {
             model = viewModelFrg
