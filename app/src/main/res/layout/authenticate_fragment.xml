@@ -74,7 +74,7 @@
             <!-- https://stackoverflow.com/questions/3685790/how-to-switch-between-hide-and-view-password -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/pass_layout"
-                app:theme="@style/authInput"
+                app:theme="@style/authenticateTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="40dp"
@@ -94,7 +94,7 @@
 
 
             <EditText
-                app:theme="@style/authInput"
+                app:theme="@style/authenticateTheme"
                 android:id="@+id/passphrase_retype"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -109,6 +109,7 @@
                 android:visibility="@{viewModel.passSet ? View.GONE : View.VISIBLE}" />
 
             <ProgressBar
+                android:theme="@style/authenticateTheme"
                 android:id="@+id/progress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

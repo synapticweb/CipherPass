@@ -23,19 +23,6 @@ class ChangePassTest {
     private val prefWrapper = PrefWrapper.getInstance(ApplicationProvider.getApplicationContext())
 
     @Test
-    fun emptyActPass_error() {
-        val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
-        testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
-
-        onView(withText("Change password")).perform(click())
-        onView(withText("OK")).perform(click())
-
-        onView(withId(R.id.pass_layout)).check(
-            matches(hasTextInputLayoutErrorText(testRule.application.getString(R.string.act_pass_empty)))
-        )
-    }
-
-    @Test
     fun emptyNewPass_Error() {
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)

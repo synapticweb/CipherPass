@@ -22,6 +22,7 @@ import net.synapticweb.cipherpass.databinding.ChangePassDialogBinding
 import net.synapticweb.cipherpass.databinding.EnterPassDialogBinding
 import net.synapticweb.cipherpass.databinding.PasswdValidatorDialogBinding
 import net.synapticweb.cipherpass.util.*
+import java.util.*
 
 
 fun SettingsFragment.changeHash(preference: ListPreference, newHashName : String, newHashType : String)  {
@@ -102,6 +103,10 @@ fun SettingsFragment.changePass() {
 
         customView(null, binding.root)
 
+        onPreShow { dialog ->
+            disablePositiveWhenBlank(dialog, R.id.actual_passphrase)
+        }
+
         setupPasswordFields(
             binding.passLayout,
             arrayOf(
@@ -109,22 +114,6 @@ fun SettingsFragment.changePass() {
                 binding.newPassphraseRetype
             )
         )
-
-        positiveButton(android.R.string.ok) {
-            if(binding.actualPassphrase.text!!.isEmpty()) {
-                binding.passLayout.error = getString(R.string.act_pass_empty)
-                return@positiveButton
-            }
-            if(binding.newPassphrase.text!!.isEmpty()) {
-                binding.newPassLayout.error = getString(R.string.pass_empty)
-                return@positiveButton
-            }
-
-            val actPassCharArray = editableToCharArray(binding.actualPassphrase.text!!)
-            val newPassCharArray = editableToCharArray(binding.newPassphrase.text!!)
-            val reNewPassCharArray = editableToCharArray(binding.newPassphraseRetype.text!!)
-            viewModelFrg.changePass(actPassCharArray, newPassCharArray, reNewPassCharArray)
-        }
 
         binding.actualPassphrase.addTextChangedListener {
             binding.passLayout.error = null
@@ -134,10 +123,7 @@ fun SettingsFragment.changePass() {
             binding.newPassLayout.error = null
         }
 
-        binding.newPassphraseRetype.addTextChangedListener {
-            binding.newPassLayout.error = null
-        }
-
+        viewModelFrg.working.removeObservers(viewLifecycleOwner)
         viewModelFrg.working.observe(viewLifecycleOwner, Observer {
             getActionButton(WhichButton.POSITIVE).isEnabled = !it
         })
@@ -159,10 +145,26 @@ fun SettingsFragment.changePass() {
             binding.passLayout.error = getString(R.string.pass_incorect)
         })
 
-        viewModelFrg.passNoMatch.removeObservers(viewLifecycleOwner)
-        viewModelFrg.passNoMatch.observe(viewLifecycleOwner, EventObserver {
-            binding.newPassLayout.error = getString(R.string.pass_no_match)
-        })
+        positiveButton(android.R.string.ok) {
+            val newPass = editableToCharArray(binding.newPassphrase.text!!)
+            val reNewPass = editableToCharArray(binding.newPassphraseRetype.text!!)
+
+            if(binding.newPassphrase.text!!.isEmpty()) {
+                binding.newPassLayout.error = getString(R.string.pass_empty)
+                Arrays.fill(reNewPass, 0.toChar())
+                return@positiveButton
+            }
+
+            if(!newPass.contentEquals(reNewPass)) {
+                binding.newPassLayout.error = getString(R.string.pass_no_match)
+                Arrays.fill(reNewPass, 0.toChar())
+                return@positiveButton
+            }
+
+            Arrays.fill(reNewPass, 0.toChar())
+            val actualPass = editableToCharArray(binding.actualPassphrase.text!!)
+            viewModelFrg.changePass(actualPass, newPass)
+        }
     }
 }
 

@@ -163,7 +163,7 @@ fun disablePositiveWhenBlank(dialog : MaterialDialog, editTextId : Int) {
     editText.addTextChangedListener(
         afterTextChanged = { editable ->
             if (editable != null) {
-                positive.isEnabled = !editable.isBlank()
+                positive.isEnabled = editable.isNotEmpty()
             }
         })
 }

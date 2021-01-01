@@ -39,15 +39,9 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
         return prefWrapper.getString(APPLOCK_KEY) != APPLOCK_PASSWD_VALUE
     }
 
-    fun changePass(actualPass : CharArray, newPass : CharArray, reNewPass : CharArray) {
+    fun changePass(actualPass : CharArray, newPass : CharArray) {
         viewModelScope.launch {
             working.value = true
-            if(!newPass.contentEquals(reNewPass)) {
-                passNoMatch.value = Event(true)
-                working.value = false
-                return@launch
-            }
-
             wrapEspressoIdlingResource {
                 if(!repository.isPassValid(actualPass)) {
                     passInvalid.value = Event(true)
@@ -55,6 +49,8 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
                     return@launch
                 }
 
+                //introducem în setări parola criptată doar dacă avem weak auth. Dacă scrierea
+                //eșuează, scnhimbăm la auth cu parolă și nu mai facem nimic.
                 if (hasWeakAuthentication() && !cipher.encryptPassToSettings(newPass)) {
                         deleteEncryptedPass()
                    prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
@@ -78,7 +74,6 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
             working.value = false
             Arrays.fill(actualPass, 0.toChar())
             Arrays.fill(newPass, 0.toChar())
-            Arrays.fill(reNewPass, 0.toChar())
         }
     }
 

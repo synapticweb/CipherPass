@@ -5,6 +5,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="md_color_button_text">@color/colorAccent</item>
     </style>
 
     <style name="addedit_field">
@@ -62,7 +63,7 @@
     </style>
 
     <!--https://stackoverflow.com/a/57985955/6192350 -->
-    <style name="authInput" >
+    <style name="authenticateTheme" >
         <item name="colorAccent">@color/colorPrimary</item>
     </style>
 
