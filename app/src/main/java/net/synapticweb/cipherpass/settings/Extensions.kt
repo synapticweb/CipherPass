@@ -270,7 +270,7 @@ fun SettingsFragment.createDialogForAuthChange(preference: Preference, authName:
         })
 
         positiveButton(android.R.string.ok) { dialog ->
-            if(viewModelFrg.shouldShowWarning()) {
+            if(binding.softStorageWarning.isVisible) {
                 if(binding.stopShowingWarning.isChecked)
                     PrefWrapper.getInstance(requireContext()).setPref(DO_NOT_SHOW_WARNING, true)
 

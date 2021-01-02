@@ -77,7 +77,6 @@ class AuthenticateFragment : Fragment() {
         _viewModel.authResult.observe(viewLifecycleOwner, EventObserver {
             when(it) {
                 AUTH_OK -> {
-                    lockState.isInUnlockActivity = false
                     binding.passphrase.text!!.clear()
                     binding.passphraseRetype.text.clear()
                     findNavController().navigate(
@@ -92,6 +91,15 @@ class AuthenticateFragment : Fragment() {
                     getString(R.string.error_setting_pass), Snackbar.LENGTH_SHORT).show()
             }
         })
+
+        //dacă aplicația este trimisă în background în timp ce authfrg este activ și stă mai mult de 30 de
+        //sec, cînd se întoarce lockstate setează flagul unauthorized. Deoarece authfrg nu îl observă flagul
+        //rămîne activ și este consumat de entrieslistfrg, ceea ce face ca activitatea să se întoarcă la
+        //authfrg.
+        //De asemenea, cînd este pornită activitatea sistem de autentificare și se revine la activitate,
+        //dacă între cele 3 evenimente trece intervalul de timeout se setează unathorized; dacă nu e consumat
+        //în authfrg îl consumă entrieslistfrg.
+        lockState.unauthorized.observe(viewLifecycleOwner, EventObserver {})
 
 
         handleBackPressed(lockState)
@@ -159,7 +167,6 @@ class AuthenticateFragment : Fragment() {
         val authIntent =
             keyMan.createConfirmDeviceCredentialIntent(getString(R.string.app_name), getString(R.string.auth_subtitle))
         authIntent?.also { intent ->
-            lockState.isInUnlockActivity = true
             startActivityForResult(intent, LOCK_ACTIVITY_CODE)
         }
             ?: run {

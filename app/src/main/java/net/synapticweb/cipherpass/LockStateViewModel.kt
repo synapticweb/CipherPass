@@ -14,7 +14,6 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
     var lastBackPress : Long = 0L
 
     val unauthorized = MutableLiveData<Event<Boolean>>()
-    var isInUnlockActivity = false
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun onActivityPause() {
@@ -32,10 +31,10 @@ class LockStateViewModel @Inject constructor(private val repository: Repository,
         val prefWrapper = PrefWrapper.getInstance(getApplication())
         val timeout = prefWrapper.getString(BACKGROUND_TIMEOUT_KEY)
         val isNoAuth = prefWrapper.getString(APPLOCK_KEY) == APPLOCK_NOLOCK_VALUE
-        //nu verificăm dacă suntem la pornirea aplicației, dacă ne întoarcem din activitatea unlock,
-        //dacă este dezactivat sau dacă aplicația nu necesită autentificare.
+        //nu verificăm dacă suntem la pornirea aplicației, dacă este dezactivat sau dacă
+        //aplicația nu necesită autentificare.
         timeout?. let {
-            if (sleepTime == 0L || isInUnlockActivity || it == BACKGROUND_TIMEOUT_DISABLED || isNoAuth)
+            if (sleepTime == 0L || it == BACKGROUND_TIMEOUT_DISABLED || isNoAuth)
                 return
             if (System.currentTimeMillis() - sleepTime > it.toLong() * 1000) {
                 lockAndReauth()
