@@ -60,9 +60,10 @@ ext {
     mockitoAndroidVersion = "3.3.3"
     materialVersion = "1.2.1"
     navigationVersion = "2.3.2"
+    preferenceVersion = "1.1.1"
     recyclerViewVersion = '1.0.0'
     roomVersion = "2.2.6"
-    sqlcipherVersion = "4.4.0"
+    sqlcipherVersion = "4.4.2"
     sqliteVersion = "2.1.0"
     workVersion = "2.4.0"
 }
@@ -72,7 +73,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "androidx.core:core-ktx:$androidxcoreVersion"
     implementation "androidx.appcompat:appcompat:$appcompatVersion"
-    implementation 'androidx.preference:preference:1.1.1'
+    implementation "androidx.preference:preference:$preferenceVersion"
     implementation "com.google.android.material:material:$materialVersion"
     implementation "com.afollestad.material-dialogs:core:$afollestadVersion"
     implementation "com.afollestad.material-dialogs:input:$afollestadVersion"
