@@ -157,6 +157,7 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
 
     fun deleteCustomField(id: Long) {
         viewModelScope.launch {
+            newFields.remove(id)
             val field = repository.getCustomField(id)
             repository.deleteCustomField(field)
         }
