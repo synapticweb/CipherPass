@@ -263,6 +263,8 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
             title(R.string.delete_custom_field_title)
             message(R.string.delete_custom_field_message)
             positiveButton {
+                if(customFieldsData.containsKey(itemId))
+                    customFieldsData.remove(itemId)
                 _viewModel.deleteCustomField(itemId)
                 dirty = true
             }

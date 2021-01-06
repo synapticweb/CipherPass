@@ -10,6 +10,8 @@ import javax.inject.Provider
 import kotlin.reflect.KClass
 
 //https://blog.kotlin-academy.com/understanding-dagger-2-multibindings-viewmodel-8418eb372848
+//https://medium.com/monstar-lab-bangladesh-engineering/dagger-for-android-a-beginners-guide-to-multibindings-de3ccba5636c
+//https://android.jlelse.eu/dagger-multibindings-for-android-part-2-4e0c38d85449
 class CPModelFactory @Inject constructor(
     private val creators: @JvmSuppressWildcards Map<Class<out ViewModel>, Provider<ViewModel>>
 ) : ViewModelProvider.Factory {
