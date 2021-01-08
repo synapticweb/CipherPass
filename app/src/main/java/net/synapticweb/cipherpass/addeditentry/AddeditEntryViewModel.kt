@@ -11,15 +11,19 @@ import net.synapticweb.cipherpass.util.Event
 import net.synapticweb.cipherpass.util.wrapEspressoIdlingResource
 import javax.inject.Inject
 
+const val NEW_FIELD = "new_field"
+const val DIRTY_FIELD = "dirty_field"
+
 class AddeditEntryViewModel @Inject constructor(private val repository: Repository,
                                                 application: Application) :
     AndroidViewModel(application) {
 
     val username = MutableLiveData<String?>()
-    val entryId = MutableLiveData<Long>()
-    val customFields : LiveData<List<CustomField>> = entryId.switchMap {
-        repository.getCustomFields(it)
-    }
+
+    private var inMemoryFields = mutableListOf<CustomField>()
+    val customFields = MutableLiveData<MutableList<CustomField>>()
+
+    private val deletedFields = arrayListOf<CustomField>()
 
     val name = MutableLiveData<String>()
     val password = MutableLiveData<String?>()
@@ -30,14 +34,12 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
     val toastMessages = MutableLiveData<Event<Int>>()
     private lateinit var savedEntry : Entry
     val icon = MutableLiveData<Int>(R.drawable.item_key)
-    private val newFields = arrayListOf<Long>()
 
     private fun isEdit() : Boolean {
-        return entryId.value != 0L
+        return ::savedEntry.isInitialized
     }
 
     fun populate(id : Long) {
-        entryId.value = id
         if(id == 0L)
             return
 
@@ -52,6 +54,10 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
                 icon.value = entry.icon
                 savedEntry = entry
             }
+            withContext(Dispatchers.IO) { delay(100)
+                inMemoryFields = repository.getCustomFieldsSync(id).toMutableList()
+            }
+            customFields.value = inMemoryFields
         }
     }
 
@@ -59,8 +65,7 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
                   username : String?,
                   password : String?,
                   url : String?,
-                  comment : String?,
-                  customFieldsData : Map<Long, String>
+                  comment : String?
                   ) {
 
         val entry = if (isEdit()) savedEntry
@@ -75,44 +80,54 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
         entry.modificationDate = System.currentTimeMillis()
         entry.icon = icon.value!!
 
-        viewModelScope.launch {
-            var rowId : Long = 0
-            var entryError = false
-            var customFieldsError = false
+        wrapEspressoIdlingResource {
+            viewModelScope.launch {
+                var newEntryRowId = 0L
 
-            if (isEdit()) {
-                if(repository.updateEntry(entry) == -1)
-                    entryError = true
-            }
-            else {
-                rowId = repository.insertEntry(entry)
-                if(rowId.toInt() == -1)
-                    entryError = true
-            }
-
-            for(customField in customFieldsData) {
-                val field = repository.getCustomField(customField.key)
-
-                field.value = customField.value
-                if(!isEdit())
-                    field.entry = rowId
-                if(repository.updateCustomField(field) != 1) {
-                    customFieldsError = true
-                    break
+                if (isEdit()) {
+                    if (repository.updateEntry(entry) == -1) {
+                        toastMessages.value = Event(R.string.addedit_save_error)
+                        return@launch
+                    }
+                } else {
+                    newEntryRowId = repository.insertEntry(entry)
+                    if (newEntryRowId.toInt() == -1) {
+                        toastMessages.value = Event(R.string.addedit_save_error)
+                        return@launch
+                    }
                 }
-            }
 
-            if(entryError || customFieldsError) {
-                toastMessages.value = Event(R.string.addedit_save_error)
-                return@launch
-            }
+                for (field in inMemoryFields) {
+                    if (field.inMemoryState == NEW_FIELD) {
+                        field.entry = if (isEdit()) entry.id else newEntryRowId
 
-            if(isEdit()) {
-                saveResult.value = Event(EDIT_SUCCESS)
-                toastMessages.value = Event(R.string.addedit_save_ok)
+                        val cfRowId = repository.insertCustomField(field)
+                        if (cfRowId.toInt() == -1) {
+                            toastMessages.value = Event(R.string.addedit_save_error)
+                            return@launch
+                        }
+                    } else if (field.inMemoryState == DIRTY_FIELD) {
+                        val rowsUpdated = repository.updateCustomField(field)
+                        if (rowsUpdated != 1) {
+                            toastMessages.value = Event(R.string.addedit_save_error)
+                            return@launch
+                        }
+                    }
+                }
+
+                for (field in deletedFields) {
+                    if (repository.deleteCustomField(field) != 1) {
+                        toastMessages.value = Event(R.string.addedit_save_error)
+                        return@launch
+                    }
+                }
+
+                if (isEdit()) {
+                    saveResult.value = Event(EDIT_SUCCESS)
+                    toastMessages.value = Event(R.string.addedit_save_ok)
+                } else
+                    saveResult.value = Event(INSERT_SUCCES)
             }
-            else
-                saveResult.value = Event(INSERT_SUCCES)
         }
     }
 
@@ -120,46 +135,41 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
         icon.value = iconRes
     }
 
-    fun createCustomField(fieldName : String, isProtected : Boolean) {
+    fun addCustomField(fieldName : String, isProtected : Boolean) {
         val entry = if(isEdit())
             savedEntry.id
         else NO_ENTRY_CUSTOM_FIELD_ID
+
         val field = CustomField(entry, fieldName, isProtected)
-
-        viewModelScope.launch {
-            val rowId = repository.insertCustomField(field)
-            if(rowId.toInt() == -1)
-                toastMessages.value = Event(R.string.insert_cf_error)
-            else
-                newFields.add(rowId)
-        }
+        field.inMemoryState = NEW_FIELD
+        inMemoryFields.add(field)
+        customFields.value = inMemoryFields
+        //dacă live data nu provine de la db, faptul că în lista atașată se operează modificare nu
+        //produce notificarea observerului. Trebuie să se schimbe lista cu totul:
+        //https://stackoverflow.com/questions/47941537/notify-observer-when-item-is-added-to-list-of-livedata
     }
 
-    fun cleanCustomFields() {
-        wrapEspressoIdlingResource {
-            viewModelScope.launch(Dispatchers.IO) {
-                for (key in newFields) {
-                    val field = repository.getCustomField(key)
-                    repository.deleteCustomField(field)
-                }
-            }
-        }
+    fun editCustomField(position: Int, fieldName: String, isProtected: Boolean) {
+       val field = inMemoryFields[position]
+        field.fieldName = fieldName
+        field.isProtected = isProtected
+        if(field.inMemoryState != NEW_FIELD)
+            field.inMemoryState = DIRTY_FIELD
+        customFields.value = inMemoryFields
     }
 
-    fun editCustomField(id: Long, fieldName: String, isProtected: Boolean) {
-        viewModelScope.launch {
-            val field = repository.getCustomField(id)
-            field.fieldName = fieldName
-            field.isProtected = isProtected
-            repository.updateCustomField(field)
-        }
+    fun deleteCustomField(position: Int) {
+        val field = inMemoryFields[position]
+        if(field.inMemoryState != NEW_FIELD)
+            deletedFields.add(field)
+        inMemoryFields.remove(field)
+        customFields.value = inMemoryFields
     }
 
-    fun deleteCustomField(id: Long) {
-        viewModelScope.launch {
-            newFields.remove(id)
-            val field = repository.getCustomField(id)
-            repository.deleteCustomField(field)
-        }
+    fun saveCustomField(position : Int, value : String) {
+        val field = inMemoryFields[position]
+        field.value = value
+        if(field.inMemoryState != NEW_FIELD)
+            field.inMemoryState = DIRTY_FIELD
     }
 }

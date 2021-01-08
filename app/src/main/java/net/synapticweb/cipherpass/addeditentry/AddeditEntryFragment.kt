@@ -40,7 +40,6 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
     private val args: AddeditEntryFragmentArgs by navArgs()
     private lateinit var binding: AddeditEntryFragmentBinding
     private var dirty : Boolean = false
-    private val customFieldsData = mutableMapOf<Long, String>()
     private lateinit var adapter : CustomFieldsAdapter
 
     override fun onAttach(context: Context) {
@@ -95,7 +94,6 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
        return when(item.itemId) {
             R.id.close -> {
-                _viewModel.cleanCustomFields()
                 findNavController().popBackStack()
                 true
             }
@@ -169,8 +167,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
                 if (binding.username.text!!.isBlank()) null else binding.username.text.toString(),
                 if (binding.pass.text!!.isBlank()) null else binding.pass.text.toString(),
                 if (binding.url.text!!.isBlank()) null else binding.url.text.toString(),
-                if (binding.comment.text!!.isBlank()) null else binding.comment.text.toString(),
-                customFieldsData
+                if (binding.comment.text!!.isBlank()) null else binding.comment.text.toString()
             )
         }
     }
@@ -192,8 +189,6 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
 
     private fun backWhenDirty() {
         fun goUp() {
-            _viewModel.cleanCustomFields()
-            dirty = false
             //Aici am încerat întîi să folosesc navigația clasică cu direcții, etc. Rezultatul era
             //că eram prins într-un ciclu infinit între addedit și detail.
             findNavController().popBackStack()
@@ -236,7 +231,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
                 positiveButton(android.R.string.ok) { dialog ->
                     val text = dialog.findViewById<EditText>(R.id.field_name_input).text.toString()
                     val isProtected = dialog.findViewById<CheckBox>(R.id.protected_field).isChecked
-                    _viewModel.createCustomField(text, isProtected)
+                    _viewModel.addCustomField(text, isProtected)
                     dirty = true
                 }
                 negativeButton(android.R.string.cancel)
@@ -250,29 +245,31 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
         binding.customFields.isNestedScrollingEnabled = false
         _viewModel.customFields.observe(viewLifecycleOwner, Observer {
             adapter.submitList(it)
+            adapter.notifyDataSetChanged()
+            //Se pare că dacă recycler-ul nu e conectat la o bază de date submitList() nu prea are efect.
+            //Deocamdată nu stau să investighez workarounduri. Fallback la notifyDataSetChanged().
+            //https://stackoverflow.com/questions/49726385/listadapter-not-updating-item-in-recyclerview
         })
     }
 
-    override fun saveField(id: Long, value: String) {
-        customFieldsData[id] = value
+    override fun saveField(position : Int, value: String) {
+        _viewModel.saveCustomField(position, value)
         dirty = true
     }
 
-    override fun manageDeletion(itemId : Long) {
+    override fun manageDeletion(position: Int) {
         MaterialDialog(requireContext()).show {
             title(R.string.delete_custom_field_title)
             message(R.string.delete_custom_field_message)
             positiveButton {
-                if(customFieldsData.containsKey(itemId))
-                    customFieldsData.remove(itemId)
-                _viewModel.deleteCustomField(itemId)
+                _viewModel.deleteCustomField(position)
                 dirty = true
             }
             negativeButton {}
         }
     }
 
-    override fun manageEdit(item: CustomField) {
+    override fun manageEdit(position: Int, item : CustomField) {
         MaterialDialog(requireContext()).show {
             title(R.string.edit_custom_field)
             customView(R.layout.add_custom_field_dialog)
@@ -286,7 +283,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
             positiveButton(android.R.string.ok) { dialog ->
                 val fieldName = dialog.findViewById<EditText>(R.id.field_name_input).text.toString()
                 val isProtected = dialog.findViewById<CheckBox>(R.id.protected_field).isChecked
-                _viewModel.editCustomField(item.id, fieldName, isProtected)
+                _viewModel.editCustomField(position, fieldName, isProtected)
                 dirty = true
             }
 

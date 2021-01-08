@@ -208,7 +208,7 @@ open class RepositoryImpl @Inject constructor(
         return database.dao.getCustomFields(entry)
     }
 
-    override fun getCustomFieldsSync(entry: Long): List<CustomField> {
+    override suspend fun getCustomFieldsSync(entry: Long): List<CustomField> {
         return database.dao.getCustomFieldsSync(entry)
     }
 }

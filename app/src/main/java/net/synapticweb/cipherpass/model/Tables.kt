@@ -1,9 +1,6 @@
 package net.synapticweb.cipherpass.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Fts4
-import androidx.room.PrimaryKey
+import androidx.room.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -71,6 +68,9 @@ data class Entry (
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
     var id : Long = 0L
+
+    @Ignore
+    var inMemoryState : String? = null
 }
 
 @Entity(tableName = "hash")

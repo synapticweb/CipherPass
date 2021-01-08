@@ -20,34 +20,33 @@ class CustomFieldsAdapter(private val fragment : CustomFieldsEditFragment) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(item, fragment)
+        holder.bind(item, fragment, position)
     }
 
     class ViewHolder private constructor(val binding : CustomFieldAddeditItemBinding) :
             RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item : CustomField, fragment : CustomFieldsEditFragment) {
+        fun bind(item : CustomField, fragment : CustomFieldsEditFragment, position: Int) {
             binding.item = item
             binding.fieldLayout.hint = item.fieldName
             binding.field.setText(item.value)
 
             binding.field.setOnFocusChangeListener { _, hasFocus ->
-                if(hasFocus)
-                    binding.field.tag = "got-focus"
+                    binding.field.tag = if(hasFocus) "got-focus" else null
             }
 
             binding.field.addTextChangedListener(
                 afterTextChanged = { editable ->
                     if(binding.field.tag == "got-focus")
-                        fragment.saveField(item.id, editable.toString())
+                        fragment.saveField(position, editable.toString())
                 })
 
             binding.deleteField.setOnClickListener {
-                fragment.manageDeletion(item.id)
+                fragment.manageDeletion(position)
             }
 
             binding.editField.setOnClickListener {
-                fragment.manageEdit(item)
+                fragment.manageEdit(position, item)
             }
             binding.executePendingBindings()
         }
@@ -63,9 +62,9 @@ class CustomFieldsAdapter(private val fragment : CustomFieldsEditFragment) :
 }
 
 interface CustomFieldsEditFragment {
-    fun saveField(id : Long, value : String)
-    fun manageDeletion(itemId : Long)
-    fun manageEdit(item : CustomField)
+    fun saveField(position: Int, value : String)
+    fun manageDeletion(position: Int)
+    fun manageEdit(position: Int, item: CustomField)
 }
 
 

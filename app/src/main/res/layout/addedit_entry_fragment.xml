@@ -14,6 +14,7 @@
 <!-- ScrollView distruge funcționalitatea recyclerview-ului
 https://stackoverflow.com/questions/27083091/recyclerview-inside-scrollview-is-not-working -->
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/addedit_scrollview"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

@@ -39,6 +39,6 @@ interface Repository {
 
     fun getCustomFields(entry : Long) : LiveData<List<CustomField>>
 
-    fun getCustomFieldsSync(entry : Long) : List<CustomField>
+    suspend fun getCustomFieldsSync(entry : Long) : List<CustomField>
 
 }
