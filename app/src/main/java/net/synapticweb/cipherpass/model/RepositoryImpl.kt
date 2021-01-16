@@ -122,6 +122,10 @@ open class RepositoryImpl @Inject constructor(
         return database.dao.getAllEntries(SimpleSQLiteQuery(query))
     }
 
+    override suspend fun getAllEntriesSync(): List<Entry> {
+        return database.dao.getAllEntriesSync()
+    }
+
     @VisibleForTesting
     suspend fun insertHash(hash: Hash): Long {
         return database.dao.insertHash(hash)

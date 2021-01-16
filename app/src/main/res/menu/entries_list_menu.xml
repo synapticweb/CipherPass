@@ -8,6 +8,8 @@
         android:title="@string/entries_list_sort"
         android:icon="@drawable/sort"
         />
+    <item android:id="@+id/export_json"
+        android:title="@string/export_menu_title" />
 
     <!--Dacă folosesc showasAction="collapseActionView|ifRoom" la search îmi apare săgeata back.-->
     <item

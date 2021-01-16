@@ -3,16 +3,18 @@ package net.synapticweb.cipherpass.entrieslist
 import android.app.Activity
 import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
-import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
-import javax.inject.Inject
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
@@ -21,6 +23,8 @@ import net.synapticweb.cipherpass.databinding.EntriesListFragmentBinding
 import net.synapticweb.cipherpass.util.EventObserver
 import net.synapticweb.cipherpass.util.PrefWrapper
 import net.synapticweb.cipherpass.util.handleBackPressed
+import javax.inject.Inject
+
 
 class EntriesListFragment : Fragment() {
     @Inject
@@ -31,12 +35,23 @@ class EntriesListFragment : Fragment() {
     private lateinit var binding : EntriesListFragmentBinding
     private lateinit var adapter: EntriesAdapter
     private lateinit var searchPopup : SearchPopup
+    private lateinit var createJsonFileLauncher : ActivityResultLauncher<Intent>
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val parentActivity : Activity = context as Activity
         val app : CipherPassApp = parentActivity.application as CipherPassApp
         app.appComponent.entriesListComponent().create().inject(this)
+
+        createJsonFileLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult())
+        {
+            if(it.resultCode == Activity.RESULT_OK) {
+                it.data?.data?.let { uri ->
+                    _viewModel.exportJson(uri)
+                }
+            }
+        }
     }
 
 
@@ -47,7 +62,7 @@ class EntriesListFragment : Fragment() {
     ): View? {
         binding = EntriesListFragmentBinding.inflate(inflater, container, false)
 
-        _viewModel.entries.observe(viewLifecycleOwner, Observer {
+        _viewModel.entries.observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
 
@@ -62,6 +77,7 @@ class EntriesListFragment : Fragment() {
         setupFab()
         setupNavigation()
         setupSearch()
+        setupExportToast()
         handleBackPressed(lockState)
     }
 
@@ -76,7 +92,7 @@ class EntriesListFragment : Fragment() {
             maxWidth = Integer.MAX_VALUE
 
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextChange(newText : String?): Boolean {
+                override fun onQueryTextChange(newText: String?): Boolean {
                     newText?.apply {
                         _viewModel.search(newText)
                     }
@@ -97,8 +113,9 @@ class EntriesListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId) {
             R.id.show_settings -> {
-                findNavController().navigate(EntriesListFragmentDirections.
-                    actionEntriesListFragmentToSettingsFragment())
+                findNavController().navigate(
+                    EntriesListFragmentDirections.actionEntriesListFragmentToSettingsFragment()
+                )
                 true
             }
             R.id.sort -> {
@@ -107,10 +124,12 @@ class EntriesListFragment : Fragment() {
                     val initialSel = prefs.getString(SORT_ORDER_KEY) ?: SORT_CREATION_DESC
                     val sortOrders = resources.getStringArray(R.array.sort_orders)
 
-                    listItemsSingleChoice(R.array.sort_order_names,
-                        initialSelection = sortOrders.indexOf(initialSel)) {_, index, _ ->
+                    listItemsSingleChoice(
+                        R.array.sort_order_names,
+                        initialSelection = sortOrders.indexOf(initialSel)
+                    ) { _, index, _ ->
                         prefs.setPrefSync(SORT_ORDER_KEY, sortOrders[index])
-                       _viewModel.loadEntries()
+                        _viewModel.loadEntries()
                     }
                 }
                 false
@@ -119,13 +138,25 @@ class EntriesListFragment : Fragment() {
                 lockState.lockAndReauth()
                 false
             }
+            R.id.export_json -> {
+                MaterialDialog(requireContext()).show {
+                    title(R.string.warning_title)
+                    message(R.string.warning_serialize)
+                    negativeButton(android.R.string.cancel) {}
+
+                    positiveButton(android.R.string.ok) {
+                        createJsonFile()
+                    }
+                }
+                false
+            }
             else -> false
         }
     }
 
     private fun setupNavigation() {
         _viewModel.openEntryEvent.observe(viewLifecycleOwner, EventObserver {
-            if(::searchPopup.isInitialized && searchPopup.isShowing)
+            if (::searchPopup.isInitialized && searchPopup.isShowing)
                 searchPopup.dismiss()
 
             findNavController().navigate(
@@ -160,20 +191,36 @@ class EntriesListFragment : Fragment() {
         binding.entriesList.addItemDecoration(
             DividerItemDecoration(
                 context,
-            DividerItemDecoration.VERTICAL)
+                DividerItemDecoration.VERTICAL
+            )
         )
     }
 
     private fun setupSearch() {
         _viewModel.searchResults.observe(viewLifecycleOwner, EventObserver {
-            if(::searchPopup.isInitialized && searchPopup.isShowing)
+            if (::searchPopup.isInitialized && searchPopup.isShowing)
                 searchPopup.dismiss()
 
-            if(it.isNotEmpty()) {
+            if (it.isNotEmpty()) {
                 searchPopup = SearchPopup(requireContext(), _viewModel)
                 searchPopup.setList(it)
                 searchPopup.showAsDropDown(requireActivity().findViewById(R.id.search))
             }
+        })
+    }
+
+    private fun createJsonFile() {
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/json"
+            putExtra(Intent.EXTRA_TITLE, "cipherpass.json")
+        }
+        createJsonFileLauncher.launch(intent)
+    }
+
+    private fun setupExportToast() {
+        _viewModel.exportResult.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(requireContext(), getString(it), Toast.LENGTH_SHORT).show()
         })
     }
 }

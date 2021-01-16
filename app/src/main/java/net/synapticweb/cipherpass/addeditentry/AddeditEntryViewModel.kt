@@ -54,7 +54,7 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
                 icon.value = entry.icon
                 savedEntry = entry
             }
-            withContext(Dispatchers.IO) { delay(100)
+            withContext(Dispatchers.IO) {
                 inMemoryFields = repository.getCustomFieldsSync(id).toMutableList()
             }
             customFields.value = inMemoryFields

@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
+apply plugin: 'kotlinx-serialization'
 
 android {
     compileSdkVersion 30
@@ -63,6 +64,7 @@ ext {
     preferenceVersion = "1.1.1"
     recyclerViewVersion = '1.0.0'
     roomVersion = "2.2.6"
+    serializationVersion = "1.0.1"
     sqlcipherVersion = "4.4.2"
     sqliteVersion = "2.1.0"
     workVersion = "2.4.0"
@@ -79,6 +81,8 @@ dependencies {
     implementation "com.afollestad.material-dialogs:input:$afollestadVersion"
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
     implementation "androidx.work:work-runtime-ktx:$workVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion"
+
 
     //fragment:
     implementation "androidx.fragment:fragment-ktx:$fragmentVersion"

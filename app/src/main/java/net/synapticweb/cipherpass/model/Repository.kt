@@ -25,6 +25,8 @@ interface Repository {
 
     fun getAllEntries(sortOrder: String) : LiveData<List<Entry>>
 
+    suspend fun getAllEntriesSync() : List<Entry>
+
     fun removeDb()
 
     suspend fun queryDb(elements : List<String>) : List<Entry>
@@ -40,5 +42,4 @@ interface Repository {
     fun getCustomFields(entry : Long) : LiveData<List<CustomField>>
 
     suspend fun getCustomFieldsSync(entry : Long) : List<CustomField>
-
 }

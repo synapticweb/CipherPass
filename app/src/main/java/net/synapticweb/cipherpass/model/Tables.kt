@@ -1,15 +1,14 @@
 package net.synapticweb.cipherpass.model
 
 import androidx.room.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Serializable
 @Entity(tableName = "entries")
 data class Entry (
-    @ColumnInfo(name = "id")
-    @PrimaryKey(autoGenerate = true)
-    var id : Long = 0L,
-
     @ColumnInfo(name = "entry_name")
     var entryName : String = "",
 
@@ -17,7 +16,7 @@ data class Entry (
     var username : String? = null,
 
     @ColumnInfo(name = "password")
-    var password : String? = "",
+    var password : String? = null,
 
     @ColumnInfo(name = "url")
     var url : String? = null,
@@ -34,6 +33,11 @@ data class Entry (
     @ColumnInfo(name = "icon_res")
     var icon : Int = 0
 ) {
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = true)
+    @Transient
+    var id : Long = 0L
+
     val hrInsertionDate : String
         get() {
             return hrDate(insertionDate)
@@ -44,6 +48,9 @@ data class Entry (
             return hrDate(modificationDate)
         }
 
+    @Ignore
+    var customFields : List<CustomField>? = null
+
     private fun hrDate(timestamp : Long) : String {
         val date = Date(timestamp)
         val format  = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
@@ -51,10 +58,12 @@ data class Entry (
     }
 }
 
+@Serializable
 @Entity(tableName = "custom_fields")
  data class CustomField (
+    @Transient
     @ColumnInfo(name = "entry")
-    var entry : Long,
+    var entry : Long = 0L,
 
     @ColumnInfo(name = "field_name")
     var fieldName : String,
@@ -67,6 +76,7 @@ data class Entry (
 ) {
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
+    @Transient
     var id : Long = 0L
 
     @Ignore

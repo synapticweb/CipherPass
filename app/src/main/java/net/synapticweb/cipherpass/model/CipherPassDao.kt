@@ -21,6 +21,9 @@ interface CipherPassDao {
     @RawQuery(observedEntities = [Entry::class])
     fun getAllEntries(query : SupportSQLiteQuery) : LiveData<List<Entry>>
 
+    @Query("SELECT * FROM `entries`")
+    suspend fun getAllEntriesSync() : List<Entry>
+
     @Insert
     suspend fun insertCustomField(field : CustomField) : Long
 
@@ -37,7 +40,7 @@ interface CipherPassDao {
     fun getCustomFields(key : Long) : LiveData<List<CustomField>>
 
     @Query("SELECT * FROM `custom_fields` WHERE `entry`= :key")
-    fun getCustomFieldsSync(key : Long) : List<CustomField>
+    suspend fun getCustomFieldsSync(key : Long) : List<CustomField>
 
     @Insert
     suspend fun insertHash(hash : Hash) : Long

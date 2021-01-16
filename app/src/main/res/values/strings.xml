@@ -113,4 +113,8 @@
     <string name="set_icon_fragment_title">Set entry icon</string>
     <string name="warning_title">Warning</string>
     <string name="stop_showing">Do not show again</string>
+    <string name="warning_serialize">The entries will be exported in unencrypted format on a public accesible location on the device storage. It is your responsibility to protect the entries data. Proceed to export?</string>
+    <string name="serialize_error">An error occurred while exporting the entries.</string>
+    <string name="serialize_success">Entries were successfully exported.</string>
+    <string name="export_menu_title">Export entries</string>
 </resources>
