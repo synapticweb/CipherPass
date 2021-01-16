@@ -8,6 +8,7 @@ import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import junit.framework.Assert.assertNull
+import kotlinx.coroutines.delay
 import net.synapticweb.cipherpass.*
 import net.synapticweb.cipherpass.util.CipherPassTestRule
 import net.synapticweb.cipherpass.util.PrefWrapper
@@ -151,6 +152,7 @@ class ChangeAuthenticationTest {
     @Test
     fun softBack_checkNoMoreWarnings_warningNotDisplayedAgain() {
         prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.removePref(ENCRYPTED_PASS_KEY)
         prefWrapper.removePref(DO_NOT_SHOW_WARNING)
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)

@@ -36,8 +36,7 @@ class AuthenticateFragmentTest {
         onView(withId(R.id.passphrase_retype)).perform(typeText("test2"), closeSoftKeyboard())
         onView(withId(R.id.send_pass)).perform(click())
 
-        onView(withId(R.id.pass_layout)).check(
-            matches(hasTextInputLayoutErrorText(testRule.application.getString(R.string.pass_no_match))))
+        onView(withText(R.string.pass_no_match)).inRoot(isToast()).check(matches(isDisplayed()))
 
         assertThat(testRule.repository.isUnlocked(), `is`(false))
     }
@@ -52,8 +51,7 @@ class AuthenticateFragmentTest {
 
         onView(withId(R.id.send_pass)).perform(click())
 
-        onView(withId(R.id.pass_layout)).check(
-            matches(hasTextInputLayoutErrorText(testRule.application.getString(R.string.pass_empty))))
+        onView(withText(R.string.pass_empty)).inRoot(isToast()).check(matches(isDisplayed()))
     }
 
 
@@ -102,8 +100,7 @@ class AuthenticateFragmentTest {
         onView(withId(R.id.passphrase)).perform(typeText("test1"), closeSoftKeyboard())
         onView(withId(R.id.send_pass)).perform(click())
 
-        onView(withId(R.id.pass_layout)).check(
-            matches(hasTextInputLayoutErrorText(testRule.application.getString(R.string.pass_incorect))))
+        onView(withText(R.string.pass_incorect)).inRoot(isToast()).check(matches(isDisplayed()))
 
         assertThat(testRule.repository.isUnlocked(), `is`(false))
     }
@@ -118,8 +115,7 @@ class AuthenticateFragmentTest {
 
         onView(withId(R.id.send_pass)).perform(click())
 
-        onView(withId(R.id.pass_layout)).check(
-            matches(hasTextInputLayoutErrorText(testRule.application.getString(R.string.pass_empty))))
+        onView(withText(R.string.pass_empty)).inRoot(isToast()).check(matches(isDisplayed()))
 
         assertThat(testRule.repository.isUnlocked(), `is`(false))
     }

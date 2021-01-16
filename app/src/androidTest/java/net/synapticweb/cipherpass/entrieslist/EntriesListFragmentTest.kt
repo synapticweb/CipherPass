@@ -7,6 +7,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.cipherpass.R
 import net.synapticweb.cipherpass.SORT_ORDER_KEY
@@ -36,7 +37,7 @@ class EntriesListFragmentTest {
         item.entryName = "b_second_entry"
         testRule.repository.insertEntry(item)
 
-        item.insertionDate = System.currentTimeMillis() + 1000
+        item.insertionDate = System.currentTimeMillis() + 10000
         item.entryName = "c_third_entry"
         testRule.repository.insertEntry(item)
 
@@ -85,7 +86,7 @@ class EntriesListFragmentTest {
     }
 
     @Test
-    fun test_by_modifDate() : Unit = runBlocking {
+    fun sort_by_modifDate() : Unit = runBlocking {
         testRule.setDb()
         testRule.prefWrapper.removePref(SORT_ORDER_KEY)
 
@@ -99,8 +100,8 @@ class EntriesListFragmentTest {
         item.modificationDate = System.currentTimeMillis() + 100000
         testRule.repository.insertEntry(item)
 
-        item.insertionDate = System.currentTimeMillis() + 1000
-        item.modificationDate = System.currentTimeMillis() + 1000
+        item.insertionDate = System.currentTimeMillis() + 10000
+        item.modificationDate = System.currentTimeMillis() + 10000
         item.entryName = "c_third_entry"
         testRule.repository.insertEntry(item)
 
@@ -113,9 +114,11 @@ class EntriesListFragmentTest {
         }
         onView(withText(context.getString(R.string.sort_modif_asc))).perform(click())
 
-        onView(withId(R.id.entries_list)).check(matches(hasItemAtPosition(0, hasDescendant(withText("b_second_entry")))))
+        onView(withId(R.id.entries_list)).check(matches(hasItemAtPosition(0, hasDescendant(withText("a_first_entry")))))
         onView(withId(R.id.entries_list)).check(matches(hasItemAtPosition(1, hasDescendant(withText("c_third_entry")))))
-        onView(withId(R.id.entries_list)).check(matches(hasItemAtPosition(2, hasDescendant(withText("a_first_entry")))))
+        onView(withId(R.id.entries_list)).check(matches(hasItemAtPosition(2, hasDescendant(withText("b_second_entry")))))
+
+
 
         return@runBlocking
     }

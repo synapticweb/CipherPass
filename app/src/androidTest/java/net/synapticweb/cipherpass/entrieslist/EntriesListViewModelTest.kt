@@ -56,7 +56,7 @@ class EntriesListViewModelTest {
         val result = viewModel.searchResults.getOrAwaitValue().getContentIfNotHandled()
         if (result != null) {
             assertThat(result.size, `is`(1))
-            assertThat(result[0].entryName, `is`("first item"))
+            assertThat(result[0].entryName, `is`("first entry"))
         }
     }
 
@@ -66,7 +66,7 @@ class EntriesListViewModelTest {
         val result = viewModel.searchResults.getOrAwaitValue().getContentIfNotHandled()
         if (result != null) {
             assertThat(result.size, `is`(2))
-            assertThat(result[0].entryName, `is`("first item"))
+            assertThat(result[0].entryName, `is`("first entry"))
             assertThat(result[1].entryName, `is`("third item"))
         }
     }
@@ -86,7 +86,7 @@ class EntriesListViewModelTest {
         val result = viewModel.searchResults.getOrAwaitValue().getContentIfNotHandled()
         if (result != null) {
             assertThat(result.size, `is`(2))
-            assertThat(result[0].entryName, `is`("first item"))
+            assertThat(result[0].entryName, `is`("first entry"))
             assertThat(result[1].entryName, `is`("second item"))
         }
     }
@@ -97,7 +97,7 @@ class EntriesListViewModelTest {
         val result = viewModel.searchResults.getOrAwaitValue().getContentIfNotHandled()
         if (result != null) {
             assertThat(result.size, `is`(2))
-            assertThat(result[0].entryName, `is`("first item"))
+            assertThat(result[0].entryName, `is`("first entry"))
             assertThat(result[1].entryName, `is`("second item"))
         }
     }

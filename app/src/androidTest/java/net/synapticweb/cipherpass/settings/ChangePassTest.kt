@@ -27,7 +27,7 @@ class ChangePassTest {
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText("Change password")).perform(click())
+        onView(withText(R.string.change_pass)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
         onView(withText("OK")).perform(click())
 
@@ -42,7 +42,7 @@ class ChangePassTest {
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText("Change password")).perform(click())
+        onView(withText(R.string.change_pass)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
 
         onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
@@ -62,7 +62,7 @@ class ChangePassTest {
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText("Change password")).perform(click())
+        onView(withText(R.string.change_pass)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText("incorect"), closeSoftKeyboard())
 
         onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
@@ -84,7 +84,7 @@ class ChangePassTest {
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText("Change password")).perform(click())
+        onView(withText(R.string.change_pass)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
 
         onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
@@ -114,7 +114,7 @@ class ChangePassTest {
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText("Change password")).perform(click())
+        onView(withText(R.string.change_pass)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
 
         onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
@@ -137,7 +137,7 @@ class ChangePassTest {
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText("Change password")).perform(click())
+        onView(withText(R.string.change_pass)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
 
         onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
@@ -164,7 +164,7 @@ class ChangePassTest {
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText("Change password")).perform(click())
+        onView(withText(R.string.change_pass)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
 
         onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
