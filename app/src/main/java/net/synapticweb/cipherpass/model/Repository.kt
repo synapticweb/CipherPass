@@ -42,4 +42,6 @@ interface Repository {
     fun getCustomFields(entry : Long) : LiveData<List<CustomField>>
 
     suspend fun getCustomFieldsSync(entry : Long) : List<CustomField>
+
+    suspend fun dbContainsEntries() : Boolean
 }

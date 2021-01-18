@@ -33,11 +33,8 @@ class CustomFieldsAdapter(private val viewModel: EntryDetailViewModel,
             binding.item = item
 
             binding.caption.text = item.fieldName
-            binding.value.setText(if(item.value.isBlank())
-                fragment.requireContext().resources.getString(R.string.value_not_set)
-            else
-                item.value
-            )
+            binding.value.setText(item.value ?:
+               fragment.requireContext().resources.getString(R.string.value_not_set))
         }
 
         companion object {

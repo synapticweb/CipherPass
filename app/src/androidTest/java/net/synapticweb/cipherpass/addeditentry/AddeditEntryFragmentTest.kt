@@ -109,8 +109,7 @@ class AddeditEntryFragmentTest {
     fun editOldEntry_retainChanges() = runBlocking {
         testRule.setDb()
 
-        val item = Entry()
-        item.entryName = "account_name"
+        val item = Entry(entryName = "account_name")
         item.username = "username"
         item.password = "password"
         item.url = "url"
@@ -200,8 +199,7 @@ class AddeditEntryFragmentTest {
     @Test
     fun editEntry_addField_save_retain() : Unit = runBlocking {
         testRule.setDb()
-        val item = Entry()
-        item.entryName = "account_name"
+        val item = Entry(entryName = "account_name")
         testRule.repository.insertEntry(item)
 
         val bundle = AddeditEntryFragmentArgs(1, "account_name").toBundle()
@@ -234,8 +232,7 @@ class AddeditEntryFragmentTest {
     @Test
     fun editEntry_deleteField_save_retain() : Unit = runBlocking {
         testRule.setDb()
-        val item = Entry()
-        item.entryName = "account_name"
+        val item = Entry(entryName = "account_name")
         testRule.repository.insertEntry(item)
 
         val cf = CustomField(1, "custom_field", false, "field_value")
@@ -270,8 +267,7 @@ class AddeditEntryFragmentTest {
     @Test
     fun editEntry_editFieldMetas_save_retain() : Unit = runBlocking {
         testRule.setDb()
-        val item = Entry()
-        item.entryName = "account_name"
+        val item = Entry(entryName = "account_name")
         testRule.repository.insertEntry(item)
 
         val cf = CustomField(1, "custom_field", false, "field_value")
@@ -309,8 +305,7 @@ class AddeditEntryFragmentTest {
     @Test
     fun editEntry_editFieldValue_saveDb() = runBlocking {
         testRule.setDb()
-        val entry = Entry()
-        entry.entryName = "account_name"
+        val entry = Entry(entryName = "account_name")
         testRule.repository.insertEntry(entry)
 
         var customField = CustomField(1, "field_name", false, "field_value")

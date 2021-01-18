@@ -24,6 +24,9 @@ interface CipherPassDao {
     @Query("SELECT * FROM `entries`")
     suspend fun getAllEntriesSync() : List<Entry>
 
+    @Query("SELECT COUNT(*) FROM `entries`")
+    suspend fun entriesCount() : Int
+
     @Insert
     suspend fun insertCustomField(field : CustomField) : Long
 

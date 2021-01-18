@@ -10,7 +10,7 @@ import java.util.*
 @Entity(tableName = "entries")
 data class Entry (
     @ColumnInfo(name = "entry_name")
-    var entryName : String = "",
+    var entryName : String,
 
     @ColumnInfo(name = "username")
     var username : String? = null,
@@ -72,7 +72,7 @@ data class Entry (
     var isProtected : Boolean = false,
 
     @ColumnInfo(name = "value")
-    var value : String = ""
+    var value : String? = null
 ) {
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)

@@ -3,22 +3,31 @@ package net.synapticweb.cipherpass.entrieslist
 import android.app.Application
 import android.net.Uri
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.synapticweb.cipherpass.*
-import net.synapticweb.cipherpass.model.Repository
 import net.synapticweb.cipherpass.model.Entry
+import net.synapticweb.cipherpass.model.Repository
 import net.synapticweb.cipherpass.util.Event
 import net.synapticweb.cipherpass.util.PrefWrapper
+import java.io.BufferedReader
 import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStreamReader
 import javax.inject.Inject
 
 
-class EntriesListViewModel @Inject constructor(private val repository: Repository, application: Application) :
+class EntriesListViewModel @Inject constructor(
+    private val repository: Repository,
+    application: Application
+) :
     AndroidViewModel(application) {
 
     private val _refresh = MutableLiveData(false)
@@ -37,18 +46,26 @@ class EntriesListViewModel @Inject constructor(private val repository: Repositor
     private val _searchResults = MutableLiveData<Event<List<Entry>>>()
     val searchResults : MutableLiveData<Event<List<Entry>>> = _searchResults
 
-    private val _exportResult = MutableLiveData<Event<Int>>()
-    val exportResult : LiveData<Event<Int>> = _exportResult
+    private val _serializeResults = MutableLiveData<Event<Int>>()
+    val serializeResults : LiveData<Event<Int>> = _serializeResults
+
+    private val _hasEntries = MutableLiveData<Event<Boolean>>()
+    val hasEntries : LiveData<Event<Boolean>> = _hasEntries
+
+    private val _finishedImport = MutableLiveData<Event<Boolean>>()
+    val finishedImport : LiveData<Event<Boolean>> = _finishedImport
+
+    lateinit var jsonData : List<Entry>
 
     init {
         loadEntries()
     }
 
-    fun openEntry(entryId : Long) {
+    fun openEntry(entryId: Long) {
         _openEntryEvent.value = Event(entryId)
     }
 
-    fun search(query : String) {
+    fun search(query: String) {
         if(query.length < 3) {
             _searchResults.value = Event(arrayListOf())
             return
@@ -74,7 +91,7 @@ class EntriesListViewModel @Inject constructor(private val repository: Repositor
         _refresh.value = true
     }
 
-    fun exportJson(fileUri : Uri) {
+    fun exportJson(fileUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             val entries = repository.getAllEntriesSync()
             for(entry in entries)
@@ -88,17 +105,82 @@ class EntriesListViewModel @Inject constructor(private val repository: Repositor
                     }
                 }
             }
-            catch (e : Exception) {
+            catch (e: Exception) {
                 Log.e(APP_TAG, e.message.toString())
                 withContext(Dispatchers.Main) {
-                    _exportResult.value = Event(R.string.serialize_error)
+                    _serializeResults.value = Event(R.string.export_error)
                 }
                 return@launch
             }
 
             withContext(Dispatchers.Main) {
-                _exportResult.value = Event(R.string.serialize_success)
+                _serializeResults.value = Event(R.string.export_success)
             }
+        }
+    }
+
+    fun readJsonData(fileUri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val contentResolver = getApplication<CipherPassApp>().contentResolver
+                val stringBuilder = StringBuilder()
+
+                contentResolver.openInputStream(fileUri)?.use { inputStream ->
+                    BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                        val buffer = CharArray(1024)
+                        var charsRead: Int
+                        while (reader.read(buffer, 0, buffer.size).also { charsRead = it } > 0) {
+                            stringBuilder.append(buffer, 0, charsRead)
+                        }
+                    }
+                }
+
+                jsonData = Json.decodeFromString(stringBuilder.toString())
+
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    _serializeResults.value = Event(R.string.import_error)
+                }
+                return@launch
+            }
+
+            if(repository.dbContainsEntries())
+                withContext(Dispatchers.Main) {
+                    _hasEntries.value = Event(true)
+                }
+            else
+                importEntries(false)
+        }
+    }
+
+    fun importEntries(replace : Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if(replace)
+                emptyDb()
+
+            for(entry in jsonData) {
+               val entryId = repository.insertEntry(entry)
+                entry.customFields?.let {
+                    for(field in it) {
+                        field.entry = entryId
+                        repository.insertCustomField(field)
+                    }
+                }
+            }
+            withContext(Dispatchers.Main) {
+                _finishedImport.value = Event(true)
+            }
+        }
+    }
+
+    @VisibleForTesting
+    suspend fun emptyDb() {
+        val entries = repository.getAllEntriesSync()
+        for (entry in entries) {
+            val fields = repository.getCustomFieldsSync(entry.id)
+            for (field in fields)
+                repository.deleteCustomField(field)
+            repository.deleteEntry(entry)
         }
     }
 }

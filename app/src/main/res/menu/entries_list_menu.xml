@@ -11,6 +11,9 @@
     <item android:id="@+id/export_json"
         android:title="@string/export_menu_title" />
 
+    <item android:id="@+id/import_json"
+        android:title="@string/import_menu_title" />
+
     <!--Dacă folosesc showasAction="collapseActionView|ifRoom" la search îmi apare săgeata back.-->
     <item
         android:id="@+id/search"

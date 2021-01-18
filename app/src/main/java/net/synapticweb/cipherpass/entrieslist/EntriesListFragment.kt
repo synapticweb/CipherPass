@@ -36,6 +36,7 @@ class EntriesListFragment : Fragment() {
     private lateinit var adapter: EntriesAdapter
     private lateinit var searchPopup : SearchPopup
     private lateinit var createJsonFileLauncher : ActivityResultLauncher<Intent>
+    private lateinit var openJsonFileLauncher: ActivityResultLauncher<Intent>
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -49,6 +50,16 @@ class EntriesListFragment : Fragment() {
             if(it.resultCode == Activity.RESULT_OK) {
                 it.data?.data?.let { uri ->
                     _viewModel.exportJson(uri)
+                }
+            }
+        }
+
+        openJsonFileLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            if(it.resultCode == Activity.RESULT_OK) {
+                it.data?.data?.let { uri ->
+                    _viewModel.readJsonData(uri)
                 }
             }
         }
@@ -77,7 +88,7 @@ class EntriesListFragment : Fragment() {
         setupFab()
         setupNavigation()
         setupSearch()
-        setupExportToast()
+        setupSerialize()
         handleBackPressed(lockState)
     }
 
@@ -150,6 +161,10 @@ class EntriesListFragment : Fragment() {
                 }
                 false
             }
+            R.id.import_json -> {
+                chooseJsonFile()
+                false
+            }
             else -> false
         }
     }
@@ -218,9 +233,34 @@ class EntriesListFragment : Fragment() {
         createJsonFileLauncher.launch(intent)
     }
 
-    private fun setupExportToast() {
-        _viewModel.exportResult.observe(viewLifecycleOwner, EventObserver {
+    private fun chooseJsonFile() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+        }
+        openJsonFileLauncher.launch(intent)
+    }
+
+    private fun setupSerialize() {
+        _viewModel.serializeResults.observe(viewLifecycleOwner, EventObserver {
             Toast.makeText(requireContext(), getString(it), Toast.LENGTH_SHORT).show()
+        })
+
+        _viewModel.finishedImport.observe(viewLifecycleOwner, EventObserver {
+            Toast.makeText(requireContext(), getString(R.string.import_success), Toast.LENGTH_SHORT).show()
+        })
+
+        _viewModel.hasEntries.observe(viewLifecycleOwner, EventObserver {
+            MaterialDialog(requireContext()).show {
+                title(R.string.warning_title)
+                message(R.string.replace_entries_title)
+                positiveButton(R.string.yes) {
+                    _viewModel.importEntries(true)
+                }
+                negativeButton(R.string.no) {
+                    _viewModel.importEntries(false)
+                }
+            }
         })
     }
 }

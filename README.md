@@ -10,3 +10,4 @@ The application has currently the following main features:
 - The user may add any number of custom defined fields to an entry.
 - Clipboard timeout: after a configurable amount of time, the items copied to clipboard are automatically deleted.
 - Background timeout: after a configurable amount of time spent by the app in the background, the user will be asked to authenticate again.
+- The entries can be exported to a file and can be imported from a file. (This feature is useful for backup or for moving to another device.)

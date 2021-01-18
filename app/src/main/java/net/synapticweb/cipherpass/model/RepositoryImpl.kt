@@ -215,4 +215,8 @@ open class RepositoryImpl @Inject constructor(
     override suspend fun getCustomFieldsSync(entry: Long): List<CustomField> {
         return database.dao.getCustomFieldsSync(entry)
     }
+
+    override suspend fun dbContainsEntries() : Boolean {
+        return database.dao.entriesCount() > 0
+    }
 }

@@ -114,7 +114,13 @@
     <string name="warning_title">Warning</string>
     <string name="stop_showing">Do not show again</string>
     <string name="warning_serialize">The entries will be exported in unencrypted format on a public accesible location on the device storage. It is your responsibility to protect the entries data. Proceed to export?</string>
-    <string name="serialize_error">An error occurred while exporting the entries.</string>
-    <string name="serialize_success">Entries were successfully exported.</string>
+    <string name="export_error">An error occurred while exporting the entries.</string>
+    <string name="export_success">Entries were successfully exported.</string>
     <string name="export_menu_title">Export entries</string>
+    <string name="import_menu_title">Import entries</string>
+    <string name="import_error">An error occurred while importing entries.</string>
+    <string name="replace_entries_title">Replace existing entries? (they cannot be recovered)</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="import_success">Entries were successfully imported.</string>
 </resources>

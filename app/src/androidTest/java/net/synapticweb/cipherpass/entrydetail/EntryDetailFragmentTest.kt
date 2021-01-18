@@ -30,8 +30,7 @@ class EntryDetailFragmentTest {
     fun deleteEntry_wipedFromDb() = runBlocking {
         testRule.setDb()
 
-        val item = Entry()
-        item.entryName = "account_name"
+        val item = Entry(entryName = "account_name")
         item.password = "password"
         testRule.repository.insertEntry(item)
 
@@ -59,8 +58,7 @@ class EntryDetailFragmentTest {
     @Test
     fun addCustomField_showInDetail() : Unit =  runBlocking {
         testRule.setDb()
-        val entry = Entry()
-        entry.entryName = "account_name"
+        val entry = Entry(entryName = "account_name")
         entry.username = "username"
         testRule.repository.insertEntry(entry)
 

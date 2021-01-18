@@ -28,8 +28,7 @@ class EntriesListFragmentTest {
         testRule.setDb()
         testRule.prefWrapper.removePref(SORT_ORDER_KEY)
 
-        val item = Entry()
-        item.entryName = "a_first_entry"
+        val item = Entry(entryName = "a_first_entry")
         item.password = "password"
         testRule.repository.insertEntry(item)
 
@@ -56,8 +55,7 @@ class EntriesListFragmentTest {
         testRule.setDb()
         testRule.prefWrapper.removePref(SORT_ORDER_KEY)
 
-        val item = Entry()
-        item.entryName = "a_first_entry"
+        val item = Entry(entryName = "a_first_entry")
         item.password = "password"
         testRule.repository.insertEntry(item)
 
@@ -90,8 +88,7 @@ class EntriesListFragmentTest {
         testRule.setDb()
         testRule.prefWrapper.removePref(SORT_ORDER_KEY)
 
-        val item = Entry()
-        item.entryName = "a_first_entry"
+        val item = Entry(entryName = "a_first_entry")
         item.password = "password"
         testRule.repository.insertEntry(item)
 

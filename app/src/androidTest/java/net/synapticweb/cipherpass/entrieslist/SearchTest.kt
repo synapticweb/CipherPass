@@ -14,7 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 
-class EntriesListViewModelTest {
+class SearchTest {
     @get:Rule
     val testRule = CipherPassTestRule()
     //fără asta la instanțierea viewModelului îmi dă că nu poate să seteze _entries.value de pe un thread
@@ -29,8 +29,7 @@ class EntriesListViewModelTest {
         val app = ApplicationProvider.getApplicationContext<TestCipherPassApp>()
         viewModel = EntriesListViewModel(testRule.repository, app)
         runBlocking {
-            val item = Entry()
-            item.entryName = "first entry"
+            val item = Entry(entryName = "first entry")
             item.username = "first username"
             item.url = "http://www.example.net"
             item.comment = "Comentariu"

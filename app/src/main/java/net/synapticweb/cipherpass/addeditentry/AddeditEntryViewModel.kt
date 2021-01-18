@@ -70,7 +70,7 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
 
         val entry = if (isEdit()) savedEntry
         else
-            Entry()
+            Entry(entryName = name)
 
         entry.entryName = name
         entry.username = username
