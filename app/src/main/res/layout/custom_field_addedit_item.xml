@@ -21,7 +21,6 @@
             android:layout_weight="8"
             android:id="@+id/field_layout"
             android:layout_height="wrap_content"
-            app:endIconMode="@{item.isProtected ? TextInputLayout.END_ICON_PASSWORD_TOGGLE : TextInputLayout.END_ICON_NONE}"
             >
 
             <com.google.android.material.textfield.TextInputEditText

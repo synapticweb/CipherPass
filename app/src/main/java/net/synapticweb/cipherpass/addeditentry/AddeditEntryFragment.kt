@@ -144,7 +144,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
                 return@setOnClickListener
             }
 
-            if (binding.name.text!!.isEmpty()) {
+            if (binding.name.text!!.isBlank()) {
                 Toast.makeText(
                     requireContext(),
                     getString(R.string.addedit_name_empty),

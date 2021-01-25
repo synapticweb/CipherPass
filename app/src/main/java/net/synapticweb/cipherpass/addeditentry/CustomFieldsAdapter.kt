@@ -6,6 +6,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.TextInputLayout
 import net.synapticweb.cipherpass.model.CustomField
 import net.synapticweb.cipherpass.addeditentry.CustomFieldsAdapter.ViewHolder
 import net.synapticweb.cipherpass.databinding.CustomFieldAddeditItemBinding
@@ -30,6 +31,9 @@ class CustomFieldsAdapter(private val fragment : CustomFieldsEditFragment) :
             binding.item = item
             binding.fieldLayout.hint = item.fieldName
             binding.field.setText(item.value)
+            binding.fieldLayout.endIconMode = if(item.isProtected)
+                TextInputLayout.END_ICON_PASSWORD_TOGGLE
+                    else TextInputLayout.END_ICON_NONE
 
             binding.field.setOnFocusChangeListener { _, hasFocus ->
                     binding.field.tag = if(hasFocus) "got-focus" else null

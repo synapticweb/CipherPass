@@ -168,7 +168,7 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
 
     fun saveCustomField(position : Int, value : String) {
         val field = inMemoryFields[position]
-        field.value = value
+        field.value = if(value.isBlank()) null else value
         if(field.inMemoryState != NEW_FIELD)
             field.inMemoryState = DIRTY_FIELD
     }

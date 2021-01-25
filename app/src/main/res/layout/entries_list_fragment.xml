@@ -2,10 +2,23 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+        <import type="android.view.View" />
+    </data>
+
 <FrameLayout
     android:id="@+id/entries_list_root"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/no_entries_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/no_entries"
+        android:layout_marginTop="15dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
@@ -13,6 +26,7 @@
         android:id="@+id/entries_list"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         />
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_entry"

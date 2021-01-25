@@ -74,6 +74,8 @@ class EntriesListFragment : Fragment() {
         binding = EntriesListFragmentBinding.inflate(inflater, container, false)
 
         _viewModel.entries.observe(viewLifecycleOwner, {
+            binding.noEntriesText.visibility = if(it.isEmpty())
+                View.VISIBLE else View.GONE
             adapter.submitList(it)
         })
 
@@ -218,8 +220,14 @@ class EntriesListFragment : Fragment() {
 
             if (it.isNotEmpty()) {
                 searchPopup = SearchPopup(requireContext(), _viewModel)
-                searchPopup.setList(it)
-                searchPopup.showAsDropDown(requireActivity().findViewById(R.id.search))
+                searchPopup.apply {
+                    setList(it)
+                    //în lollipop nu apare fereastra. https://stackoverflow.com/a/50533895/6192350
+                    contentView.measure(resources.displayMetrics.widthPixels,
+                        resources.displayMetrics.heightPixels)
+                    height = contentView.measuredHeight
+                    showAsDropDown(requireActivity().findViewById(R.id.search))
+                }
             }
         })
     }

@@ -1,13 +1,14 @@
 package net.synapticweb.cipherpass.entrieslist
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.net.Uri
+import android.provider.OpenableColumns
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -19,10 +20,10 @@ import net.synapticweb.cipherpass.util.Event
 import net.synapticweb.cipherpass.util.PrefWrapper
 import java.io.BufferedReader
 import java.io.FileOutputStream
-import java.io.IOException
 import java.io.InputStreamReader
 import javax.inject.Inject
 
+const val MAX_FILE_LENGTH = 10*1000*1024
 
 class EntriesListViewModel @Inject constructor(
     private val repository: Repository,
@@ -70,8 +71,9 @@ class EntriesListViewModel @Inject constructor(
             _searchResults.value = Event(arrayListOf())
             return
         }
-        //unul sau mai multe spații sau 0 sau mai multe caractere nonalfanumerice urmate
-        //de 1 sau mai multe spații: dacă scrie term1, term2 să nu caute după term1, .
+        //Separatorul este format din unul sau mai multe spații sau 0 sau mai multe caractere
+        //nonalfanumerice urmate de 1 sau mai multe spații: dacă scrie term1, term2
+        //să nu caute după "term1,".
         val elems = query.split("[^a-zA-Z0-9]*\\s+".toRegex())
         val finalElems = mutableListOf<String>()
         for(elem in elems)
@@ -119,23 +121,39 @@ class EntriesListViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("Recycle")
     fun readJsonData(fileUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val contentResolver = getApplication<CipherPassApp>().contentResolver
-                val stringBuilder = StringBuilder()
+                val sb = StringBuilder()
+
+               contentResolver.query(fileUri, arrayOf(OpenableColumns.SIZE),
+                   null, null, null)?.let {
+                   if(it.moveToNext()) {
+                       val size = it.getString(it.getColumnIndex(OpenableColumns.SIZE)).toLong()
+                       if (size > MAX_FILE_LENGTH) {
+                           withContext(Dispatchers.Main) {
+                               _serializeResults.value = Event(R.string.import_error)
+                           }
+                           it.close()
+                           return@launch
+                       }
+                   }
+                   it.close()
+               }
 
                 contentResolver.openInputStream(fileUri)?.use { inputStream ->
                     BufferedReader(InputStreamReader(inputStream)).use { reader ->
                         val buffer = CharArray(1024)
                         var charsRead: Int
                         while (reader.read(buffer, 0, buffer.size).also { charsRead = it } > 0) {
-                            stringBuilder.append(buffer, 0, charsRead)
+                            sb.append(buffer, 0, charsRead)
                         }
                     }
                 }
 
-                jsonData = Json.decodeFromString(stringBuilder.toString())
+                jsonData = Json.decodeFromString(sb.toString())
 
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
