@@ -60,7 +60,7 @@ Soluția a fost 2way data binding.-->
                         android:layout_width="0dp"
                         android:layout_weight="1.5"
                         android:layout_height="wrap_content"
-                        app:imageResource="@{viewModel.icon}" /> <!--https://stackoverflow.com/a/58747016/6192350 -->
+                        app:imageResource="@{viewModel.iconRes}" /> <!--https://stackoverflow.com/a/58747016/6192350 -->
 
                 </LinearLayout>
 

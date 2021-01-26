@@ -42,19 +42,20 @@
         <item>SORT_MODIF_DESC</item>
     </string-array>
 
-    <integer-array name="icons">
-        <item>@drawable/item_key</item>
-        <item>@drawable/item_account</item>
-        <item>@drawable/item_balance</item>
-        <item>@drawable/item_man</item>
-        <item>@drawable/item_money</item>
-        <item>@drawable/item_shoping</item>
-        <item>@drawable/item_fb</item>
-        <item>@drawable/item_assesment</item>
-        <item>@drawable/item_apart</item>
-        <item>@drawable/item_inbox</item>
-        <item>@drawable/item_album</item>
-    </integer-array>
+    <string-array name="icons">
+        <item>item_key</item>
+        <item>item_account</item>
+        <item>item_balance</item>
+        <item>item_man</item>
+        <item>item_money</item>
+        <item>item_shoping</item>
+        <item>item_fb</item>
+        <item>item_insta</item>
+        <item>item_assesment</item>
+        <item>item_apart</item>
+        <item>item_inbox</item>
+        <item>item_album</item>
+    </string-array>
 
     <string-array name="clipboard_timeout_entries">
         <item>@string/ctout_15</item>

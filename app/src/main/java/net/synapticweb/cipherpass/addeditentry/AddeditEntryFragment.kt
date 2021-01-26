@@ -25,6 +25,7 @@ import com.afollestad.materialdialogs.customview.customView
 import net.synapticweb.cipherpass.*
 import net.synapticweb.cipherpass.databinding.AddeditEntryFragmentBinding
 import net.synapticweb.cipherpass.model.CustomField
+import net.synapticweb.cipherpass.model.KEY_DRAWABLE_NAME
 import net.synapticweb.cipherpass.util.EventObserver
 import net.synapticweb.cipherpass.util.disablePositiveWhenEmpty
 import net.synapticweb.cipherpass.util.setupPasswordFields
@@ -215,7 +216,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
     private fun setupReceiveIcon() {
         parentFragmentManager.setFragmentResultListener(SET_ICON_REQUEST_KEY,
             viewLifecycleOwner, FragmentResultListener { _: String, bundle: Bundle ->
-                _viewModel.setIcon(bundle.getInt(SET_ICON_BUNDLE_KEY))
+                _viewModel.setIcon(bundle.getString(SET_ICON_BUNDLE_KEY, KEY_DRAWABLE_NAME))
                 dirty = true
         })
     }

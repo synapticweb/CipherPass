@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import net.synapticweb.cipherpass.R
 import net.synapticweb.cipherpass.databinding.IconItemBinding
 
-class SetIconAdapter(private val viewModel : SetIconViewModel, private val context: Context) :
+class SetIconAdapter(private val viewModel : SetIconViewModel,  val context: Context) :
     RecyclerView.Adapter<SetIconAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : ViewHolder {
         return ViewHolder.from(parent)
@@ -18,17 +18,17 @@ class SetIconAdapter(private val viewModel : SetIconViewModel, private val conte
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val typedArray = context.resources.obtainTypedArray(R.array.icons)
-        val iconRes = typedArray.getResourceId(position, 0)
-        typedArray.recycle()
-        holder.bind(viewModel, iconRes)
+        val iconNames = context.resources.getStringArray(R.array.icons)
+        val iconName = iconNames[position]
+        val iconRes = context.resources.getIdentifier(iconName, "drawable", context.packageName)
+        holder.bind(viewModel, iconName, iconRes)
     }
 
     class ViewHolder private constructor(val binding : IconItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(viewModel : SetIconViewModel, iconRes : Int) {
+        fun bind(viewModel : SetIconViewModel, iconName : String, iconRes : Int) {
             binding.viewModel = viewModel
-            binding.iconRes = iconRes
+            binding.iconName = iconName
             binding.icon.setImageResource(iconRes)
         }
 

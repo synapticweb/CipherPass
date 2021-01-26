@@ -6,6 +6,7 @@ import kotlinx.coroutines.*
 import net.synapticweb.cipherpass.*
 import net.synapticweb.cipherpass.model.CustomField
 import net.synapticweb.cipherpass.model.Entry
+import net.synapticweb.cipherpass.model.KEY_DRAWABLE_NAME
 import net.synapticweb.cipherpass.model.Repository
 import net.synapticweb.cipherpass.util.Event
 import net.synapticweb.cipherpass.util.wrapEspressoIdlingResource
@@ -33,7 +34,11 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
     val saveResult = MutableLiveData<Event<Int>>()
     val toastMessages = MutableLiveData<Event<Int>>()
     private lateinit var savedEntry : Entry
-    val icon = MutableLiveData<Int>(R.drawable.item_key)
+    private val icon = MutableLiveData(KEY_DRAWABLE_NAME)
+    val iconRes : LiveData<Int> = icon.map {
+        val context = getApplication<CipherPassApp>()
+        context.resources.getIdentifier(it, "drawable", context.packageName)
+    }
 
     private fun isEdit() : Boolean {
         return ::savedEntry.isInitialized
@@ -131,8 +136,8 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
         }
     }
 
-    fun setIcon(iconRes : Int) {
-        icon.value = iconRes
+    fun setIcon(icon : String) {
+        this.icon.value = icon
     }
 
     fun addCustomField(fieldName : String, isProtected : Boolean) {

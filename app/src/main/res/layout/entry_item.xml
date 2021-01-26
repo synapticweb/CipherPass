@@ -29,7 +29,7 @@
         <ImageView
             android:layout_width="30dp"
             android:layout_height="30dp"
-            app:imageResource="@{entry.icon}"
+            app:imageResource="@{viewModel.getIconRes(entry.icon)}"
             android:layout_centerInParent="true"
             />
 

@@ -7,9 +7,9 @@ import javax.inject.Inject
 
 class SetIconViewModel @Inject constructor(application: Application) :
     AndroidViewModel(application) {
-    val icon = MutableLiveData<Int>()
+    val icon = MutableLiveData<String>()
 
-    fun setIcon(iconRes : Int) {
-        icon.value = iconRes
+    fun setIcon(iconName : String) {
+        icon.value = iconName
     }
 }

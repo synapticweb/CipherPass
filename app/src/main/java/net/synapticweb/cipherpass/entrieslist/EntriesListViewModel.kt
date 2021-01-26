@@ -201,4 +201,9 @@ class EntriesListViewModel @Inject constructor(
             repository.deleteEntry(entry)
         }
     }
+
+    fun getIconRes(iconName : String) : Int {
+        val context = getApplication<CipherPassApp>()
+        return context.resources.getIdentifier(iconName, "drawable", context.packageName)
+    }
 }

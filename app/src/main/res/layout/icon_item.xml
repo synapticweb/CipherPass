@@ -6,8 +6,8 @@
             name="viewModel"
             type="net.synapticweb.cipherpass.addeditentry.SetIconViewModel" />
         <variable
-            name="iconRes"
-            type="Integer" />
+            name="iconName"
+            type="String" />
     </data>
 
     <ImageView
@@ -17,7 +17,7 @@
         android:layout_height="40dp"
         android:id="@+id/icon"
         app:tint="#555"
-        android:onClick="@{() -> viewModel.setIcon(iconRes)}"
+        android:onClick="@{() -> viewModel.setIcon(iconName)}"
         />
 
 </layout>

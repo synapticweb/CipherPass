@@ -6,6 +6,8 @@ import kotlinx.serialization.Transient
 import java.text.SimpleDateFormat
 import java.util.*
 
+const val KEY_DRAWABLE_NAME = "item_key"
+
 @Serializable
 @Entity(tableName = "entries")
 data class Entry (
@@ -30,8 +32,8 @@ data class Entry (
     @ColumnInfo(name = "modification_date")
     var modificationDate : Long = System.currentTimeMillis(),
 
-    @ColumnInfo(name = "icon_res")
-    var icon : Int = 0
+    @ColumnInfo(name = "icon")
+    var icon : String = KEY_DRAWABLE_NAME
 ) {
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
