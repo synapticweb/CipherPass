@@ -45,16 +45,33 @@
     <string-array name="icons">
         <item>item_key</item>
         <item>item_account</item>
+        <item>item_fb</item>
+        <item>item_apple</item>
+        <item>item_github</item>
+        <item>item_gmail</item>
+        <item>item_google</item>
+        <item>item_paypal</item>
+        <item>item_reddit</item>
+        <item>item_skype</item>
+        <item>item_twitter</item>
+        <item>item_yahoo</item>
         <item>item_balance</item>
         <item>item_man</item>
         <item>item_money</item>
         <item>item_shoping</item>
-        <item>item_fb</item>
         <item>item_insta</item>
         <item>item_assesment</item>
         <item>item_apart</item>
         <item>item_inbox</item>
         <item>item_album</item>
+        <item>item_admin</item>
+        <item>item_android</item>
+        <item>item_card</item>
+        <item>item_cloud</item>
+        <item>item_computer</item>
+        <item>item_drive</item>
+        <item>item_euro</item>
+        <item>item_home</item>
     </string-array>
 
     <string-array name="clipboard_timeout_entries">
