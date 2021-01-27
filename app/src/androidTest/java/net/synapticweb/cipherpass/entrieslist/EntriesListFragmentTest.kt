@@ -7,10 +7,8 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.cipherpass.R
-import net.synapticweb.cipherpass.SORT_ORDER_KEY
 import net.synapticweb.cipherpass.TestCipherPassApp
 import net.synapticweb.cipherpass.model.Entry
 import net.synapticweb.cipherpass.util.CipherPassTestRule

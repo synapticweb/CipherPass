@@ -11,6 +11,13 @@ import net.synapticweb.cipherpass.util.*
 import java.util.*
 import javax.inject.Inject
 
+const val IS_PASSPHRASE_SET_KEY = "passphrase_set_key"
+const val AUTH_OK = 0
+const val APPLOCK_KEY = "applock"
+const val HASH_TYPE_KEY = "hash"
+const val APPLOCK_PASSWD_VALUE = "passwd"
+const val APPLOCK_SYSTEM_VALUE = "system"
+const val APPLOCK_NOLOCK_VALUE = "none"
 
 class AuthenticateViewModel @Inject constructor(private val repository: Repository,
                                                 private val cipher: CPCipher,
@@ -22,12 +29,12 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
 
     fun isPassSet() : Boolean {
         val prefWrapper = PrefWrapper.getInstance(getApplication())
-        return prefWrapper.getBoolean(PASSPHRASE_SET_KEY) != null
+        return prefWrapper.getBoolean(IS_PASSPHRASE_SET_KEY) != null
     }
 
     private fun setPassSet() {
         val prefWrapper = PrefWrapper.getInstance(getApplication())
-        prefWrapper.setPref(PASSPHRASE_SET_KEY, true)
+        prefWrapper.setPref(IS_PASSPHRASE_SET_KEY, true)
     }
 
     fun getApplockPref() : String {

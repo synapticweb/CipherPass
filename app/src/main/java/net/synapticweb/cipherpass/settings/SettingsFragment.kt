@@ -15,7 +15,11 @@ import javax.inject.Inject
 import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import net.synapticweb.cipherpass.*
+import net.synapticweb.cipherpass.authenticate.APPLOCK_KEY
+import net.synapticweb.cipherpass.authenticate.HASH_TYPE_KEY
 import net.synapticweb.cipherpass.util.EventObserver
+
+const val CHANGE_PASS_KEY = "changepass"
 
 class SettingsFragment : PreferenceFragmentCompat() {
     @Inject

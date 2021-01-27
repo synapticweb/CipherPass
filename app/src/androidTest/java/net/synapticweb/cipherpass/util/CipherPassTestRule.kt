@@ -4,11 +4,16 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.IdlingRegistry
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.cipherpass.*
+import net.synapticweb.cipherpass.authenticate.HASH_TYPE_KEY
 import net.synapticweb.cipherpass.di.TestAppComponent
+import net.synapticweb.cipherpass.model.HASH_PBKDF2
 import net.synapticweb.cipherpass.model.Hash
 import net.synapticweb.cipherpass.model.TestRepositoryImpl
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
+
+const val TEST_DATABASE_NAME = "testcipherpass.db"
+const val TEST_PASS = "test"
 
 class CipherPassTestRule : TestWatcher() {
     private lateinit var appPrefs : Map<String, *>

@@ -2,10 +2,15 @@ package net.synapticweb.cipherpass
 
 import android.app.Application
 import androidx.lifecycle.*
+import net.synapticweb.cipherpass.authenticate.APPLOCK_KEY
+import net.synapticweb.cipherpass.authenticate.APPLOCK_NOLOCK_VALUE
 import net.synapticweb.cipherpass.model.Repository
 import net.synapticweb.cipherpass.util.Event
 import net.synapticweb.cipherpass.util.PrefWrapper
 import javax.inject.Inject
+
+const val BACKGROUND_TIMEOUT_KEY = "background_timeout"
+const val BACKGROUND_TIMEOUT_DISABLED = "disabled"
 
 class LockStateViewModel @Inject constructor(private val repository: Repository, application: Application)
     : AndroidViewModel(application), LifecycleObserver {

@@ -10,10 +10,11 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import junit.framework.Assert.assertNull
 import kotlinx.coroutines.delay
 import net.synapticweb.cipherpass.*
-import net.synapticweb.cipherpass.util.CipherPassTestRule
-import net.synapticweb.cipherpass.util.PrefWrapper
-import net.synapticweb.cipherpass.util.hasTextInputLayoutErrorText
-import net.synapticweb.cipherpass.util.monitorFragment
+import net.synapticweb.cipherpass.authenticate.APPLOCK_KEY
+import net.synapticweb.cipherpass.authenticate.APPLOCK_NOLOCK_VALUE
+import net.synapticweb.cipherpass.authenticate.APPLOCK_PASSWD_VALUE
+import net.synapticweb.cipherpass.authenticate.APPLOCK_SYSTEM_VALUE
+import net.synapticweb.cipherpass.util.*
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Rule
 import org.junit.Test

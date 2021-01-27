@@ -16,7 +16,6 @@ import com.afollestad.materialdialogs.actions.getActionButton
 import com.google.android.material.textfield.TextInputLayout
 import net.synapticweb.cipherpass.LockStateViewModel
 import net.synapticweb.cipherpass.R
-import net.synapticweb.cipherpass.SET_ICON_COLUMN_WIDTH
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
 import java.nio.charset.Charset
@@ -26,6 +25,7 @@ import java.util.*
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 
+const val SET_ICON_COLUMN_WIDTH = 55
 
 fun Fragment.handleBackPressed(lockState: LockStateViewModel) {
     requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {

@@ -14,6 +14,9 @@ import javax.inject.Inject
 
 const val NEW_FIELD = "new_field"
 const val DIRTY_FIELD = "dirty_field"
+const val INSERT_SUCCES = 0
+const val EDIT_SUCCESS = 1
+const val NO_ENTRY_CUSTOM_FIELD_ID = 0L
 
 class AddeditEntryViewModel @Inject constructor(private val repository: Repository,
                                                 application: Application) :

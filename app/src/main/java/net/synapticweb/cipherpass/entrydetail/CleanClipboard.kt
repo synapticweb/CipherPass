@@ -6,7 +6,6 @@ import android.content.Context
 import android.os.Build
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import net.synapticweb.cipherpass.CLIPBOARD_LABEL_KEY
 
 class CleanClipboard(appContext: Context, workerParams: WorkerParameters) :
     Worker(appContext, workerParams) {

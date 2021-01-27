@@ -18,12 +18,14 @@ import com.afollestad.materialdialogs.callbacks.onPreShow
 import com.afollestad.materialdialogs.customview.customView
 import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.cipherpass.*
+import net.synapticweb.cipherpass.authenticate.HASH_TYPE_KEY
 import net.synapticweb.cipherpass.databinding.ChangePassDialogBinding
 import net.synapticweb.cipherpass.databinding.EnterPassDialogBinding
 import net.synapticweb.cipherpass.databinding.PasswdValidatorDialogBinding
 import net.synapticweb.cipherpass.util.*
 import java.util.*
 
+const val DO_NOT_SHOW_WARNING = "do_ not_show_warning"
 
 fun SettingsFragment.changeHash(preference: ListPreference, newHashType : String)  {
     val binding : PasswdValidatorDialogBinding =

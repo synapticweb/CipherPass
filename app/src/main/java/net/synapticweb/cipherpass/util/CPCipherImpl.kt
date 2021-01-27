@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyInfo
-import net.synapticweb.cipherpass.ENCRYPTED_PASS_KEY
 import java.io.*
 import java.math.BigInteger
 import java.security.*
@@ -16,7 +15,7 @@ const val ASYM_KEY_ALIAS : String = "passkey"
 const val ASYM_ALGORITHM : String = "RSA"
 const val ASYM_TRANSFORMATION = "RSA/ECB/PKCS1Padding"
 const val ASYM_PROVIDER = "AndroidKeyStore"
-
+const val ENCRYPTED_PASS_KEY = "enc_pass_key"
 
 //Criptare simetrică: https://medium.com/@josiassena/using-the-android-keystore-system-to-store-sensitive-information-3a56175a454b
 //Asimetrică, posibil pe Android 5: https://www.androidauthority.com/use-android-keystore-store-passwords-sensitive-information-623779/

@@ -9,6 +9,9 @@ import androidx.test.espresso.matcher.ViewMatchers
 import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.cipherpass.*
+import net.synapticweb.cipherpass.authenticate.HASH_TYPE_KEY
+import net.synapticweb.cipherpass.model.HASH_MD5_VALUE
+import net.synapticweb.cipherpass.model.HASH_SHA_VALUE
 import net.synapticweb.cipherpass.model.Hash
 import net.synapticweb.cipherpass.util.*
 import org.hamcrest.CoreMatchers.`is`

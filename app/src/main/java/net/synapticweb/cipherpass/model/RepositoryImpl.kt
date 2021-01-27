@@ -11,10 +11,16 @@ import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteException
 import net.sqlcipher.database.SupportFactory
 import net.synapticweb.cipherpass.*
+import net.synapticweb.cipherpass.authenticate.HASH_TYPE_KEY
+import net.synapticweb.cipherpass.entrieslist.*
 import net.synapticweb.cipherpass.util.*
 import java.lang.Exception
 import java.lang.StringBuilder
 import javax.inject.Inject
+
+const val HASH_MD5_VALUE = "md5"
+const val HASH_SHA_VALUE = "sha"
+const val HASH_PBKDF2 = "pbkdf2"
 
 open class RepositoryImpl @Inject constructor(
     private val context: Context,

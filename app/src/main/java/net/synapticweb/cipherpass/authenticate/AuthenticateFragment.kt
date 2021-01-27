@@ -24,6 +24,8 @@ import net.synapticweb.cipherpass.util.*
 import java.util.*
 import javax.inject.Inject
 
+const val LOCK_ACTIVITY_CODE = 0
+
 class AuthenticateFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory : ViewModelProvider.Factory

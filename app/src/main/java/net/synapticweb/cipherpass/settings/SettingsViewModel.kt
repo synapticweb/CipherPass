@@ -5,10 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import net.synapticweb.cipherpass.APPLOCK_KEY
-import net.synapticweb.cipherpass.APPLOCK_PASSWD_VALUE
-import net.synapticweb.cipherpass.DO_NOT_SHOW_WARNING
-import net.synapticweb.cipherpass.ENCRYPTED_PASS_KEY
+import net.synapticweb.cipherpass.authenticate.APPLOCK_KEY
+import net.synapticweb.cipherpass.authenticate.APPLOCK_PASSWD_VALUE
 import net.synapticweb.cipherpass.model.Repository
 import net.synapticweb.cipherpass.util.*
 import java.util.*

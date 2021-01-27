@@ -20,6 +20,8 @@ import net.synapticweb.cipherpass.util.EventObserver
 import net.synapticweb.cipherpass.util.getSetIconNumColumns
 import javax.inject.Inject
 
+const val SET_ICON_BUNDLE_KEY = "bundle_key"
+
 class SetIconFragment : Fragment(){
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory

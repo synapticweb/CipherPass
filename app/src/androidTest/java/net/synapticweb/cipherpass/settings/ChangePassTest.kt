@@ -10,6 +10,9 @@ import junit.framework.Assert.assertNotNull
 import junit.framework.Assert.assertNull
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.cipherpass.*
+import net.synapticweb.cipherpass.authenticate.APPLOCK_KEY
+import net.synapticweb.cipherpass.authenticate.APPLOCK_PASSWD_VALUE
+import net.synapticweb.cipherpass.authenticate.APPLOCK_SYSTEM_VALUE
 import net.synapticweb.cipherpass.util.*
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat

@@ -10,6 +10,7 @@ import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.cipherpass.*
+import net.synapticweb.cipherpass.model.HASH_PBKDF2
 import net.synapticweb.cipherpass.util.CipherPassTestRule
 import net.synapticweb.cipherpass.model.Hash
 import net.synapticweb.cipherpass.util.*
@@ -26,7 +27,7 @@ class AuthenticateFragmentTest {
 
     @Test
     fun dbNotInitialized_PasswdNoMatch_Error() {
-        prefWrapper.removePref(PASSPHRASE_SET_KEY)
+        prefWrapper.removePref(IS_PASSPHRASE_SET_KEY)
         prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
 
         val activityScenario = launch(MainActivity::class.java)
@@ -43,7 +44,7 @@ class AuthenticateFragmentTest {
 
     @Test
     fun dbNotInitialized_EmptyPasswd_Error() {
-        prefWrapper.removePref(PASSPHRASE_SET_KEY)
+        prefWrapper.removePref(IS_PASSPHRASE_SET_KEY)
         prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
 
         val activityScenario = launch(MainActivity::class.java)
@@ -57,7 +58,7 @@ class AuthenticateFragmentTest {
 
     @Test
     fun dbNotInitialized_goodPasswds_Authenticate()  {
-        prefWrapper.removePref(PASSPHRASE_SET_KEY)
+        prefWrapper.removePref(IS_PASSPHRASE_SET_KEY)
         prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
 
         val activityScenario = launch(MainActivity::class.java)
@@ -70,7 +71,7 @@ class AuthenticateFragmentTest {
         onView(withId(R.id.entries_list_root)).check(matches(isDisplayed()))
         assertThat(testRule.repository.isUnlocked(), `is`(true))
 
-        assertThat(prefWrapper.getBoolean(PASSPHRASE_SET_KEY), `is`(true))
+        assertThat(prefWrapper.getBoolean(IS_PASSPHRASE_SET_KEY), `is`(true))
 
        val hashObj : Hash? = runBlocking {
            testRule.repository.getHash()
@@ -91,7 +92,7 @@ class AuthenticateFragmentTest {
             testRule.repository.unlock(TEST_PASS.toByteArray())
             testRule.repository.lock()
         }
-        prefWrapper.setPref(PASSPHRASE_SET_KEY, true)
+        prefWrapper.setPref(IS_PASSPHRASE_SET_KEY, true)
         prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
 
         val activityScenario = launch(MainActivity::class.java)
@@ -107,7 +108,7 @@ class AuthenticateFragmentTest {
 
     @Test
     fun appRunnedOnce_emptyPasswd_Error() {
-        prefWrapper.setPref(PASSPHRASE_SET_KEY, true)
+        prefWrapper.setPref(IS_PASSPHRASE_SET_KEY, true)
         prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
 
         val activityScenario = launch(MainActivity::class.java)
@@ -128,7 +129,7 @@ class AuthenticateFragmentTest {
             testRule.repository.unlock(TEST_PASS.toByteArray())
             testRule.repository.lock()
         }
-        prefWrapper.setPref(PASSPHRASE_SET_KEY, true)
+        prefWrapper.setPref(IS_PASSPHRASE_SET_KEY, true)
         prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
 
         val activityScenario = launch(MainActivity::class.java)
@@ -144,7 +145,7 @@ class AuthenticateFragmentTest {
     @Test
     fun dbNotInitialized_createHashReturnFalse_showSnackbar() {
         testRule.repository.createPassHashFalse = true
-        prefWrapper.removePref(PASSPHRASE_SET_KEY)
+        prefWrapper.removePref(IS_PASSPHRASE_SET_KEY)
         prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
         val activityScenario = launch(MainActivity::class.java)
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
@@ -168,7 +169,7 @@ class AuthenticateFragmentTest {
             testRule.cipher.encryptPassToSettings(TEST_PASS.toCharArray())
         }
         testRule.repository.lock()
-        prefWrapper.setPref(PASSPHRASE_SET_KEY, true)
+        prefWrapper.setPref(IS_PASSPHRASE_SET_KEY, true)
         prefWrapper.setPref(APPLOCK_KEY, APPLOCK_NOLOCK_VALUE)
 
         val activityScenario = launch(MainActivity::class.java)
@@ -186,7 +187,7 @@ class AuthenticateFragmentTest {
         testRule.setDb()
         testRule.repository.lock()
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
-        prefWrapper.setPref(PASSPHRASE_SET_KEY, true)
+        prefWrapper.setPref(IS_PASSPHRASE_SET_KEY, true)
         prefWrapper.setPref(APPLOCK_KEY, APPLOCK_NOLOCK_VALUE)
 
         val activityScenario = launch(MainActivity::class.java)

@@ -10,9 +10,6 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.synapticweb.cipherpass.CLIPBOARD_LABEL_KEY
-import net.synapticweb.cipherpass.CLIPBOARD_TIMEOUT_DISABLED
-import net.synapticweb.cipherpass.CLIPBOARD_TIMEOUT_KEY
 import net.synapticweb.cipherpass.CipherPassApp
 import net.synapticweb.cipherpass.model.CustomField
 import net.synapticweb.cipherpass.model.Entry
@@ -21,6 +18,10 @@ import net.synapticweb.cipherpass.util.Event
 import net.synapticweb.cipherpass.util.PrefWrapper
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
+const val CLIPBOARD_LABEL_KEY = "net.synapticweb.cipherpass.clipboard_key"
+const val CLIPBOARD_TIMEOUT_KEY = "clipboard_timeout"
+const val CLIPBOARD_TIMEOUT_DISABLED = "disabled"
 
 class EntryDetailViewModel @Inject constructor(private val repository: Repository,
                                                application: Application

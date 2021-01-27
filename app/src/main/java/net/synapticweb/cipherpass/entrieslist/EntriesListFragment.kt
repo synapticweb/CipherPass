@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import net.synapticweb.cipherpass.*
+import net.synapticweb.cipherpass.authenticate.APPLOCK_KEY
+import net.synapticweb.cipherpass.authenticate.APPLOCK_NOLOCK_VALUE
 import net.synapticweb.cipherpass.databinding.EntriesListFragmentBinding
 import net.synapticweb.cipherpass.util.EventObserver
 import net.synapticweb.cipherpass.util.PrefWrapper

@@ -14,7 +14,7 @@ import junit.framework.Assert.assertNull
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.cipherpass.R
-import net.synapticweb.cipherpass.SORT_CREATION_DESC
+import net.synapticweb.cipherpass.entrieslist.SORT_CREATION_DESC
 import net.synapticweb.cipherpass.model.CustomField
 import net.synapticweb.cipherpass.model.Entry
 import net.synapticweb.cipherpass.util.*

@@ -31,6 +31,8 @@ import net.synapticweb.cipherpass.util.disablePositiveWhenEmpty
 import net.synapticweb.cipherpass.util.setupPasswordFields
 import javax.inject.Inject
 
+const val SET_ICON_REQUEST_KEY = "icon_req_key"
+
 class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
