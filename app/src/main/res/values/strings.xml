@@ -19,8 +19,8 @@
     <string name="settings_insert_pass_message">Please insert your password:</string>
     <string name="system_lock_next">Next</string>
     <string name="system_lock_finish">Finish</string>
-    <string name="system_lock_soft_warning">Using the system provided lock requires that credentials are stored on the device. This device is only able to provide software backed storage for credentials, which is less secure than hardware backed storage. Continue?</string>
-    <string name="no_lock_soft_warning">Having no lock requires that credentials are stored on the device. This device is only able to provide software backed storage for credentials, which is less secure than hardware backed storage. Continue?</string>
+    <string name="system_lock_soft_warning">Using the system provided authentication requires that encryption keys are stored on the device. This device is only able to provide software backed storage for encryption keys, which is less secure than hardware backed storage. Continue?</string>
+    <string name="no_lock_soft_warning">Having no authentication requires that encryption keys are stored on the device. This device is only able to provide software backed storage for encryption keys, which is less secure than hardware backed storage. Continue?</string>
     <string name="system_lock_file_write_fail">There was an error processing your request.</string>
     <string name="system_lock_not_available">Only available on Android 6 and newer.</string>
     <string name="system_lock_device_not_secure">To use this feature, you have to secure your device with a password, pin or pattern.</string>
@@ -89,7 +89,7 @@
     <string name="value_not_set">Value not set</string>
     <string name="protected_field">Protected</string>
     <string name="delete_custom_field_title">Delete field</string>
-    <string name="delete_custom_field_message">Delete this custom field? (Recovery is not possible.)</string>
+    <string name="delete_custom_field_message">Delete this custom field?</string>
     <string name="edit_custom_field">Edit custom field</string>
     <string name="clipboard_timeout">Clipboard timeout</string>
     <string name="clipboard_timeout_summary">Time before clearing clipboard after copying an item.</string>
@@ -124,4 +124,13 @@
     <string name="no">No</string>
     <string name="import_success">Entries were successfully imported.</string>
     <string name="no_entries">There are currently no entries.</string>
+    <string name="about_fragment_name">About</string>
+    <string name="version">version</string>
+    <string name="app_description">is a basic password manager for Android that stores password data in an AES-256 encrypted database. This ensures secure storage of password data even on rooted devices.</string>
+    <string name="website_label">Website:</string>
+    <string name="website">https://github.com/synapticweb/CipherPass</string>
+    <string name="contact_label">Developer contact:</string>
+    <string name="email">synapticwebb@gmail.com</string>
+    <string name="no_waranty">is free and open source software. It comes with ABSOLUTELY NO WARRANTY.</string>
+    <string name="attributions">uses database encryption provided by SqlCipher library (https://github.com/sqlcipher/android-database-sqlcipher). The launcher icon is based on artwork from https://www.vecteezy.com. The background of the actionbar banner is based on artwork created by Harryarts (https://www.freepik.com). The social media icons are based on artwork from https://www.flaticon.com and https://www.svgrepo.com/.</string>
 </resources>

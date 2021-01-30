@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="packageInfo"
+            type="android.content.pm.PackageInfo" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_launcher"
+                />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{@string/app_name + ` ` + @string/version + ` ` + packageInfo.versionName}"
+                        android:layout_marginBottom="5dp"
+                        />
+
+                    <TextView
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:autoLink="web"
+                        android:text="@string/website"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/app_description"
+            android:lineSpacingMultiplier="1.2"
+            android:layout_marginTop="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{@string/app_name + ` ` + @string/app_description}"
+            android:layout_marginBottom="5dp"
+            />
+
+        <TextView
+            android:id="@+id/no_warranty"
+            android:layout_marginTop="5dp"
+            android:lineSpacingMultiplier="1.2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{@string/app_name + ` ` + @string/no_waranty}"
+            android:layout_marginBottom="20dp"/>
+
+       <TextView
+           android:lineSpacingMultiplier="1.2"
+           android:id="@+id/attributions"
+           android:autoLink="all"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="@{@string/app_name + ` ` + @string/attributions}"/>
+
+    </LinearLayout>
+
+    </ScrollView>
+
+</layout>

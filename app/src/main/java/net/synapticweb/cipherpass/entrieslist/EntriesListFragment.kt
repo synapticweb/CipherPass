@@ -169,6 +169,12 @@ class EntriesListFragment : Fragment() {
                 chooseJsonFile()
                 false
             }
+            R.id.about -> {
+                findNavController().navigate(
+                    EntriesListFragmentDirections.actionEntriesListFragmentToAboutFragment()
+                )
+                false
+            }
             else -> false
         }
     }
