@@ -13,11 +13,6 @@ import javax.inject.Inject
 
 const val IS_PASSPHRASE_SET_KEY = "passphrase_set_key"
 const val AUTH_OK = 0
-const val APPLOCK_KEY = "applock"
-const val HASH_TYPE_KEY = "hash"
-const val APPLOCK_PASSWD_VALUE = "passwd"
-const val APPLOCK_SYSTEM_VALUE = "system"
-const val APPLOCK_NOLOCK_VALUE = "none"
 
 class AuthenticateViewModel @Inject constructor(private val repository: Repository,
                                                 private val cipher: CPCipher,
@@ -38,8 +33,10 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
     }
 
     fun getApplockPref() : String {
+        val res = getApplication<CipherPassApp>().resources
         val prefWrapper = PrefWrapper.getInstance(getApplication())
-        return prefWrapper.getString(APPLOCK_KEY) ?: APPLOCK_PASSWD_VALUE
+        return prefWrapper.getString(res.getString(R.string.applock_key)) ?:
+                res.getString(R.string.applock_passwd_value)
     }
 
   fun getPassphrase()  {

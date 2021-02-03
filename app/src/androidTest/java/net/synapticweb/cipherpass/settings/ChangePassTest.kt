@@ -10,9 +10,6 @@ import junit.framework.Assert.assertNotNull
 import junit.framework.Assert.assertNull
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.cipherpass.*
-import net.synapticweb.cipherpass.authenticate.APPLOCK_KEY
-import net.synapticweb.cipherpass.authenticate.APPLOCK_PASSWD_VALUE
-import net.synapticweb.cipherpass.authenticate.APPLOCK_SYSTEM_VALUE
 import net.synapticweb.cipherpass.util.*
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
@@ -24,13 +21,16 @@ class ChangePassTest {
     @get:Rule
     val testRule = CipherPassTestRule()
     private val prefWrapper = PrefWrapper.getInstance(ApplicationProvider.getApplicationContext())
+    private val appLockKey = testRule.application.resources.getString(R.string.applock_key)
+    private val applockPasswd = testRule.application.resources.getString(R.string.applock_passwd_value)
+    private val appLockSystem = testRule.application.resources.getString(R.string.applock_system_value)
 
     @Test
     fun emptyNewPass_Error() {
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText(R.string.change_pass)).perform(click())
+        onView(withText(R.string.change_pass_title)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
         onView(withText("OK")).perform(click())
 
@@ -45,7 +45,7 @@ class ChangePassTest {
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText(R.string.change_pass)).perform(click())
+        onView(withText(R.string.change_pass_title)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
 
         onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
@@ -65,7 +65,7 @@ class ChangePassTest {
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText(R.string.change_pass)).perform(click())
+        onView(withText(R.string.change_pass_title)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText("incorect"), closeSoftKeyboard())
 
         onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
@@ -81,13 +81,13 @@ class ChangePassTest {
     @Test
     fun correctInput_strongPass_passChange() {
         testRule.setDb()
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText(R.string.change_pass)).perform(click())
+        onView(withText(R.string.change_pass_title)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
 
         onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
@@ -112,12 +112,12 @@ class ChangePassTest {
     @Test
     fun correctInput_weakPass_passChange() {
         testRule.setDb()
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_SYSTEM_VALUE)
+        prefWrapper.setPref(appLockKey, appLockSystem)
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText(R.string.change_pass)).perform(click())
+        onView(withText(R.string.change_pass_title)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
 
         onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
@@ -136,11 +136,11 @@ class ChangePassTest {
     fun correctInput_weakAuth_errorPassHash() {
         testRule.setDb()
         testRule.repository.createPassHashFalse = true
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_SYSTEM_VALUE)
+        prefWrapper.setPref(appLockKey, appLockSystem)
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText(R.string.change_pass)).perform(click())
+        onView(withText(R.string.change_pass_title)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
 
         onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
@@ -156,18 +156,18 @@ class ChangePassTest {
         }
         assertThat(testRule.repository.isUnlocked(), `is`(true)) //parola nu s-a schimbat
         assertNull(prefWrapper.getString(ENCRYPTED_PASS_KEY)) //nu s-a salvat parola criptată
-        assertThat(prefWrapper.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
+        assertThat(prefWrapper.getString(appLockKey), `is`(applockPasswd))
     }
 
     @Test
     fun correctInput_weakAuth_errorWriteEncryptedPass() {
         testRule.setDb()
         testRule.cipher.encryptPassReturnError = true
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_SYSTEM_VALUE)
+        prefWrapper.setPref(appLockKey, appLockSystem)
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
 
-        onView(withText(R.string.change_pass)).perform(click())
+        onView(withText(R.string.change_pass_title)).perform(click())
         onView(withId(R.id.actual_passphrase)).perform(typeText(TEST_PASS), closeSoftKeyboard())
 
         onView(withId(R.id.new_passphrase)).perform(typeText("test1"), closeSoftKeyboard())
@@ -183,6 +183,6 @@ class ChangePassTest {
         }
         assertThat(testRule.repository.isUnlocked(), `is`(true)) //parola nu s-a schimbat
         assertNull(prefWrapper.getString(ENCRYPTED_PASS_KEY)) //nu s-a salvat parola criptată
-        assertThat(prefWrapper.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
+        assertThat(prefWrapper.getString(appLockKey), `is`(applockPasswd))
     }
 }

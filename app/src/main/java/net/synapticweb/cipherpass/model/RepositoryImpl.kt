@@ -11,16 +11,12 @@ import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteException
 import net.sqlcipher.database.SupportFactory
 import net.synapticweb.cipherpass.*
-import net.synapticweb.cipherpass.authenticate.HASH_TYPE_KEY
 import net.synapticweb.cipherpass.entrieslist.*
 import net.synapticweb.cipherpass.util.*
 import java.lang.Exception
 import java.lang.StringBuilder
 import javax.inject.Inject
 
-const val HASH_MD5_VALUE = "md5"
-const val HASH_SHA_VALUE = "sha"
-const val HASH_PBKDF2 = "pbkdf2"
 
 open class RepositoryImpl @Inject constructor(
     private val context: Context,
@@ -51,7 +47,8 @@ open class RepositoryImpl @Inject constructor(
     }
 
     override suspend fun isPassValid(passphrase: CharArray) : Boolean {
-        val hashType = prefWrapper.getString(HASH_TYPE_KEY) ?: HASH_PBKDF2
+        val hashType = prefWrapper.getString(context.resources.getString(R.string.hash_type_key))
+            ?: context.resources.getString(R.string.hash_pbkdf2_value)
 
        return withContext(Dispatchers.Default) {
            val oldHash = getHash()
@@ -62,7 +59,8 @@ open class RepositoryImpl @Inject constructor(
 
 
     override suspend fun createPassHash(passphrase: CharArray, newHashType : String?) : Boolean {
-        val hashType = newHashType ?: prefWrapper.getString(HASH_TYPE_KEY) ?: HASH_PBKDF2
+        val hashType = newHashType ?: prefWrapper.getString(context.resources.getString(R.string.hash_type_key))
+        ?: context.resources.getString(R.string.hash_pbkdf2_value)
         val salt = createSalt()
         val hash = createHashString(passphrase, salt, hashType)
 
@@ -116,12 +114,12 @@ open class RepositoryImpl @Inject constructor(
     override fun getAllEntries(sortOrder: String) : LiveData<List<Entry>> {
         var query = "SELECT * FROM `entries` ORDER BY "
         query = when(sortOrder) {
-            SORT_CREATION_ASC -> "$query`insertion_date` ASC"
-            SORT_CREATION_DESC -> "$query`insertion_date` DESC"
-            SORT_NAME_ASC -> "$query`entry_name` ASC"
-            SORT_NAME_DESC -> "$query`entry_name` DESC"
-            SORT_MODIF_ASC -> "$query`modification_date` ASC"
-            SORT_MODIF_DESC -> "$query`modification_date` DESC"
+            context.resources.getString(R.string.sort_creation_asc_name) -> "$query`insertion_date` ASC"
+            context.resources.getString(R.string.sort_creation_desc_name) -> "$query`insertion_date` DESC"
+            context.resources.getString(R.string.sort_name_asc_name) -> "$query`entry_name` ASC"
+            context.resources.getString(R.string.sort_name_desc_name) -> "$query`entry_name` DESC"
+            context.resources.getString(R.string.sort_modif_asc_name) -> "$query`modification_date` ASC"
+            context.resources.getString(R.string.sort_modif_desc_name) -> "$query`modification_date` DESC"
             else -> "$query`insertion_date` DESC"
         }
 
@@ -164,13 +162,13 @@ open class RepositoryImpl @Inject constructor(
     suspend fun createHashString(passphrase: CharArray, salt : ByteArray, hashType : String) : String {
         return withContext(Dispatchers.Default) {
             when (hashType) {
-                HASH_MD5_VALUE -> byteArrayToHexStr(
+                context.resources.getString(R.string.hash_md5_value) -> byteArrayToHexStr(
                     createHashMd5(charArrayToByteArray(passphrase), salt)
                 )
-                HASH_SHA_VALUE -> byteArrayToHexStr(
+                context.resources.getString(R.string.hash_sha_value) -> byteArrayToHexStr(
                     createHashSha(charArrayToByteArray(passphrase), salt)
                 )
-                HASH_PBKDF2 -> byteArrayToHexStr(
+                context.resources.getString(R.string.hash_pbkdf2_value) -> byteArrayToHexStr(
                     createHashPBKDF2(passphrase, salt)
                 )
                 else -> throw java.lang.IllegalArgumentException()

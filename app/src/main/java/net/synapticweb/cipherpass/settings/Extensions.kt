@@ -18,14 +18,13 @@ import com.afollestad.materialdialogs.callbacks.onPreShow
 import com.afollestad.materialdialogs.customview.customView
 import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.cipherpass.*
-import net.synapticweb.cipherpass.authenticate.HASH_TYPE_KEY
 import net.synapticweb.cipherpass.databinding.ChangePassDialogBinding
 import net.synapticweb.cipherpass.databinding.EnterPassDialogBinding
 import net.synapticweb.cipherpass.databinding.PasswdValidatorDialogBinding
 import net.synapticweb.cipherpass.util.*
 import java.util.*
 
-const val DO_NOT_SHOW_WARNING = "do_ not_show_warning"
+const val DO_NOT_SHOW_WARNING_KEY = "do_ not_show_warning"
 
 fun SettingsFragment.changeHash(preference: ListPreference, newHashType : String)  {
     val binding : PasswdValidatorDialogBinding =
@@ -69,7 +68,7 @@ fun SettingsFragment.changeHash(preference: ListPreference, newHashType : String
                     dismiss()
                     if (it) {
                         PrefWrapper.getInstance(requireContext()).
-                            setPref(HASH_TYPE_KEY, newHashType)
+                            setPref(getString(R.string.hash_type_key), newHashType)
                         preference.value = newHashType
                         Toast.makeText(
                             requireContext(),
@@ -95,7 +94,7 @@ fun SettingsFragment.changeHash(preference: ListPreference, newHashType : String
 fun SettingsFragment.changePass() {
     MaterialDialog(requireContext()).show {
         noAutoDismiss()
-        title(R.string.change_pass_title)
+        title(R.string.change_pass_dialog_title)
         val binding = ChangePassDialogBinding.inflate(
             LayoutInflater.from(requireContext())) .apply {
             model = viewModelFrg
@@ -274,7 +273,7 @@ fun SettingsFragment.createDialogForAuthChange(preference: Preference, authName:
         positiveButton(android.R.string.ok) { dialog ->
             if(binding.softStorageWarning.isVisible) {
                 if(binding.stopShowingWarning.isChecked)
-                    PrefWrapper.getInstance(requireContext()).setPref(DO_NOT_SHOW_WARNING, true)
+                    PrefWrapper.getInstance(requireContext()).setPref(DO_NOT_SHOW_WARNING_KEY, true)
 
                 binding.softStorageWarning.visibility = View.GONE
                 binding.stopShowingWarningBox.visibility = View.GONE

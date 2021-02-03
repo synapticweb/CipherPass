@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.synapticweb.cipherpass.CipherPassApp
+import net.synapticweb.cipherpass.R
 import net.synapticweb.cipherpass.model.CustomField
 import net.synapticweb.cipherpass.model.Entry
 import net.synapticweb.cipherpass.model.Repository
@@ -20,8 +21,6 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 const val CLIPBOARD_LABEL_KEY = "net.synapticweb.cipherpass.clipboard_key"
-const val CLIPBOARD_TIMEOUT_KEY = "clipboard_timeout"
-const val CLIPBOARD_TIMEOUT_DISABLED = "disabled"
 
 class EntryDetailViewModel @Inject constructor(private val repository: Repository,
                                                application: Application
@@ -62,15 +61,16 @@ class EntryDetailViewModel @Inject constructor(private val repository: Repositor
     }
 
     fun copy(data : CharSequence, dataName : CharSequence) {
+        val res = getApplication<CipherPassApp>().resources
         val clipboard = getApplication<CipherPassApp>().
                     getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText(CLIPBOARD_LABEL_KEY, data)
         clipboard.setPrimaryClip(clip)
         val prefWrapper = PrefWrapper.getInstance(getApplication())
-        val clipboardTimeout = prefWrapper.getString(CLIPBOARD_TIMEOUT_KEY)
+        val clipboardTimeout = prefWrapper.getString(res.getString(R.string.clipboard_timeout_key))
 
         clipboardTimeout?. let {
-            if(it != CLIPBOARD_TIMEOUT_DISABLED) {
+            if(it != res.getString(R.string.clipboard_timeout_disabled_value)) {
                 val cleanClipboard = OneTimeWorkRequestBuilder<CleanClipboard>()
                     .setInitialDelay(it.toLong(), TimeUnit.SECONDS)
                     .build()

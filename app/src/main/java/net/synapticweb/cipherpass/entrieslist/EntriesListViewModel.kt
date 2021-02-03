@@ -24,14 +24,8 @@ import java.io.InputStreamReader
 import javax.inject.Inject
 
 const val MAX_FILE_LENGTH = 10*1000*1024
-
 const val SORT_ORDER_KEY = "sort_order_key"
-const val SORT_CREATION_ASC = "SORT_CREATION_ASC"
-const val SORT_CREATION_DESC = "SORT_CREATION_DESC"
-const val SORT_NAME_ASC = "SORT_NAME_ASC"
-const val SORT_NAME_DESC = "SORT_NAME_DESC"
-const val SORT_MODIF_ASC = "SORT_MODIF_ASC"
-const val SORT_MODIF_DESC = "SORT_MODIF_DESC"
+
 
 class EntriesListViewModel @Inject constructor(
     private val repository: Repository,
@@ -43,7 +37,8 @@ class EntriesListViewModel @Inject constructor(
 
     private val _entries : LiveData<List<Entry>> = _refresh.switchMap {
         val prefs = PrefWrapper.getInstance(getApplication())
-        val sortOrder = prefs.getString(SORT_ORDER_KEY) ?: SORT_CREATION_DESC
+        val sortOrder = prefs.getString(SORT_ORDER_KEY) ?:
+            getApplication<CipherPassApp>().resources.getString(R.string.sort_creation_desc_name)
         repository.getAllEntries(sortOrder)
     }
 

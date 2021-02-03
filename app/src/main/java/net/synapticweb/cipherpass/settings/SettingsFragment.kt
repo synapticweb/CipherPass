@@ -9,17 +9,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.preference.ListPreference
-import androidx.preference.PreferenceFragmentCompat
 import javax.inject.Inject
 import androidx.fragment.app.viewModels
-import androidx.preference.Preference
+import androidx.preference.*
 import net.synapticweb.cipherpass.*
-import net.synapticweb.cipherpass.authenticate.APPLOCK_KEY
-import net.synapticweb.cipherpass.authenticate.HASH_TYPE_KEY
+import net.synapticweb.cipherpass.R
 import net.synapticweb.cipherpass.util.EventObserver
 
-const val CHANGE_PASS_KEY = "changepass"
 
 class SettingsFragment : PreferenceFragmentCompat() {
     @Inject
@@ -52,7 +48,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences)
-        val appLock = findPreference<ListPreference>(APPLOCK_KEY)
+        val appLock = findPreference<ListPreference>(getString(R.string.applock_key))
         appLock?.summary = appLock?.entry
 
         appLock?.setOnPreferenceChangeListener { preference, newValue ->
@@ -61,16 +57,26 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
 
-        val changePassPref = findPreference<Preference>(CHANGE_PASS_KEY)
+        val changePassPref = findPreference<Preference>(getString(R.string.changepass_key))
         changePassPref?.setOnPreferenceClickListener {
             changePass()
             true
         }
 
-        val hashFunction = findPreference<ListPreference>(HASH_TYPE_KEY)
+        val hashFunction = findPreference<ListPreference>(getString(R.string.hash_type_key))
         hashFunction?.setOnPreferenceChangeListener { preference, newValue ->
                 changeHash(preference as ListPreference, newValue as String)
                 false
             }
+
+        val allowReports = findPreference<SwitchPreference>(getString(R.string.allow_reports_key))
+        val includeLogcat = findPreference<CheckBoxPreference>(getString(R.string.include_logcat_key))
+
+        allowReports?.apply {
+            setOnPreferenceChangeListener { _, value ->
+                includeLogcat?.isEnabled = value as Boolean
+                true
+            }
+        }
     }
 }

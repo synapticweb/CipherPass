@@ -4,9 +4,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.IdlingRegistry
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.cipherpass.*
-import net.synapticweb.cipherpass.authenticate.HASH_TYPE_KEY
 import net.synapticweb.cipherpass.di.TestAppComponent
-import net.synapticweb.cipherpass.model.HASH_PBKDF2
 import net.synapticweb.cipherpass.model.Hash
 import net.synapticweb.cipherpass.model.TestRepositoryImpl
 import org.junit.rules.TestWatcher
@@ -25,7 +23,9 @@ class CipherPassTestRule : TestWatcher() {
     val cipher : TestCPCipherImpl = (application.appComponent as TestAppComponent).cipher as TestCPCipherImpl
 
     fun setDb(hashType : String? = null) = runBlocking {
-        val actHashType = hashType ?: prefWrapper.getString(HASH_TYPE_KEY) ?: HASH_PBKDF2
+        val hashTypeKey = application.resources.getString(R.string.hash_type_key)
+        val hashPk = application.resources.getString(R.string.hash_pbkdf2_value)
+        val actHashType = hashType ?: prefWrapper.getString(hashTypeKey) ?: hashPk
         repository.unlock(TEST_PASS.toByteArray())
         val salt = createSalt()
         val hashStr = repository.createHashString(TEST_PASS.toCharArray(), salt, actHashType)

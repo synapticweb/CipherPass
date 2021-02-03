@@ -19,8 +19,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import net.synapticweb.cipherpass.*
-import net.synapticweb.cipherpass.authenticate.APPLOCK_KEY
-import net.synapticweb.cipherpass.authenticate.APPLOCK_NOLOCK_VALUE
 import net.synapticweb.cipherpass.databinding.EntriesListFragmentBinding
 import net.synapticweb.cipherpass.util.EventObserver
 import net.synapticweb.cipherpass.util.PrefWrapper
@@ -121,7 +119,7 @@ class EntriesListFragment : Fragment() {
         }
 
         val prefWrapper = PrefWrapper.getInstance(requireContext())
-        if(prefWrapper.getString(APPLOCK_KEY) == APPLOCK_NOLOCK_VALUE)
+        if(prefWrapper.getString(getString(R.string.applock_key)) == getString(R.string.applock_nolock_value))
             menu.findItem(R.id.lock).isVisible = false
     }
 
@@ -136,7 +134,7 @@ class EntriesListFragment : Fragment() {
             R.id.sort -> {
                 MaterialDialog(requireContext()).show {
                     val prefs = PrefWrapper.getInstance(requireContext())
-                    val initialSel = prefs.getString(SORT_ORDER_KEY) ?: SORT_CREATION_DESC
+                    val initialSel = prefs.getString(SORT_ORDER_KEY) ?: getString(R.string.sort_creation_desc_name)
                     val sortOrders = resources.getStringArray(R.array.sort_orders)
 
                     listItemsSingleChoice(

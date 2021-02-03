@@ -72,7 +72,7 @@ class EntriesListFragmentTest {
         fragmentScenario.onFragment { fragment ->
             fragment.onOptionsItemSelected(sortMenuItem)
         }
-        onView(withText(context.getString(R.string.sort_name_asc))).perform(click())
+        onView(withText(context.getString(R.string.sort_name_asc_name))).perform(click())
 
         onView(withId(R.id.entries_list)).check(matches(hasItemAtPosition(0, hasDescendant(withText("a_first_entry")))))
         onView(withId(R.id.entries_list)).check(matches(hasItemAtPosition(1, hasDescendant(withText("b_second_entry")))))
@@ -107,7 +107,7 @@ class EntriesListFragmentTest {
         fragmentScenario.onFragment { fragment ->
             fragment.onOptionsItemSelected(sortMenuItem)
         }
-        onView(withText(context.getString(R.string.sort_modif_asc))).perform(click())
+        onView(withText(context.getString(R.string.sort_modif_asc_name))).perform(click())
 
         onView(withId(R.id.entries_list)).check(matches(hasItemAtPosition(0, hasDescendant(withText("a_first_entry")))))
         onView(withId(R.id.entries_list)).check(matches(hasItemAtPosition(1, hasDescendant(withText("c_third_entry")))))

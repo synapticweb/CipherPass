@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="applock_entries">
-        <item>@string/applock_key_passwd</item>
-        <item>@string/applock_key_system</item>
-        <item>@string/applock_key_none</item>
+        <item>@string/applock_passwd_name</item>
+        <item>@string/applock_system_name</item>
+        <item>@string/applock_none_name</item>
     </string-array>
 
     <string-array name="applock_values">
-        <item>passwd</item>
-        <item>system</item>
-        <item>none</item>
+        <item>@string/applock_passwd_value</item>
+        <item>@string/applock_system_value</item>
+        <item>@string/applock_nolock_value</item>
     </string-array>
 
     <string-array name="hash_func_entries">
-        <item>@string/hash_func_md5</item>
-        <item>@string/hash_func_sha</item>
-        <item>@string/hash_func_PBKDF2</item>
+        <item>@string/hash_type_md5_name</item>
+        <item>@string/hash_type_sha_name</item>
+        <item>@string/hash_type_PBKDF2_name</item>
     </string-array>
 
     <string-array name="hash_func_values">
-        <item>md5</item>
-        <item>sha</item>
-        <item>pbkdf2</item>
+        <item>@string/hash_md5_value</item>
+        <item>@string/hash_sha_value</item>
+        <item>@string/hash_pbkdf2_value</item>
     </string-array>
 
     <string-array name="sort_order_names">
-        <item>@string/sort_creation_asc</item>
-        <item>@string/sort_creation_desc</item>
-        <item>@string/sort_name_asc</item>
-        <item>@string/sort_name_desc</item>
-        <item>@string/sort_modif_asc</item>
-        <item>@string/sort_modif_desc</item>
+        <item>@string/sort_creation_asc_name</item>
+        <item>@string/sort_creation_desc_name</item>
+        <item>@string/sort_name_asc_name</item>
+        <item>@string/sort_name_desc_name</item>
+        <item>@string/sort_modif_asc_name</item>
+        <item>@string/sort_modif_desc_name</item>
     </string-array>
 
     <string-array name="sort_orders">
-        <item>SORT_CREATION_ASC</item>
-        <item>SORT_CREATION_DESC</item>
-        <item>SORT_NAME_ASC</item>
-        <item>SORT_NAME_DESC</item>
-        <item>SORT_MODIF_ASC</item>
-        <item>SORT_MODIF_DESC</item>
+        <item>@string/sort_creation_asc_name</item>
+        <item>@string/sort_creation_desc_name</item>
+        <item>@string/sort_name_asc_name</item>
+        <item>@string/sort_name_desc_name</item>
+        <item>@string/sort_modif_asc_name</item>
+        <item>@string/sort_modif_desc_name</item>
     </string-array>
 
     <string-array name="icons">
@@ -75,12 +75,12 @@
     </string-array>
 
     <string-array name="clipboard_timeout_entries">
-        <item>@string/ctout_15</item>
-        <item>@string/ctout_30</item>
-        <item>@string/ctout_60</item>
-        <item>@string/ctout_180</item>
-        <item>@string/ctout_300</item>
-        <item>@string/ctout_disabled</item>
+        <item>@string/clipboard_timeout_15_name</item>
+        <item>@string/clipboard_timeout_30_name</item>
+        <item>@string/clipboard_timeout_60_name</item>
+        <item>@string/clipboard_timeout_180_name</item>
+        <item>@string/clipboard_timeout_300_name</item>
+        <item>@string/clipboard_timeout_disabled_name</item>
     </string-array>
 
     <string-array name="clipboard_timeout_values">
@@ -89,17 +89,17 @@
         <item>60</item>
         <item>180</item>
         <item>300</item>
-        <item>disabled</item>
+        <item>@string/clipboard_timeout_disabled_value</item>
     </string-array>
 
     <string-array name="background_timeout_entries">
-        <item>@string/bt_30</item>
-        <item>@string/bt_60</item>
-        <item>@string/bt_300</item>
-        <item>@string/bt_600</item>
-        <item>@string/bt_900</item>
-        <item>@string/bt_1800</item>
-        <item>@string/bt_disabled</item>
+        <item>@string/background_timeout_30_name</item>
+        <item>@string/background_timeout_60_name</item>
+        <item>@string/background_timeout_300_name</item>
+        <item>@string/background_timeout_600_name</item>
+        <item>@string/background_timeout_900_name</item>
+        <item>@string/background_timeout_1800_name</item>
+        <item>@string/background_timeout_disabled_name</item>
     </string-array>
 
     <string-array name="background_timeout_values">
@@ -109,7 +109,7 @@
         <item>600</item>
         <item>900</item>
         <item>1800</item>
-        <item>disabled</item>
+        <item>@string/background_timeout_disabled_value</item>
     </string-array>
 
 </resources>

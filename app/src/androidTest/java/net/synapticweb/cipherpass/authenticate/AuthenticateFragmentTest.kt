@@ -10,7 +10,6 @@ import junit.framework.Assert.assertNotNull
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.cipherpass.*
-import net.synapticweb.cipherpass.model.HASH_PBKDF2
 import net.synapticweb.cipherpass.util.CipherPassTestRule
 import net.synapticweb.cipherpass.model.Hash
 import net.synapticweb.cipherpass.util.*
@@ -24,11 +23,14 @@ class AuthenticateFragmentTest {
     @get:Rule
     val testRule = CipherPassTestRule()
     private val prefWrapper = PrefWrapper.getInstance(ApplicationProvider.getApplicationContext())
+    private val appLockKey = testRule.application.resources.getString(R.string.applock_key)
+    private val applockPasswd = testRule.application.resources.getString(R.string.applock_passwd_value)
+    private val appLockNoLock = testRule.application.resources.getString(R.string.applock_nolock_value)
 
     @Test
     fun dbNotInitialized_PasswdNoMatch_Error() {
         prefWrapper.removePref(IS_PASSPHRASE_SET_KEY)
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
 
         val activityScenario = launch(MainActivity::class.java)
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
@@ -45,7 +47,7 @@ class AuthenticateFragmentTest {
     @Test
     fun dbNotInitialized_EmptyPasswd_Error() {
         prefWrapper.removePref(IS_PASSPHRASE_SET_KEY)
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
 
         val activityScenario = launch(MainActivity::class.java)
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
@@ -59,7 +61,7 @@ class AuthenticateFragmentTest {
     @Test
     fun dbNotInitialized_goodPasswds_Authenticate()  {
         prefWrapper.removePref(IS_PASSPHRASE_SET_KEY)
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
 
         val activityScenario = launch(MainActivity::class.java)
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
@@ -79,9 +81,11 @@ class AuthenticateFragmentTest {
 
         assertNotNull(hashObj)
         val currentHash = runBlocking {
+            val hashTypeKey = testRule.application.resources.getString(R.string.hash_type_key)
+            val hashPbkdf2 = testRule.application.resources.getString(R.string.hash_pbkdf2_value)
             testRule.repository.createHashString(
                 TEST_PASS.toCharArray(), hexStrToByteArray(hashObj!!.salt), prefWrapper.getString(
-                HASH_TYPE_KEY) ?: HASH_PBKDF2)
+                hashTypeKey) ?: hashPbkdf2)
         }
         assertThat(currentHash, `is`(hashObj!!.hash))
     }
@@ -93,7 +97,7 @@ class AuthenticateFragmentTest {
             testRule.repository.lock()
         }
         prefWrapper.setPref(IS_PASSPHRASE_SET_KEY, true)
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
 
         val activityScenario = launch(MainActivity::class.java)
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
@@ -109,7 +113,7 @@ class AuthenticateFragmentTest {
     @Test
     fun appRunnedOnce_emptyPasswd_Error() {
         prefWrapper.setPref(IS_PASSPHRASE_SET_KEY, true)
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
 
         val activityScenario = launch(MainActivity::class.java)
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
@@ -130,7 +134,7 @@ class AuthenticateFragmentTest {
             testRule.repository.lock()
         }
         prefWrapper.setPref(IS_PASSPHRASE_SET_KEY, true)
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
 
         val activityScenario = launch(MainActivity::class.java)
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
@@ -146,7 +150,7 @@ class AuthenticateFragmentTest {
     fun dbNotInitialized_createHashReturnFalse_showSnackbar() {
         testRule.repository.createPassHashFalse = true
         prefWrapper.removePref(IS_PASSPHRASE_SET_KEY)
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
         val activityScenario = launch(MainActivity::class.java)
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
 
@@ -170,7 +174,7 @@ class AuthenticateFragmentTest {
         }
         testRule.repository.lock()
         prefWrapper.setPref(IS_PASSPHRASE_SET_KEY, true)
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_NOLOCK_VALUE)
+        prefWrapper.setPref(appLockKey, appLockNoLock)
 
         val activityScenario = launch(MainActivity::class.java)
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)
@@ -188,7 +192,7 @@ class AuthenticateFragmentTest {
         testRule.repository.lock()
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
         prefWrapper.setPref(IS_PASSPHRASE_SET_KEY, true)
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_NOLOCK_VALUE)
+        prefWrapper.setPref(appLockKey, appLockNoLock)
 
         val activityScenario = launch(MainActivity::class.java)
         testRule.dataBindingIdlingResource.monitorActivity(activityScenario)

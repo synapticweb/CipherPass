@@ -10,10 +10,6 @@
     <string name="pass_no_match">The passwords entered do not match.</string>
     <string name="pass_empty">Password cannot be empty</string>
     <string name="one_more_backpress">Press the back button one more time to exit.</string>
-    <string name="applock_key_title">Authentication type</string>
-    <string name="applock_key_passwd">Ask for password</string>
-    <string name="applock_key_system">Use system authentication</string>
-    <string name="applock_key_none">No authentication</string>
     <string name="settings_menu_item">Settings</string>
     <string name="settings_insert_pass_title">Password required</string>
     <string name="settings_insert_pass_message">Please insert your password:</string>
@@ -26,19 +22,13 @@
     <string name="system_lock_device_not_secure">To use this feature, you have to secure your device with a password, pin or pattern.</string>
     <string name="system_lock_unavailable">The system provided authentification is unavailable.</string>
     <string name="auth_subtitle">Authentication required</string>
-    <string name="change_pass">Change master password</string>
-    <string name="change_pass_title">Change password</string>
+    <string name="change_pass_dialog_title">Change password</string>
     <string name="act_pass_hint">Actual password</string>
     <string name="new_pass_hint">New password</string>
     <string name="new_pass_retype_hint">Retype new password</string>
     <string name="change_pass_ok">Successfully changed the password.</string>
     <string name="change_pass_error">Error while changing password.</string>
     <string name="act_pass_empty">Actual password cannot be empty.</string>
-    <string name="hash_func_key">Hash function</string>
-    <string name="hash_func_summary">The cryptographic function used for storing the app password.</string>
-    <string name="hash_func_md5">MD5 (fast - low security)</string>
-    <string name="hash_func_sha">SHA512 (fast - medium security)</string>
-    <string name="hash_func_PBKDF2">PBKDF2 (slow - good security)</string>
     <string name="hash_change_success">The hash function was successfully changed</string>
     <string name="hash_change_error">Error changing the hash function.</string>
     <string name="enter_pass">Enter password:</string>
@@ -76,12 +66,6 @@
     <string name="search_title">Search</string>
     <string name="entries_list_sort">Sort order</string>
     <string name="lock_title">Lock database</string>
-    <string name="sort_name_asc">Sort by name ascending</string>
-    <string name="sort_name_desc">Sort by name descending</string>
-    <string name="sort_creation_asc">Sort by creation date ascending</string>
-    <string name="sort_creation_desc">Sort by creation date descending</string>
-    <string name="sort_modif_asc">Sort by modification date ascending</string>
-    <string name="sort_modif_desc">Sort by modification date descending</string>
     <string name="new_field_button">New field</string>
     <string name="new_field_input_title">Add new field</string>
     <string name="new_field_input_hint">Field name</string>
@@ -91,23 +75,6 @@
     <string name="delete_custom_field_title">Delete field</string>
     <string name="delete_custom_field_message">Delete this custom field?</string>
     <string name="edit_custom_field">Edit custom field</string>
-    <string name="clipboard_timeout">Clipboard timeout</string>
-    <string name="clipboard_timeout_summary">Time before clearing clipboard after copying an item.</string>
-    <string name="ctout_15">15 seconds</string>
-    <string name="ctout_30">30 seconds</string>
-    <string name="ctout_60">1 minute</string>
-    <string name="ctout_180">3 minutes</string>
-    <string name="ctout_300">5 minutes</string>
-    <string name="ctout_disabled">Disabled</string>
-    <string name="background_timeout">Background timeout</string>
-    <string name="background_timeout_summary">Time before requring authentication when the app is in background.</string>
-    <string name="bt_30">30 seconds</string>
-    <string name="bt_60">1 minute</string>
-    <string name="bt_300">5 minutes</string>
-    <string name="bt_600">10 minutes</string>
-    <string name="bt_900">15 minutes</string>
-    <string name="bt_1800">30 minutes</string>
-    <string name="bt_disabled">Disabled</string>
     <string name="settings_fragment_title">Settings</string>
     <string name="enter_password_title">Provide your password</string>
     <string name="set_icon_fragment_title">Set entry icon</string>
@@ -133,4 +100,71 @@
     <string name="email">synapticwebb@gmail.com</string>
     <string name="no_waranty">is free and open source software. It comes with ABSOLUTELY NO WARRANTY.</string>
     <string name="attributions">uses database encryption provided by SqlCipher library (https://github.com/sqlcipher/android-database-sqlcipher). The launcher icon is based on artwork from https://www.vecteezy.com. The background of the actionbar banner is based on artwork created by Harryarts (https://www.freepik.com). The social media icons are based on artwork from https://www.flaticon.com and https://www.svgrepo.com/.</string>
+
+    <!-- Preference keys, entry names, entry values, titles, summaries-->
+    <string name="applock_key">applock</string>
+    <string name="applock_title">Authentication type</string>
+    <string name="applock_passwd_value">passwd</string>
+    <string name="applock_system_value">system</string>
+    <string name="applock_nolock_value">none</string>
+    <string name="applock_passwd_name">Ask for password</string>
+    <string name="applock_system_name">Use system authentication</string>
+    <string name="applock_none_name">No authentication</string>
+
+    <string name="change_pass_title">Change master password</string>
+    <string name="changepass_key">changepass</string>
+
+    <string name="hash_type_key">hash</string>
+    <string name="hash_type_title">Hash function</string>
+    <string name="hash_type_summary">The cryptographic function used for storing the app password.</string>
+    <string name="hash_type_md5_name">MD5 (fast - low security)</string>
+    <string name="hash_type_sha_name">SHA512 (fast - medium security)</string>
+    <string name="hash_type_PBKDF2_name">PBKDF2 (slow - good security)</string>
+    <string name="hash_md5_value">md5</string>
+    <string name="hash_sha_value">sha</string>
+    <string name="hash_pbkdf2_value">pbkdf2</string>
+
+    <string name="clipboard_timeout_title">Clipboard timeout</string>
+    <string name="clipboard_timeout_summary">Time before clearing clipboard after copying an item.</string>
+    <string name="clipboard_timeout_key">clipboard_timeout</string>
+    <string name="clipboard_timeout_disabled_value">disabled</string>
+    <string name="clipboard_timeout_15_name">15 seconds</string>
+    <string name="clipboard_timeout_30_name">30 seconds</string>
+    <string name="clipboard_timeout_60_name">1 minute</string>
+    <string name="clipboard_timeout_180_name">3 minutes</string>
+    <string name="clipboard_timeout_300_name">5 minutes</string>
+    <string name="clipboard_timeout_disabled_name">Disabled</string>
+
+    <string name="background_timeout_key">background_timeout</string>
+    <string name="background_timeout_title">Background timeout</string>
+    <string name="background_timeout_summary">Time before requring authentication when the app is in background.</string>
+    <string name="background_timeout_30_name">30 seconds</string>
+    <string name="background_timeout_60_name">1 minute</string>
+    <string name="background_timeout_300_name">5 minutes</string>
+    <string name="background_timeout_600_name">10 minutes</string>
+    <string name="background_timeout_900_name">15 minutes</string>
+    <string name="background_timeout_1800_name">30 minutes</string>
+    <string name="background_timeout_disabled_name">Disabled</string>
+    <string name="background_timeout_disabled_value">disabled</string>
+
+    <string name="sort_name_asc_name">Sort by name ascending</string>
+    <string name="sort_name_desc_name">Sort by name descending</string>
+    <string name="sort_creation_asc_name">Sort by creation date ascending</string>
+    <string name="sort_creation_desc_name">Sort by creation date descending</string>
+    <string name="sort_modif_asc_name">Sort by modification date ascending</string>
+    <string name="sort_modif_desc_name">Sort by modification date descending</string>
+    <string name="sort_creation_asc_value">SORT_CREATION_ASC</string>
+    <string name="sort_creation_desc_value">SORT_CREATION_DESC</string>
+    <string name="sort_name_asc_value">SORT_NAME_ASC</string>
+    <string name="sort_name_desc_value">SORT_NAME_DESC</string>
+    <string name="sort_modif_asc_value">SORT_MODIF_ASC</string>
+    <string name="sort_modif_desc_value">SORT_MODIF_DESC</string>
+
+    <string name="allow_reports_key">acra.enable</string>
+    <string name="allow_reports_title">Crash reports</string>
+    <string name="allow_reports_summary">Allow sending anonymous report to developer when app crashes.</string>
+
+    <string name="include_logcat_key">acra.syslog.enable</string>
+    <string name="include_logcat_title">Logcat extract</string>
+    <string name="include_logcat_summary">Include logcat extract in crash report.</string>
 </resources>

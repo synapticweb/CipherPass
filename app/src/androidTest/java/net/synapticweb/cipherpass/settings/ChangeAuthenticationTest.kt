@@ -8,12 +8,7 @@ import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import junit.framework.Assert.assertNull
-import kotlinx.coroutines.delay
 import net.synapticweb.cipherpass.*
-import net.synapticweb.cipherpass.authenticate.APPLOCK_KEY
-import net.synapticweb.cipherpass.authenticate.APPLOCK_NOLOCK_VALUE
-import net.synapticweb.cipherpass.authenticate.APPLOCK_PASSWD_VALUE
-import net.synapticweb.cipherpass.authenticate.APPLOCK_SYSTEM_VALUE
 import net.synapticweb.cipherpass.util.*
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Rule
@@ -23,12 +18,18 @@ class ChangeAuthenticationTest {
     @get:Rule
     val testRule = CipherPassTestRule()
     private val prefWrapper = PrefWrapper.getInstance(ApplicationProvider.getApplicationContext())
+    private val appLockKey = testRule.application.resources.getString(R.string.applock_key)
+    private val applockPasswd = testRule.application.resources.getString(R.string.applock_passwd_value)
+    private val appLockNoLock = testRule.application.resources.getString(R.string.applock_nolock_value)
+    private val appLockSystem = testRule.application.resources.getString(R.string.applock_system_value)
+
+
 
     @Test
     fun softBacked_showWarning() {
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
-        prefWrapper.removePref(DO_NOT_SHOW_WARNING)
+        prefWrapper.removePref(DO_NOT_SHOW_WARNING_KEY)
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
@@ -41,9 +42,9 @@ class ChangeAuthenticationTest {
 
     @Test
     fun softBacked_clickOK_showEditText() {
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
-        prefWrapper.removePref(DO_NOT_SHOW_WARNING)
+        prefWrapper.removePref(DO_NOT_SHOW_WARNING_KEY)
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
@@ -61,7 +62,7 @@ class ChangeAuthenticationTest {
     fun badPass_Error() {
         testRule.setDb()
         testRule.cipher.hasHardwareStorage = true
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
@@ -81,7 +82,7 @@ class ChangeAuthenticationTest {
     fun goodPass_modifySettings() {
         testRule.setDb()
         testRule.cipher.hasHardwareStorage = true
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
@@ -94,12 +95,12 @@ class ChangeAuthenticationTest {
 
         val passwd = testRule.cipher.decryptPassFromSettings()
         assertThat(passwd, `is`("test".toCharArray()))
-        assertThat(prefWrapper.getString(APPLOCK_KEY), `is`(APPLOCK_NOLOCK_VALUE))
+        assertThat(prefWrapper.getString(appLockKey), `is`(appLockNoLock))
     }
 
     @Test
     fun systemAuth_toNoAuth_noDialog() {
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_SYSTEM_VALUE)
+        prefWrapper.setPref(appLockKey, appLockSystem)
         testRule.cipher.encryptPassToSettings("test".toCharArray())
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
@@ -108,12 +109,12 @@ class ChangeAuthenticationTest {
         onView(withText("No authentication")).perform(click())
 
         onView(withId(R.id.md_root)).check(doesNotExist())
-        assertThat(prefWrapper.getString(APPLOCK_KEY), `is`(APPLOCK_NOLOCK_VALUE))
+        assertThat(prefWrapper.getString(appLockKey), `is`(appLockNoLock))
     }
 
     @Test
     fun systemAuth_toPassAuth_noDialog_passErased() {
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_SYSTEM_VALUE)
+        prefWrapper.setPref(appLockKey, appLockSystem)
         testRule.cipher.encryptPassToSettings("test".toCharArray())
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
@@ -123,14 +124,14 @@ class ChangeAuthenticationTest {
 
         onView(withId(R.id.md_root)).check(doesNotExist())
         assertNull(testRule.cipher.decryptPassFromSettings())
-        assertThat(prefWrapper.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
+        assertThat(prefWrapper.getString(appLockKey), `is`(applockPasswd))
     }
 
     @Test
     fun goodPass_errorWriteSettings_showSnackbar() {
         testRule.setDb()
         testRule.cipher.hasHardwareStorage = true
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
         testRule.cipher.encryptPassReturnError = true
 
@@ -147,14 +148,14 @@ class ChangeAuthenticationTest {
             .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
 
         assertNull(testRule.cipher.decryptPassFromSettings())
-        assertThat(prefWrapper.getString(APPLOCK_KEY), `is`(APPLOCK_PASSWD_VALUE))
+        assertThat(prefWrapper.getString(appLockKey), `is`(applockPasswd))
     }
 
     @Test
     fun softBack_checkNoMoreWarnings_warningNotDisplayedAgain() {
-        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+        prefWrapper.setPref(appLockKey, applockPasswd)
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
-        prefWrapper.removePref(DO_NOT_SHOW_WARNING)
+        prefWrapper.removePref(DO_NOT_SHOW_WARNING_KEY)
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)

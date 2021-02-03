@@ -3,7 +3,6 @@ fără string la parolele conturilor
 #*dată modificare cont
 grupuri
 *iconițe pentru fiecare cont și grup
-log cu timber 
 #*ordonare: creation last mod, alfa
 #*cautare
 db remote
@@ -13,3 +12,20 @@ dialog cu progres la creare/editare
 *backup and export db
 #error handling la editare și ștergere
 completare settings
+
+#editare sau stergere custom field: no change detected
+#culoare butoane dialoguri materialdia
+#buton lock rearanjare sort
+#scoatere eroare roșu
+#passphrase to password
+#do not show warning soft storage
+#cînd se scoate cîmpul protejat rămîn punctele
+#se dă voie empty entry name
+#text cînd nu sînt entries.
+#cînd valoarea cf e "" nu apare value not set în detail
+icoane
+#adunare constante
+#icoana
+#about page
+acra, analitics
+logare în caz de eroare

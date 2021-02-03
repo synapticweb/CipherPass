@@ -14,7 +14,6 @@ import junit.framework.Assert.assertNull
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.synapticweb.cipherpass.R
-import net.synapticweb.cipherpass.entrieslist.SORT_CREATION_DESC
 import net.synapticweb.cipherpass.model.CustomField
 import net.synapticweb.cipherpass.model.Entry
 import net.synapticweb.cipherpass.util.*
@@ -81,7 +80,9 @@ class AddeditEntryFragmentTest {
 
         onView(withId(R.id.save)).perform(click())
 
-        val entry : Entry? = testRule.repository.getAllEntries(SORT_CREATION_DESC).value?.get(0)
+        val entry : Entry? = testRule.repository.getAllEntries(
+            testRule.application.resources.getString(R.string.sort_creation_desc_value))
+                .value?.get(0)
         if (entry != null) {
             assertThat(entry.entryName, `is`("test_name"))
             assertThat(entry.username, `is`("test_username"))

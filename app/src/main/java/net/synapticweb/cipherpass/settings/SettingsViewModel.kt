@@ -5,8 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import net.synapticweb.cipherpass.authenticate.APPLOCK_KEY
-import net.synapticweb.cipherpass.authenticate.APPLOCK_PASSWD_VALUE
+import net.synapticweb.cipherpass.CipherPassApp
+import net.synapticweb.cipherpass.R
 import net.synapticweb.cipherpass.model.Repository
 import net.synapticweb.cipherpass.util.*
 import java.util.*
@@ -21,7 +21,7 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
     val finish = MutableLiveData<Event<Boolean>>()
     val passInvalid = MutableLiveData<Event<Boolean>>()
     val writeSettingsFail = MutableLiveData<Event<Boolean>>()
-
+    private val res = getApplication<CipherPassApp>().resources
     private val prefWrapper = PrefWrapper.getInstance(getApplication())
 
     fun hasEncryptedPass() : Boolean {
@@ -33,7 +33,8 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
     }
 
     private fun hasWeakAuthentication() : Boolean {
-        return prefWrapper.getString(APPLOCK_KEY) != APPLOCK_PASSWD_VALUE
+        return prefWrapper.getString(res.getString(R.string.applock_key)) !=
+                res.getString(R.string.applock_passwd_value)
     }
 
     fun changePass(actualPass : CharArray, newPass : CharArray) {
@@ -50,7 +51,8 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
                 //eșuează, scnhimbăm la auth cu parolă și nu mai facem nimic.
                 if (hasWeakAuthentication() && !cipher.encryptPassToSettings(newPass)) {
                     deleteEncryptedPass()
-                    prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+                    prefWrapper.setPref(res.getString(R.string.applock_key),
+                        res.getString(R.string.applock_passwd_value))
                     finish.value = Event(false)
                     working.value = false
                     return@launch
@@ -58,7 +60,8 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
 
                 if(!repository.createPassHash(newPass, null)) {
                     if(hasEncryptedPass()) {
-                        prefWrapper.setPref(APPLOCK_KEY, APPLOCK_PASSWD_VALUE)
+                        prefWrapper.setPref(res.getString(R.string.applock_key),
+                            res.getString(R.string.applock_passwd_value))
                         deleteEncryptedPass()
                     }
                     finish.value = Event(false)
@@ -118,7 +121,7 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
                 return@launch
             }
 
-            prefWrapper.setPrefSync(APPLOCK_KEY, authType)
+            prefWrapper.setPrefSync(res.getString(R.string.applock_key), authType)
             working.value = false
             finish.value = Event(true)
         }
@@ -126,6 +129,6 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
 
     fun shouldShowWarning() : Boolean {
         return !cipher.isStorageHardwareBacked() &&
-                !(prefWrapper.getBoolean(DO_NOT_SHOW_WARNING) ?: false)
+                !(prefWrapper.getBoolean(DO_NOT_SHOW_WARNING_KEY) ?: false)
     }
 }

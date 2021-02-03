@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <ListPreference
-        android:key="applock"
-        android:title="@string/applock_key_title"
+        android:key="@string/applock_key"
+        android:title="@string/applock_title"
         android:entries="@array/applock_entries"
         android:entryValues="@array/applock_values"
         android:defaultValue="passwd">
@@ -10,20 +10,20 @@
     </ListPreference>
 
     <ListPreference
-        android:key="hash"
-        android:title="@string/hash_func_key"
-        android:summary="@string/hash_func_summary"
+        android:key="@string/hash_type_key"
+        android:title="@string/hash_type_title"
+        android:summary="@string/hash_type_summary"
         android:entries="@array/hash_func_entries"
         android:entryValues="@array/hash_func_values"
         android:defaultValue="pbkdf2" />
 
     <Preference
-        android:key="changepass"
-        android:title="@string/change_pass"/>
+        android:key="@string/changepass_key"
+        android:title="@string/change_pass_title"/>
 
     <ListPreference
-        android:key="clipboard_timeout"
-        android:title="@string/clipboard_timeout"
+        android:key="@string/clipboard_timeout_key"
+        android:title="@string/clipboard_timeout_title"
         android:entries="@array/clipboard_timeout_entries"
         android:entryValues="@array/clipboard_timeout_values"
         android:summary="@string/clipboard_timeout_summary"
@@ -31,12 +31,24 @@
     </ListPreference>
 
     <ListPreference
-        android:key="background_timeout"
-        android:title="@string/background_timeout"
+        android:key="@string/background_timeout_key"
+        android:title="@string/background_timeout_title"
         android:summary="@string/background_timeout_summary"
         android:entries="@array/background_timeout_entries"
         android:entryValues="@array/background_timeout_values"
         android:defaultValue="30">
     </ListPreference>
+
+    <SwitchPreference
+        android:key="@string/allow_reports_key"
+        android:defaultValue="true"
+        android:summary="@string/allow_reports_summary"
+        android:title="@string/allow_reports_title" />
+
+    <CheckBoxPreference
+        android:key="@string/include_logcat_key"
+        android:defaultValue="true"
+        android:title="@string/include_logcat_title"
+        android:summary="@string/include_logcat_summary" />
 
 </androidx.preference.PreferenceScreen>

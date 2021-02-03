@@ -55,9 +55,9 @@ class AuthenticateFragment : Fragment() {
         setupSendPass()
 
         when(_viewModel.getApplockPref()) {
-            APPLOCK_SYSTEM_VALUE -> showSystemAuthDialog()
+            getString(R.string.applock_system_value) -> showSystemAuthDialog()
 
-            APPLOCK_NOLOCK_VALUE -> {
+            getString(R.string.applock_nolock_value) -> {
                 binding.passLayout.visibility = View.GONE
                 binding.sendPass.visibility = View.GONE
                 _viewModel.getPassphrase()
