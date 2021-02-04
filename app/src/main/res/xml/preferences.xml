@@ -39,16 +39,17 @@
         android:defaultValue="30">
     </ListPreference>
 
-    <SwitchPreference
+    <net.synapticweb.cipherpass.settings.CustomSwitchPreference
         android:key="@string/allow_reports_key"
         android:defaultValue="true"
         android:summary="@string/allow_reports_summary"
-        android:title="@string/allow_reports_title" />
+        android:title="@string/allow_reports_title"
+       />
 
-    <CheckBoxPreference
-        android:key="@string/include_logcat_key"
-        android:defaultValue="true"
-        android:title="@string/include_logcat_title"
-        android:summary="@string/include_logcat_summary" />
+    <net.synapticweb.cipherpass.settings.CustomSwitchPreference
+        android:key="@string/allow_usage_data_key"
+        android:title="@string/allow_usage_data_title"
+        android:summary="@string/allow_usage_data_summary"
+        android:defaultValue="true" />
 
 </androidx.preference.PreferenceScreen>

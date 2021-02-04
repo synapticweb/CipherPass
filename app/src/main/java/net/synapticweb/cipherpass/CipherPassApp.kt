@@ -9,6 +9,9 @@ import org.acra.annotation.AcraCore
 import org.acra.annotation.AcraHttpSender
 import org.acra.data.StringFormat
 import org.acra.sender.HttpSender
+import org.matomo.sdk.Matomo
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.TrackerBuilder
 
 const val APP_TAG = "CipherPass"
 
@@ -21,6 +24,7 @@ open class CipherPassApp : Application() {
     val appComponent : AppComponent by lazy {
        initializeComponent()
     }
+    private var tracker : Tracker? = null
 
     open fun initializeComponent() : AppComponent {
         return DaggerAppComponent.factory().create(applicationContext, this)
@@ -30,5 +34,12 @@ open class CipherPassApp : Application() {
         super.attachBaseContext(base)
         if (!BuildConfig.DEBUG)
             ACRA.init(this)
+    }
+
+    @Synchronized
+    fun getTracker() : Tracker {
+        if(tracker == null)
+            tracker = TrackerBuilder.createDefault("https://matomo.synapticweb.net/matomo.php", 1).build(Matomo.getInstance(this))
+        return tracker as Tracker
     }
 }

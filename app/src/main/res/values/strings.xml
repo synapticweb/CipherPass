@@ -93,13 +93,17 @@
     <string name="no_entries">There are currently no entries.</string>
     <string name="about_fragment_name">About</string>
     <string name="version">version</string>
-    <string name="app_description">is a basic password manager for Android that stores password data in an AES-256 encrypted database. This ensures secure storage of password data even on rooted devices.</string>
+    <string name="app_description">is a basic password manager for Android that stores password data in an encrypted database. This ensures secure storage of password data even on rooted devices.</string>
     <string name="website_label">Website:</string>
     <string name="website">https://github.com/synapticweb/CipherPass</string>
     <string name="contact_label">Developer contact:</string>
     <string name="email">synapticwebb@gmail.com</string>
     <string name="no_waranty">is free and open source software. It comes with ABSOLUTELY NO WARRANTY.</string>
     <string name="attributions">uses database encryption provided by SqlCipher library (https://github.com/sqlcipher/android-database-sqlcipher). The launcher icon is based on artwork from https://www.vecteezy.com. The background of the actionbar banner is based on artwork created by Harryarts (https://www.freepik.com). The social media icons are based on artwork from https://www.flaticon.com and https://www.svgrepo.com/.</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="priv_pol_intro">There are two situations when %s collects and sends data over the internet:</string>
+    <string name="priv_pol_1">1. When the switch preference \"Crash reports\" is ON and an app crash happens, some data useful for debugging is compiled in a crash report which is anonymously sent to developer. This data include the app version, the device model, the device brand, the Android version, the stack trace, the device capabilities, the logcat extras if available, the settings of the app, and the date and hour of the crash. Except the developer, there is no third party that has access to this data. There is no way for the developer to actually identify the users using this data. The crash report never includes PASSWORD DATA that the user has stored in the app database. The crash reports are compiled and sent using the ACRA library (https://github.com/ACRA/acra).</string>
+    <string name="priv_pol2">2. When the switch preference "\Usage data\" is ON, the developer is notified when the user installs or updates the app and also when the user opens the app. This data is anonymous and is used only for statistics (i.e, how hany people installed the app, how many people currently use the app, what Android versions they use, in what countries is the app installed more frequently). Except the developer, there is no third party that has access to this data. There is no way for the developer to actually identify the users using this data. The usage data never includes PASSWORD DATA that the user has stored in the app database. The usage data is collected using the Matomo analytics software (https://matomo.org/). </string>
 
     <!-- Preference keys, entry names, entry values, titles, summaries-->
     <string name="applock_key">applock</string>
@@ -162,9 +166,9 @@
 
     <string name="allow_reports_key">acra.enable</string>
     <string name="allow_reports_title">Crash reports</string>
-    <string name="allow_reports_summary">Allow sending anonymous report to developer when app crashes.</string>
+    <string name="allow_reports_summary">When this setting is on a report will be anonymously sent to developer if the app crashes.</string>
 
-    <string name="include_logcat_key">acra.syslog.enable</string>
-    <string name="include_logcat_title">Logcat extract</string>
-    <string name="include_logcat_summary">Include logcat extract in crash report.</string>
+    <string name="allow_usage_data_key">usage_data</string>
+    <string name="allow_usage_data_title">Usage data</string>
+    <string name="allow_usage_data_summary">When this setting is on some usage data will be anonymously sent to developer.</string>
 </resources>

@@ -23,8 +23,8 @@ import net.synapticweb.cipherpass.databinding.EntriesListFragmentBinding
 import net.synapticweb.cipherpass.util.EventObserver
 import net.synapticweb.cipherpass.util.PrefWrapper
 import net.synapticweb.cipherpass.util.handleBackPressed
+import org.matomo.sdk.extra.TrackHelper
 import javax.inject.Inject
-
 
 class EntriesListFragment : Fragment() {
     @Inject
@@ -81,6 +81,14 @@ class EntriesListFragment : Fragment() {
 
         setHasOptionsMenu(true)
 
+        val prefWrapper = PrefWrapper.getInstance(requireContext())
+        val acceptsTracking = prefWrapper.getBoolean(getString(R.string.allow_usage_data_key)) == true
+
+        if(!BuildConfig.DEBUG && acceptsTracking) {
+            val tracker = (requireActivity().application as CipherPassApp).getTracker()
+            TrackHelper.track().download().version(BuildConfig.VERSION_NAME).with(tracker)
+            TrackHelper.track().screen(requireActivity()).with(tracker)
+        }
         return binding.root
     }
 

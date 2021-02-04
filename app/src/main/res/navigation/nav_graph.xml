@@ -42,6 +42,9 @@
         <action
             android:id="@+id/action_settingsFragment_to_authenticateFragment"
             app:destination="@id/authenticateFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_privPolicyFragment"
+            app:destination="@id/privPolicyFragment" />
     </fragment>
 
     <fragment
@@ -107,6 +110,17 @@
             app:destination="@id/entriesListFragment" />
         <action
             android:id="@+id/action_aboutFragment_to_authenticateFragment"
+            app:destination="@id/authenticateFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/privPolicyFragment"
+        android:name="net.synapticweb.cipherpass.entrieslist.PrivPolicyFragment"
+        android:label="@string/privacy_policy" >
+        <action
+            android:id="@+id/action_privPolicyFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_privPolicyFragment_to_authenticateFragment"
             app:destination="@id/authenticateFragment" />
     </fragment>
 </navigation>
