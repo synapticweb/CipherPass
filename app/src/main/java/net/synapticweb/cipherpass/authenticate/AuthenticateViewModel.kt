@@ -13,22 +13,25 @@ import javax.inject.Inject
 
 const val IS_PASSPHRASE_SET_KEY = "passphrase_set_key"
 const val AUTH_OK = 0
+const val KEY_STORAGE_TYPE_KEY = "key_storage_type"
+const val KEY_STORAGE_HARDWARE = "hardware"
+const val KEY_STORAGE_SOFTWARE = "software"
 
 class AuthenticateViewModel @Inject constructor(private val repository: Repository,
                                                 private val cipher: CPCipher,
                                                 application: Application) : AndroidViewModel(application) {
+
+    private val prefWrapper = PrefWrapper.getInstance(getApplication())
     val passSet  = MutableLiveData(isPassSet())
     val passwd = MutableLiveData<CharArray?>()
     val working = MutableLiveData<Boolean>()
     val authResult = MutableLiveData<Event<Int>>()
 
     fun isPassSet() : Boolean {
-        val prefWrapper = PrefWrapper.getInstance(getApplication())
         return prefWrapper.getBoolean(IS_PASSPHRASE_SET_KEY) != null
     }
 
     private fun setPassSet() {
-        val prefWrapper = PrefWrapper.getInstance(getApplication())
         prefWrapper.setPref(IS_PASSPHRASE_SET_KEY, true)
     }
 
@@ -80,6 +83,12 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
             working.value = false
             authResult.value = Event(AUTH_OK)
             Arrays.fill(passphrase, 0.toChar())
+
+            if(prefWrapper.getString(KEY_STORAGE_TYPE_KEY) == null)
+                prefWrapper.setPref(KEY_STORAGE_TYPE_KEY,  if(cipher.isStorageHardwareBacked())
+                    KEY_STORAGE_HARDWARE
+                else
+                    KEY_STORAGE_SOFTWARE)
         }
     }
 }

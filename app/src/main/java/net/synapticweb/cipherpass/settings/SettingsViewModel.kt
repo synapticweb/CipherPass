@@ -126,9 +126,4 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
             finish.value = Event(true)
         }
     }
-
-    fun shouldShowWarning() : Boolean {
-        return !cipher.isStorageHardwareBacked() &&
-                !(prefWrapper.getBoolean(DO_NOT_SHOW_WARNING_KEY) ?: false)
-    }
 }

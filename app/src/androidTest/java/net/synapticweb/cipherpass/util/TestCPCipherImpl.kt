@@ -7,7 +7,7 @@ class TestCPCipherImpl(context: Context) : CPCipherImpl(context) {
     var encryptPassReturnError : Boolean = false
     var decryptPassReturnError : Boolean = false
 
-    override fun isStorageHardwareBacked() : Boolean {
+    override suspend fun isStorageHardwareBacked() : Boolean {
         return hasHardwareStorage
     }
 

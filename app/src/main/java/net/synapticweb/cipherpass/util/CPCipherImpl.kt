@@ -64,7 +64,7 @@ open class CPCipherImpl(private val context : Context) : CPCipher {
         return (keyStore.getEntry(ASYM_KEY_ALIAS, null) as KeyStore.PrivateKeyEntry).privateKey
     }
 
-    override fun isStorageHardwareBacked(): Boolean {
+    override suspend fun isStorageHardwareBacked(): Boolean {
         if(Build.VERSION.SDK_INT < 23)
             return false
         val key = getPrivateKey()

@@ -3,10 +3,9 @@ package net.synapticweb.cipherpass.settings
 import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
+import android.text.Editable
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.preference.ListPreference
@@ -18,77 +17,46 @@ import com.afollestad.materialdialogs.callbacks.onPreShow
 import com.afollestad.materialdialogs.customview.customView
 import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.cipherpass.*
+import net.synapticweb.cipherpass.authenticate.KEY_STORAGE_HARDWARE
+import net.synapticweb.cipherpass.authenticate.KEY_STORAGE_SOFTWARE
+import net.synapticweb.cipherpass.authenticate.KEY_STORAGE_TYPE_KEY
 import net.synapticweb.cipherpass.databinding.ChangePassDialogBinding
-import net.synapticweb.cipherpass.databinding.EnterPassDialogBinding
 import net.synapticweb.cipherpass.databinding.PasswdValidatorDialogBinding
+import net.synapticweb.cipherpass.databinding.SoftStorageWarningDialogBinding
 import net.synapticweb.cipherpass.util.*
 import java.util.*
 
 const val DO_NOT_SHOW_WARNING_KEY = "do_ not_show_warning"
 
 fun SettingsFragment.changeHash(preference: ListPreference, newHashType : String)  {
-    val binding : PasswdValidatorDialogBinding =
-        PasswdValidatorDialogBinding.inflate(
-            LayoutInflater.from(requireContext())
-        ).apply {
-            viewModel = viewModelFrg
-            lifecycleOwner = this@changeHash
-        }
-
-    MaterialDialog(requireContext()).show {
-        noAutoDismiss()
-        title(null, getString(R.string.enter_pass))
-        customView(null, binding.root)
-
-        onPreShow { dialog ->
-            disablePositiveWhenEmpty(dialog, R.id.passphrase)
-        }
-
-        binding.passphrase.addTextChangedListener {
-            binding.passLayout.error = null
-        }
-
-        positiveButton(android.R.string.ok) {
-            viewModelFrg.working.removeObservers(viewLifecycleOwner)
-            viewModelFrg.working.observe(viewLifecycleOwner, Observer {
-                getActionButton(WhichButton.POSITIVE).isEnabled = !it
+    doJobWithPassword(fun(dialog) {
+        viewModelFrg.finish.removeObservers(viewLifecycleOwner)
+        viewModelFrg.finish.observe(viewLifecycleOwner,
+            EventObserver {
+                dialog.dismiss()
+                if (it) {
+                    PrefWrapper.getInstance(requireContext()).
+                    setPref(getString(R.string.hash_type_key), newHashType)
+                    preference.value = newHashType
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.hash_change_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.hash_change_error),
+                        Toast.LENGTH_SHORT
+                    ).show()
             })
 
-            viewModelFrg.passInvalid.removeObservers(viewLifecycleOwner)
-            viewModelFrg.passInvalid.observe(viewLifecycleOwner,
-                EventObserver {
-                    binding.passLayout.error =
-                        getString(R.string.pass_incorect)
-                })
-
-            viewModelFrg.finish.removeObservers(viewLifecycleOwner)
-            viewModelFrg.finish.observe(viewLifecycleOwner,
-                EventObserver {
-                    binding.passphrase.text!!.clear()
-                    dismiss()
-                    if (it) {
-                        PrefWrapper.getInstance(requireContext()).
-                            setPref(getString(R.string.hash_type_key), newHashType)
-                        preference.value = newHashType
-                        Toast.makeText(
-                            requireContext(),
-                            getString(R.string.hash_change_success),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else
-                        Toast.makeText(
-                            requireContext(),
-                            getString(R.string.hash_change_error),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                })
-
-            viewModelFrg.changeHash(
-                editableToCharArray(
-                    binding.passphrase.text!!
-                ), newHashType)
-        }
-    }
+    }, fun(editable) {
+        viewModelFrg.changeHash(
+            editableToCharArray(
+                editable
+            ), newHashType)
+    })
 }
 
 fun SettingsFragment.changePass() {
@@ -219,78 +187,103 @@ fun SettingsFragment.changeAuthentication(preference: Preference, newValue : Str
 
 fun SettingsFragment.createDialogForAuthChange(preference: Preference, authName: String,
                                                authenticationType : String) {
-    val binding : EnterPassDialogBinding =
-        EnterPassDialogBinding.inflate(
-            LayoutInflater.from(requireContext())
-        ).apply {
-            viewModel = viewModelFrg
-            authType = authenticationType
-            lifecycleOwner = this@createDialogForAuthChange
-        }
-
-    binding.passphrase.addTextChangedListener {
-        binding.passLayout.error = null
-    }
-
-    viewModelFrg.passInvalid.removeObservers(viewLifecycleOwner)
-    viewModelFrg.passInvalid.observe(viewLifecycleOwner, EventObserver {
-        binding.passLayout.error = getString(R.string.pass_incorect)
-    })
-
-    MaterialDialog(requireContext()).show {
-        noAutoDismiss()
-        title(
-            if(viewModelFrg.shouldShowWarning())
-                R.string.warning_title
-            else
-                R.string.enter_password_title
-        )
-        customView(null, binding.root)
-        onPreShow { dialog ->
-            if(binding.passLayout.isVisible)
-                disablePositiveWhenEmpty(dialog, R.id.passphrase)
-        }
-
-        viewModelFrg.working.removeObservers(viewLifecycleOwner)
-        viewModelFrg.working.observe(viewLifecycleOwner, Observer {
-            getActionButton(WhichButton.POSITIVE).isEnabled = !it
-        })
-
+    val setObservers = fun(dialog : MaterialDialog) {
         viewModelFrg.finish.removeObservers(viewLifecycleOwner)
         viewModelFrg.finish.observe(viewLifecycleOwner, EventObserver {
             preference.summary = authName
             (preference as ListPreference).value = authenticationType
-            dismiss()
+            dialog.dismiss()
         })
 
         viewModelFrg.writeSettingsFail.removeObservers(viewLifecycleOwner)
         viewModelFrg.writeSettingsFail.observe(viewLifecycleOwner, EventObserver {
-            dismiss()
+            dialog.dismiss()
             Snackbar.make(requireView(), getString(R.string.system_lock_file_write_fail),
                 Snackbar.LENGTH_SHORT).show()
         })
+    }
 
-        positiveButton(android.R.string.ok) { dialog ->
-            if(binding.softStorageWarning.isVisible) {
+    val onPositive = fun(editable : Editable) {
+        viewModelFrg.changeAuthentication(editableToCharArray(editable), authenticationType)
+    }
+
+    if(shouldShowWarning()) {
+        MaterialDialog(requireContext()).show {
+            noAutoDismiss()
+            title(R.string.warning_title)
+            val binding = SoftStorageWarningDialogBinding.inflate(
+                LayoutInflater.from(requireContext())).apply {
+                    authType = authenticationType
+                    lifecycleOwner = this@createDialogForAuthChange
+                }
+            customView(null, binding.root)
+            positiveButton(android.R.string.ok) {
                 if(binding.stopShowingWarning.isChecked)
                     PrefWrapper.getInstance(requireContext()).setPref(DO_NOT_SHOW_WARNING_KEY, true)
+                dismiss()
+                doJobWithPassword(setObservers, onPositive)
+            }
 
-                binding.softStorageWarning.visibility = View.GONE
-                binding.stopShowingWarningBox.visibility = View.GONE
-                binding.passLayout.visibility = View.VISIBLE
-                disablePositiveWhenEmpty(dialog, R.id.passphrase)
-                title(R.string.enter_password_title)
+            negativeButton(android.R.string.cancel) {
+                dismiss()
             }
-            else {
-                binding.passphrase.text?.let {
-                    viewModelFrg.changeAuthentication(editableToCharArray(it), authenticationType)
-                    it.clear()
-                }
-            }
+        }
+    }
+    else
+        doJobWithPassword(setObservers, onPositive)
+}
+
+fun SettingsFragment.doJobWithPassword(setCustomObservers : (dialog : MaterialDialog) -> Unit,
+                                       onPositive : (editable : Editable) -> Unit) {
+    val binding : PasswdValidatorDialogBinding =
+        PasswdValidatorDialogBinding.inflate(
+            LayoutInflater.from(requireContext())
+        ).apply {
+            viewModel = viewModelFrg
+            lifecycleOwner = this@doJobWithPassword
+        }
+
+    MaterialDialog(requireContext()).show {
+        noAutoDismiss()
+        title(null, getString(R.string.enter_pass))
+        customView(null, binding.root)
+
+        onPreShow { dialog ->
+            disablePositiveWhenEmpty(dialog, R.id.passphrase)
+        }
+
+        binding.passphrase.addTextChangedListener {
+            binding.passLayout.error = null
+        }
+
+        viewModelFrg.working.removeObservers(viewLifecycleOwner)
+        viewModelFrg.working.observe(viewLifecycleOwner, {
+            getActionButton(WhichButton.POSITIVE).isEnabled = !it
+        })
+
+        viewModelFrg.passInvalid.removeObservers(viewLifecycleOwner)
+        viewModelFrg.passInvalid.observe(viewLifecycleOwner,
+            EventObserver {
+                binding.passLayout.error =
+                    getString(R.string.pass_incorect)
+            })
+
+        setCustomObservers(this)
+
+        positiveButton {
+            onPositive(binding.passphrase.text!!)
+            binding.passphrase.text!!.clear()
         }
 
         negativeButton(android.R.string.cancel) {
             dismiss()
         }
     }
+}
+
+fun SettingsFragment.shouldShowWarning() : Boolean {
+    val prefWrapper = PrefWrapper.getInstance(requireContext())
+    val storageType = prefWrapper.getString(KEY_STORAGE_TYPE_KEY) ?: KEY_STORAGE_SOFTWARE
+    return storageType != KEY_STORAGE_HARDWARE &&
+            !(prefWrapper.getBoolean(DO_NOT_SHOW_WARNING_KEY) ?: false)
 }

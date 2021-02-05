@@ -23,8 +23,6 @@ class ChangeAuthenticationTest {
     private val appLockNoLock = testRule.application.resources.getString(R.string.applock_nolock_value)
     private val appLockSystem = testRule.application.resources.getString(R.string.applock_system_value)
 
-
-
     @Test
     fun softBacked_showWarning() {
         prefWrapper.setPref(appLockKey, applockPasswd)
@@ -53,9 +51,7 @@ class ChangeAuthenticationTest {
 
         onView(withText("OK")).perform(click())
         onView(withId(R.id.passphrase)).check(matches(isDisplayed()))
-        onView(withId(R.id.soft_storage_warning)).check(matches(withEffectiveVisibility(Visibility.GONE)))
-        onView(withId(R.id.stop_showing_warning_box)).check(matches(withEffectiveVisibility(Visibility.GONE)))
-        onView(withId(R.id.md_text_title)).check(matches(withText(R.string.enter_password_title)))
+        onView(withId(R.id.md_text_title)).check(matches(withText(R.string.enter_pass)))
     }
 
     @Test
@@ -73,7 +69,6 @@ class ChangeAuthenticationTest {
         onView(withId(R.id.passphrase)).perform(typeText("test1"), closeSoftKeyboard())
         onView(withText("OK")).perform(click())
 
-        onView(withId(R.id.md_text_title)).check(matches(withText(R.string.enter_password_title)))
         onView(withId(R.id.pass_layout)).check(matches(hasTextInputLayoutErrorText(
             testRule.application.getString(R.string.pass_incorect))))
     }
@@ -169,6 +164,6 @@ class ChangeAuthenticationTest {
         onView(withText("Authentication type")).perform(click())
         onView(withText("No authentication")).perform(click())
 
-        onView(withId(R.id.soft_storage_warning)).check(matches(withEffectiveVisibility(Visibility.GONE)))
+        onView(withId(R.id.soft_storage_warning)).check(doesNotExist())
     }
 }
