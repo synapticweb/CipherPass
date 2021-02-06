@@ -3,7 +3,6 @@ package net.synapticweb.cipherpass.settings
 import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
-import android.text.Editable
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
@@ -51,11 +50,8 @@ fun SettingsFragment.changeHash(preference: ListPreference, newHashType : String
                     ).show()
             })
 
-    }, fun(editable) {
-        viewModelFrg.changeHash(
-            editableToCharArray(
-                editable
-            ), newHashType)
+    }, fun(password) {
+        viewModelFrg.changeHash(password, newHashType)
     })
 }
 
@@ -203,8 +199,8 @@ fun SettingsFragment.createDialogForAuthChange(preference: Preference, authName:
         })
     }
 
-    val onPositive = fun(editable : Editable) {
-        viewModelFrg.changeAuthentication(editableToCharArray(editable), authenticationType)
+    val onPositive = fun(password : CharArray) {
+        viewModelFrg.changeAuthentication(password, authenticationType)
     }
 
     if(shouldShowWarning()) {
@@ -234,7 +230,7 @@ fun SettingsFragment.createDialogForAuthChange(preference: Preference, authName:
 }
 
 fun SettingsFragment.doJobWithPassword(setCustomObservers : (dialog : MaterialDialog) -> Unit,
-                                       onPositive : (editable : Editable) -> Unit) {
+                                       onPositive : (password : CharArray) -> Unit) {
     val binding : PasswdValidatorDialogBinding =
         PasswdValidatorDialogBinding.inflate(
             LayoutInflater.from(requireContext())
@@ -271,7 +267,8 @@ fun SettingsFragment.doJobWithPassword(setCustomObservers : (dialog : MaterialDi
         setCustomObservers(this)
 
         positiveButton {
-            onPositive(binding.passphrase.text!!)
+            val password = editableToCharArray(binding.passphrase.text!!)
+            onPositive(password)
             binding.passphrase.text!!.clear()
         }
 

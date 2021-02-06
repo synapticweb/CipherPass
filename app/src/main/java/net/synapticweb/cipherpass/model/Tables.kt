@@ -110,6 +110,9 @@ class EntryFts {
     @ColumnInfo(name = "username")
     var username : String? = null
 
+    @ColumnInfo(name = "password")
+    var password : String? = null
+
     @ColumnInfo(name = "url")
     var url : String? = null
 

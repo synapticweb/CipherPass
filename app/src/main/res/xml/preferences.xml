@@ -39,7 +39,7 @@
         android:defaultValue="30">
     </ListPreference>
 
-    <net.synapticweb.cipherpass.settings.CustomSwitchPreference
+    <SwitchPreference
         android:key="@string/allow_reports_key"
         android:defaultValue="true"
         android:summary="@string/allow_reports_summary"

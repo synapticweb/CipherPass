@@ -8,7 +8,12 @@ import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import junit.framework.Assert.assertNull
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.synapticweb.cipherpass.*
+import net.synapticweb.cipherpass.authenticate.KEY_STORAGE_HARDWARE
+import net.synapticweb.cipherpass.authenticate.KEY_STORAGE_SOFTWARE
+import net.synapticweb.cipherpass.authenticate.KEY_STORAGE_TYPE_KEY
 import net.synapticweb.cipherpass.util.*
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Rule
@@ -28,6 +33,7 @@ class ChangeAuthenticationTest {
         prefWrapper.setPref(appLockKey, applockPasswd)
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
         prefWrapper.removePref(DO_NOT_SHOW_WARNING_KEY)
+        prefWrapper.setPref(KEY_STORAGE_TYPE_KEY, KEY_STORAGE_SOFTWARE)
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
@@ -43,6 +49,7 @@ class ChangeAuthenticationTest {
         prefWrapper.setPref(appLockKey, applockPasswd)
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
         prefWrapper.removePref(DO_NOT_SHOW_WARNING_KEY)
+        prefWrapper.setPref(KEY_STORAGE_TYPE_KEY, KEY_STORAGE_SOFTWARE)
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
@@ -57,7 +64,7 @@ class ChangeAuthenticationTest {
     @Test
     fun badPass_Error() {
         testRule.setDb()
-        testRule.cipher.hasHardwareStorage = true
+        prefWrapper.setPref(KEY_STORAGE_TYPE_KEY, KEY_STORAGE_HARDWARE)
         prefWrapper.setPref(appLockKey, applockPasswd)
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
 
@@ -76,7 +83,7 @@ class ChangeAuthenticationTest {
     @Test
     fun goodPass_modifySettings() {
         testRule.setDb()
-        testRule.cipher.hasHardwareStorage = true
+        prefWrapper.setPref(KEY_STORAGE_TYPE_KEY, KEY_STORAGE_HARDWARE)
         prefWrapper.setPref(appLockKey, applockPasswd)
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
 
@@ -125,7 +132,7 @@ class ChangeAuthenticationTest {
     @Test
     fun goodPass_errorWriteSettings_showSnackbar() {
         testRule.setDb()
-        testRule.cipher.hasHardwareStorage = true
+        prefWrapper.setPref(KEY_STORAGE_TYPE_KEY, KEY_STORAGE_HARDWARE)
         prefWrapper.setPref(appLockKey, applockPasswd)
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
         testRule.cipher.encryptPassReturnError = true
@@ -151,6 +158,7 @@ class ChangeAuthenticationTest {
         prefWrapper.setPref(appLockKey, applockPasswd)
         prefWrapper.removePref(ENCRYPTED_PASS_KEY)
         prefWrapper.removePref(DO_NOT_SHOW_WARNING_KEY)
+        prefWrapper.setPref(KEY_STORAGE_TYPE_KEY, KEY_STORAGE_SOFTWARE)
 
         val fragmentScenario = launchFragmentInContainer<SettingsFragment>(null, R.style.AppTheme)
         testRule.dataBindingIdlingResource.monitorFragment(fragmentScenario)
@@ -159,6 +167,9 @@ class ChangeAuthenticationTest {
 
         onView(withId(R.id.stop_showing_warning)).perform(click())
         onView(withText("OK")).perform(click())
+        runBlocking {
+            delay(200)
+        }
         onView(withText("CANCEL")).perform(click())
 
         onView(withText("Authentication type")).perform(click())

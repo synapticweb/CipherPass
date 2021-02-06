@@ -124,6 +124,7 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
             prefWrapper.setPrefSync(res.getString(R.string.applock_key), authType)
             working.value = false
             finish.value = Event(true)
+            Arrays.fill(passphrase, 0.toChar())
         }
     }
 }

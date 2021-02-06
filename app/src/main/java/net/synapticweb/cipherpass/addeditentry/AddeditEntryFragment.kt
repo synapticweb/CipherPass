@@ -42,7 +42,6 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
 
     private val args: AddeditEntryFragmentArgs by navArgs()
     private lateinit var binding: AddeditEntryFragmentBinding
-    private var dirty : Boolean = false
     private lateinit var adapter : CustomFieldsAdapter
 
     override fun onAttach(context: Context) {
@@ -138,7 +137,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
 
     private fun setupFab() {
         binding.save.setOnClickListener {
-            if(!dirty) {
+            if(!_viewModel.isDirty()) {
                 Toast.makeText(
                     requireContext(),
                     getString(R.string.addedit_nochange),
@@ -185,7 +184,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
             editText.addTextChangedListener(
                 afterTextChanged = {
                     if(editText.tag == "got-focus")
-                        dirty = true
+                        _viewModel.setDirty(true)
             })
         }
     }
@@ -196,7 +195,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
             //că eram prins într-un ciclu infinit între addedit și detail.
             findNavController().popBackStack()
         }
-        if (dirty)
+        if (_viewModel.isDirty())
             MaterialDialog(requireContext()).show {
                 title(R.string.confirm_discard_title)
                 message(R.string.confirm_discard_message)
@@ -217,9 +216,9 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
 
     private fun setupReceiveIcon() {
         parentFragmentManager.setFragmentResultListener(SET_ICON_REQUEST_KEY,
-            viewLifecycleOwner, FragmentResultListener { _: String, bundle: Bundle ->
+            viewLifecycleOwner,  { _: String, bundle: Bundle ->
                 _viewModel.setIcon(bundle.getString(SET_ICON_BUNDLE_KEY, KEY_DRAWABLE_NAME))
-                dirty = true
+                _viewModel.setDirty(true)
         })
     }
 
@@ -235,7 +234,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
                     val text = dialog.findViewById<EditText>(R.id.field_name_input).text.toString()
                     val isProtected = dialog.findViewById<CheckBox>(R.id.protected_field).isChecked
                     _viewModel.addCustomField(text, isProtected)
-                    dirty = true
+                    _viewModel.setDirty(true)
                 }
                 negativeButton(android.R.string.cancel)
             }
@@ -257,7 +256,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
 
     override fun saveField(position : Int, value: String) {
         _viewModel.saveCustomField(position, value)
-        dirty = true
+        _viewModel.setDirty(true)
     }
 
     override fun manageDeletion(position: Int) {
@@ -266,7 +265,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
             message(R.string.delete_custom_field_message)
             positiveButton {
                 _viewModel.deleteCustomField(position)
-                dirty = true
+                _viewModel.setDirty(true)
             }
             negativeButton {}
         }
@@ -287,7 +286,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
                 val fieldName = dialog.findViewById<EditText>(R.id.field_name_input).text.toString()
                 val isProtected = dialog.findViewById<CheckBox>(R.id.protected_field).isChecked
                 _viewModel.editCustomField(position, fieldName, isProtected)
-                dirty = true
+                _viewModel.setDirty(true)
             }
 
             negativeButton {}

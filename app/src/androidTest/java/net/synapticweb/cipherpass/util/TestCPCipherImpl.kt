@@ -3,13 +3,8 @@ package net.synapticweb.cipherpass.util
 import android.content.Context
 
 class TestCPCipherImpl(context: Context) : CPCipherImpl(context) {
-    var hasHardwareStorage : Boolean = false
     var encryptPassReturnError : Boolean = false
     var decryptPassReturnError : Boolean = false
-
-    override suspend fun isStorageHardwareBacked() : Boolean {
-        return hasHardwareStorage
-    }
 
     override fun encryptPassToSettings(passphrase: CharArray): Boolean {
         if(encryptPassReturnError)

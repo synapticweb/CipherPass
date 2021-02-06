@@ -42,13 +42,17 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
         val context = getApplication<CipherPassApp>()
         context.resources.getIdentifier(it, "drawable", context.packageName)
     }
+    //dacă întoarcem ecranul într-o fereastră edit fragmentul se restartează și apelează din nou populate
+    //ceea ce anulează editările. Dacă dirty este în fragment se pierde la restartarea fragmentului.
+    private var hasBeenPopulated = false
+    private var dirty = false
 
     private fun isEdit() : Boolean {
         return ::savedEntry.isInitialized
     }
 
     fun populate(id : Long) {
-        if(id == 0L)
+        if(id == 0L || hasBeenPopulated)
             return
 
         viewModelScope.launch {  //edit
@@ -67,6 +71,7 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
             }
             customFields.value = inMemoryFields
         }
+        hasBeenPopulated = true
     }
 
     fun saveEntry(name : String,
@@ -144,11 +149,11 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
     }
 
     fun addCustomField(fieldName : String, isProtected : Boolean) {
-        val entry = if(isEdit())
+        val entryId = if(isEdit())
             savedEntry.id
         else NO_ENTRY_CUSTOM_FIELD_ID
 
-        val field = CustomField(entry, fieldName, isProtected)
+        val field = CustomField(entryId, fieldName, isProtected)
         field.inMemoryState = NEW_FIELD
         inMemoryFields.add(field)
         customFields.value = inMemoryFields
@@ -180,4 +185,7 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
         if(field.inMemoryState != NEW_FIELD)
             field.inMemoryState = DIRTY_FIELD
     }
+
+    fun isDirty() : Boolean { return dirty }
+    fun setDirty(value : Boolean) { dirty = value }
 }

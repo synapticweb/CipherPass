@@ -21,6 +21,7 @@ class CustomSwitchPreference(context: Context, attrs : AttributeSet) : SwitchPre
     }
 
     init {
+        //putea fi folosit și android:layout în preferences.xml
         layoutResource = R.layout.privacy_switch_pref
     }
 

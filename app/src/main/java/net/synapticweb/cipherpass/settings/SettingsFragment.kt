@@ -68,17 +68,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 false
             }
 
-        val allowReports = findPreference<CustomSwitchPreference>(getString(R.string.allow_reports_key))
         val allowUsage = findPreference<CustomSwitchPreference>(getString(R.string.allow_usage_data_key))
-
-        allowReports?.apply {
-            privLinkListener = View.OnClickListener {
-                findNavController().navigate(
-                    SettingsFragmentDirections.actionSettingsFragmentToPrivPolicyFragment()
-                )
-
-            }
-        }
 
         allowUsage?.apply {
             privLinkListener = View.OnClickListener {

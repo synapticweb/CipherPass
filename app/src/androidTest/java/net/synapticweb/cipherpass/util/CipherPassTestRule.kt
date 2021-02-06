@@ -54,7 +54,6 @@ class CipherPassTestRule : TestWatcher() {
 
         repository.createPassHashFalse = false
         cipher.encryptPassReturnError = false
-        cipher.hasHardwareStorage = false
         cipher.decryptPassReturnError = false
     }
 }
