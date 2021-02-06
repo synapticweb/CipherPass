@@ -1,3 +1,9 @@
+<!--
+  ~ Copyright (C) 2021 Eugen Rădulescu <synapticwebb@gmail.com>
+  ~ This file is part of the CipherPass project ( https://github.com/synapticweb/CipherPass ).
+  ~ See the LICENSE file in the project root for license terms.
+  -->
+
 <resources>
     <string name="app_name">CipherPass</string>
     <string name="pass_notset_caption">Please set a password to encrypt the database. The password should be at least 6 characters long. Choose a random sequence of characters, not a dictionary word and do not write it down. If you lose it, you won\'t be able to recover your data. </string>

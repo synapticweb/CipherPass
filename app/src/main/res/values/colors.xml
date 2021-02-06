@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2021 Eugen Rădulescu <synapticwebb@gmail.com>
+  ~ This file is part of the CipherPass project ( https://github.com/synapticweb/CipherPass ).
+  ~ See the LICENSE file in the project root for license terms.
+  -->
+
 <resources>
     <color name="colorPrimary">#0067c8</color>
     <color name="colorPrimaryDark">#0058aa</color>
