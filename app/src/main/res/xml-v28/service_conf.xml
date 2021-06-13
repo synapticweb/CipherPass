@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2021 Eugen Rădulescu <synapticwebb@gmail.com>
+  ~ This file is part of the CipherPass project ( https://github.com/synapticweb/CipherPass ).
+  ~ See the LICENSE file in the project root for license terms.
+  -->
+
+<autofill-service xmlns:android="http://schemas.android.com/apk/res/android">
+    <compatibility-package android:name="com.android.chrome" android:maxLongVersionCode="1000000000"/>
+    <compatibility-package
+        android:name="com.brave.browser"
+        android:maxLongVersionCode="10000000000"/>
+    <compatibility-package
+        android:name="com.brave.browser_beta"
+        android:maxLongVersionCode="10000000000"/>
+    <compatibility-package
+        android:name="com.brave.browser_default"
+        android:maxLongVersionCode="10000000000"/>
+    <compatibility-package
+        android:name="com.brave.browser_dev"
+        android:maxLongVersionCode="10000000000"/>
+</autofill-service>

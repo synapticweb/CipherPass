@@ -23,8 +23,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.cipherpass.*
+import net.synapticweb.cipherpass.autofill.AutofillActivity
+import net.synapticweb.cipherpass.autofill.INSERTED_BY_AUTOFILL
+import net.synapticweb.cipherpass.autofill.MatchedEntriesFragment
 import net.synapticweb.cipherpass.databinding.AuthenticateFragmentBinding
 import net.synapticweb.cipherpass.util.*
 import java.util.*
@@ -87,8 +91,12 @@ class AuthenticateFragment : Fragment() {
                 AUTH_OK -> {
                     binding.passphrase.text!!.clear()
                     binding.passphraseRetype.text.clear()
-                    findNavController().navigate(
-                        AuthenticateFragmentDirections.actionAuthenticateFragmentToEntriesListFragment()
+                    if(isFromAutofill())
+                        (activity as AutofillActivity).insertFragment(MatchedEntriesFragment())
+                    else
+                        findNavController().navigate(
+                            AuthenticateFragmentDirections.
+                               actionAuthenticateFragmentToEntriesListFragment()
                     )
                 }
 
@@ -110,7 +118,8 @@ class AuthenticateFragment : Fragment() {
         lockState.unauthorized.observe(viewLifecycleOwner, EventObserver {})
 
 
-        handleBackPressed(lockState)
+        if(!isFromAutofill())
+            handleBackPressed(lockState)
         setupSystemAuth()
         return binding.root
     }
@@ -149,7 +158,7 @@ class AuthenticateFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val appToolbar = requireActivity().findViewById<Toolbar>(R.id.app_toolbar)
+        val appToolbar = requireActivity().findViewById<Toolbar>(getAppbarId())
         val authToolbar = requireActivity().findViewById<Toolbar>(R.id.auth_toolbar)
         appToolbar.visibility = View.GONE
         (requireActivity() as AppCompatActivity).setSupportActionBar(authToolbar)
@@ -157,7 +166,7 @@ class AuthenticateFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        val appToolbar = requireActivity().findViewById<Toolbar>(R.id.app_toolbar)
+        val appToolbar = requireActivity().findViewById<Toolbar>(getAppbarId())
         appToolbar.visibility = View.VISIBLE
         (requireActivity() as AppCompatActivity).setSupportActionBar(appToolbar)
     }
@@ -182,5 +191,16 @@ class AuthenticateFragment : Fragment() {
                 Snackbar.make(requireActivity().findViewById(android.R.id.content), getString(R.string.system_lock_unavailable),
                     Snackbar.LENGTH_LONG).show()
             }
+    }
+
+    private fun isFromAutofill() : Boolean {
+        return arguments?.getBoolean(INSERTED_BY_AUTOFILL) ?: false
+    }
+
+    private fun getAppbarId() : Int {
+        return if(isFromAutofill())
+            R.id.autofill_toolbar
+        else
+            R.id.app_toolbar
     }
 }

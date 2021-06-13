@@ -6,6 +6,7 @@
 
 <resources>
     <string name="app_name">CipherPass</string>
+    <string name="service_label">CipherPass</string>
     <string name="pass_notset_caption">Please set a password to encrypt the database. The password should be at least 6 characters long. Choose a random sequence of characters, not a dictionary word and do not write it down. If you lose it, you won\'t be able to recover your data. </string>
     <string name="pass_not_set_send_pass">Set password</string>
     <string name="pass_set_send_pass">UNLOCK DATABASE</string>

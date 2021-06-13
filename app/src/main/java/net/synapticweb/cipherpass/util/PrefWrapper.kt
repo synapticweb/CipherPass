@@ -33,6 +33,7 @@ class PrefWrapper private constructor(context: Context) {
         when(value) {
             is String -> editor.putString(key, value)
             is Boolean -> editor.putBoolean(key, value)
+            is Set<*> -> editor.putStringSet(key, value as Set<String>)
             else -> throw IllegalArgumentException("No such preference type!")
         }
         editor.apply()
@@ -43,6 +44,7 @@ class PrefWrapper private constructor(context: Context) {
         when(value) {
             is String -> editor.putString(key, value)
             is Boolean -> editor.putBoolean(key, value)
+            is Set<*> -> editor.putStringSet(key, value as Set<String>)
             else -> throw IllegalArgumentException("No such preference type!")
         }
         return editor.commit()
@@ -60,6 +62,12 @@ class PrefWrapper private constructor(context: Context) {
         return settings.getString(key, null)
     }
 
+    fun getStringSet(key : String) : Set<String>? {
+        if (!settings.contains(key))
+            return null
+        return settings.getStringSet(key, null)
+    }
+
     fun removePref(key: String) {
         val editor = settings.edit()
         if (settings.contains(key))
@@ -75,10 +83,11 @@ class PrefWrapper private constructor(context: Context) {
         val editor = settings.edit()
         editor.clear()
         for(pref in prefs) {
-            if(pref.value is Boolean)
-                editor.putBoolean(pref.key, pref.value as Boolean)
-            else if(pref.value is String)
-                editor.putString(pref.key, pref.value as String)
+            when(pref.value) {
+                is Boolean -> editor.putBoolean(pref.key, pref.value as Boolean)
+                is String -> editor.putString(pref.key, pref.value as String)
+                is Set<*> -> editor.putStringSet(pref.key, pref.value as Set<String>)
+            }
         }
         editor.apply()
     }

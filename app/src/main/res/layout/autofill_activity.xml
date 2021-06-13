@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2021 Eugen Rădulescu <synapticwebb@gmail.com>
+  ~ This file is part of the CipherPass project ( https://github.com/synapticweb/CipherPass ).
+  ~ See the LICENSE file in the project root for license terms.
+  -->
+
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/autofill_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:elevation="4dp"
+            app:theme="@style/appToolbar"
+            app:popupTheme="@style/appToolbarPopup"
+            />
+
+<!--        <TextView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Test" />-->
+
+        <androidx.fragment.app.FragmentContainerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/autofill_fragment"
+            />
+
+    </LinearLayout>

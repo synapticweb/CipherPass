@@ -25,14 +25,19 @@
                 android:resource="@xml/searchable" />
         </activity>
 
-<!--        <service android:name=".service.CPAutofillService"-->
-<!--            android:label="@string/autofill_service_label"-->
-<!--            android:permission="android.permission.BIND_AUTOFILL_SERVICE">-->
-<!--        <intent-filter>-->
-<!--            <action android:name="android.service.autofill.AutofillService" />-->
-<!--        </intent-filter>-->
+        <service android:name=".autofill.CipherPassService"
+            android:label="@string/service_label"
+            android:permission="android.permission.BIND_AUTOFILL_SERVICE">
+        <intent-filter>
+            <action android:name="android.service.autofill.AutofillService" />
+        </intent-filter>
 
-<!--        </service>-->
+            <meta-data
+                android:name="android.autofill"
+                android:resource="@xml/service_conf" />
+        </service>
+
+        <activity android:name=".autofill.AutofillActivity" />
 
     </application>
 

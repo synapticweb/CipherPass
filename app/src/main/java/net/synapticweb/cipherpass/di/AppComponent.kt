@@ -15,6 +15,8 @@ import net.synapticweb.cipherpass.addeditentry.di.AddeditEntryComponent
 import net.synapticweb.cipherpass.authenticate.di.AuthenticateComponent
 import net.synapticweb.cipherpass.entrydetail.di.EntryDetailComponent
 import net.synapticweb.cipherpass.entrieslist.di.EntriesListComponent
+import net.synapticweb.cipherpass.autofill.CipherPassService
+import net.synapticweb.cipherpass.autofill.di.AutofillComponent
 import net.synapticweb.cipherpass.settings.di.SettingsComponent
 import javax.inject.Singleton
 
@@ -34,4 +36,5 @@ interface AppComponent {
     fun settingsComponent() : SettingsComponent.Factory
     fun addEntryComponent() : AddeditEntryComponent.Factory
     fun entryDetailComponent() : EntryDetailComponent.Factory
+    fun autofillComponent() : AutofillComponent.Factory
 }
