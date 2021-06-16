@@ -10,9 +10,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "ignored_packages")
-data class IgnoredPackage(
-    @ColumnInfo(name = "package") var mPackage : String
+@Entity(tableName = "ignored_clients")
+data class IgnoredClient(
+    @ColumnInfo(name = "client") var client : String
 ) {
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)

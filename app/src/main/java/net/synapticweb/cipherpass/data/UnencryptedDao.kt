@@ -11,16 +11,19 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import net.synapticweb.cipherpass.model.IgnoredPackage
+import net.synapticweb.cipherpass.model.IgnoredClient
 
 @Dao
 interface UnencryptedDao {
     @Insert
-    suspend fun insertIgnoredPackage(ignoredPackage: IgnoredPackage) : Long
+    suspend fun insertIgnoredClient(ignoredClient: IgnoredClient) : Long
 
     @Delete
-    suspend fun deleteIgnoredPackage(ignoredPackage: IgnoredPackage) : Int
+    suspend fun deleteIgnoredClient(ignoredClient: IgnoredClient) : Int
 
-    @Query("SELECT * FROM `ignored_packages`")
-    fun getIgnoredPackages() : LiveData<IgnoredPackage>
+    @Query("SELECT * FROM `ignored_clients`")
+    fun getIgnoredClients() : LiveData<List<IgnoredClient>>
+
+    @Query("SELECT * FROM `ignored_clients`")
+    suspend fun getIgnoredClientsSync() : List<IgnoredClient>
 }

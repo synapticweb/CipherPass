@@ -14,14 +14,17 @@ import android.content.IntentSender
 import android.os.Build
 import android.os.CancellationSignal
 import android.service.autofill.*
+import android.text.InputType
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
+import kotlinx.coroutines.*
 import net.synapticweb.cipherpass.APP_TAG
 import net.synapticweb.cipherpass.CipherPassApp
 import net.synapticweb.cipherpass.data.Repository
 import net.synapticweb.cipherpass.autofill.ClientData.NodeDescription
+import net.synapticweb.cipherpass.data.UnencryptedDatabase
 import javax.inject.Inject
 
 const val CLIENT_DOMAIN_NAME = "client_domain_name"
@@ -53,6 +56,9 @@ class CipherPassService : AutofillService() {
     private fun generateResponse(structure : AssistStructure) : FillResponse? {
         val builder = FillResponse.Builder()
         val clientData = parseStructure(structure)
+        val userAndPasswdIds = clientData.getUsernameAndPasswdIds()
+        if(isClientIgnored(clientData) || userAndPasswdIds.isEmpty())
+            return null
 
         if(repository.isUnlocked()) {
             Log.i(APP_TAG, "Unlocked")
@@ -73,14 +79,14 @@ class CipherPassService : AutofillService() {
             PendingIntent.FLAG_CANCEL_CURRENT
         ).intentSender
 
-        return builder.setAuthentication(clientData.getAutofillIds(),
+        return builder.setAuthentication(userAndPasswdIds.toTypedArray(),
             intentSender, authPresentation)
             .build()
     }
 
     private fun parseStructure(structure : AssistStructure) : ClientData {
         val clientData = ClientData()
-        clientData.clientPackage = structure.activityComponent.packageName
+        clientData.packageName = structure.activityComponent.packageName
 
         val windowNodes: List<AssistStructure.WindowNode> =
             structure.run {
@@ -102,10 +108,14 @@ class CipherPassService : AutofillService() {
             viewNode.autofillId?.let {
                 if(shouldDescribe(viewNode)) {
                     val nodeDescription = NodeDescription(
-                        it, viewNode.autofillHints?.toList(),
-                        viewNode.hint, viewNode.autofillType,
-                        viewNode.inputType, viewNode.idEntry,
-                        viewNode.contentDescription as String?
+                        it,
+                        viewNode.autofillHints?.toList(),
+                        viewNode.hint,
+                        viewNode.autofillType,
+                        viewNode.inputType,
+                        viewNode.idEntry,
+                        viewNode.contentDescription,
+                        viewNode.htmlInfo
                     )
                     clientData.nodes.add(nodeDescription)
                 }
@@ -133,7 +143,28 @@ class CipherPassService : AutofillService() {
        }
     }
 
+
     private fun shouldDescribe(node : ViewNode) : Boolean {
         return node.autofillType == View.AUTOFILL_TYPE_TEXT
+    }
+
+    private fun isClientIgnored(clientData: ClientData) : Boolean {
+        val job = Job()
+        val scope = CoroutineScope(Dispatchers.IO + job)
+        val dao = UnencryptedDatabase.
+                getInstance(applicationContext, scope).dao
+
+        var ignoredClients : List<String>
+        runBlocking(Dispatchers.IO) {
+            ignoredClients = dao.getIgnoredClientsSync().map { it.client }
+        }
+        job.cancel()
+
+        if(ignoredClients.any {
+                it == clientData.packageName || it == clientData.webDomain.toString()
+            })
+            return true
+
+        return false
     }
 }

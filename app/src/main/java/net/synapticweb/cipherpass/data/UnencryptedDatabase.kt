@@ -13,9 +13,9 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import net.synapticweb.cipherpass.model.IgnoredPackage
+import net.synapticweb.cipherpass.model.IgnoredClient
 
-@Database(entities = [IgnoredPackage::class], version = 1, exportSchema = false)
+@Database(entities = [IgnoredClient::class], version = 1, exportSchema = false)
 abstract class UnencryptedDatabase : RoomDatabase() {
     abstract val dao : UnencryptedDao
 
@@ -49,7 +49,7 @@ abstract class UnencryptedDatabase : RoomDatabase() {
             super.onCreate(db)
             INSTANCE?.let {
                 scope.launch {
-                    it.dao.insertIgnoredPackage(IgnoredPackage(context.packageName))
+                    it.dao.insertIgnoredClient(IgnoredClient(context.packageName))
                 }
             }
         }
