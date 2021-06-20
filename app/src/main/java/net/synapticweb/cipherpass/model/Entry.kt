@@ -66,41 +66,6 @@ data class Entry (
     }
 }
 
-@Serializable
-@Entity(tableName = "custom_fields")
- data class CustomField (
-    @Transient
-    @ColumnInfo(name = "entry")
-    var entry : Long = 0L,
-
-    @ColumnInfo(name = "field_name")
-    var fieldName : String,
-
-    @ColumnInfo(name = "is_protected")
-    var isProtected : Boolean = false,
-
-    @ColumnInfo(name = "value")
-    var value : String? = null
-) {
-    @ColumnInfo(name = "id")
-    @PrimaryKey(autoGenerate = true)
-    @Transient
-    var id : Long = 0L
-
-    @Ignore
-    var inMemoryState : String? = null
-}
-
-@Entity(tableName = "hash")
-class Hash(
-    @ColumnInfo(name = "hash") var hash: String,
-    @ColumnInfo(name = "salt") var salt: String
-) {
-    @ColumnInfo(name = "id")
-    @PrimaryKey(autoGenerate = true)
-    var id : Long = 0L
-}
-
 //https://sqlite.org/fts3.html
 //https://developer.android.com/reference/androidx/room/Fts4#notIndexed()
 //https://developer.android.com/training/data-storage/room/defining-data#search
@@ -124,14 +89,4 @@ class EntryFts {
 
     @ColumnInfo(name = "comment")
     var comment : String? = null
-}
-
-@Fts4(contentEntity = CustomField::class)
-@Entity(tableName = "custom_fields_fts")
-class CustomFieldFts {
-    @ColumnInfo(name = "field_name")
-    var fieldName : String = ""
-
-    @ColumnInfo(name = "value")
-    var value : String = ""
 }

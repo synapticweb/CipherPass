@@ -13,7 +13,7 @@ import net.synapticweb.cipherpass.*
 import net.synapticweb.cipherpass.model.CustomField
 import net.synapticweb.cipherpass.model.Entry
 import net.synapticweb.cipherpass.model.KEY_DRAWABLE_NAME
-import net.synapticweb.cipherpass.model.Repository
+import net.synapticweb.cipherpass.data.Repository
 import net.synapticweb.cipherpass.util.Event
 import net.synapticweb.cipherpass.util.wrapEspressoIdlingResource
 import javax.inject.Inject

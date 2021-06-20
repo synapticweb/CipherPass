@@ -7,6 +7,7 @@
 package net.synapticweb.cipherpass.model
 
 import android.content.Context
+import net.synapticweb.cipherpass.data.RepositoryImpl
 import javax.inject.Inject
 
 class TestRepositoryImpl @Inject constructor(context: Context, fileName : String) :

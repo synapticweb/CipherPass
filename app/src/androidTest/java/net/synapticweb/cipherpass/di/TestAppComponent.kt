@@ -10,7 +10,7 @@ import android.app.Application
 import android.content.Context
 import dagger.BindsInstance
 import dagger.Component
-import net.synapticweb.cipherpass.model.Repository
+import net.synapticweb.cipherpass.data.Repository
 import net.synapticweb.cipherpass.util.CPCipher
 import javax.inject.Singleton
 
