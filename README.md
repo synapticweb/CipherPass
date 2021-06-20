@@ -12,3 +12,5 @@ The application has currently the following main features:
 - Clipboard timeout: after a configurable amount of time, the items copied to clipboard are automatically deleted.
 - Background timeout: after a configurable amount of time spent by the app in the background, the user will be asked to authenticate again.
 - The entries can be exported to a file and can be imported from a file. (This feature is useful for backup or for moving to another device.)
+
+<a href='https://play.google.com/store/apps/details?id=net.synapticweb.cipherpass&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' width='135px' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
