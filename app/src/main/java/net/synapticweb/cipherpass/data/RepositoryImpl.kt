@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for license terms.
  */
 
-package net.synapticweb.cipherpass.model
+package net.synapticweb.cipherpass.data
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
@@ -18,6 +18,9 @@ import net.sqlcipher.database.SQLiteException
 import net.sqlcipher.database.SupportFactory
 import net.synapticweb.cipherpass.*
 import net.synapticweb.cipherpass.entrieslist.*
+import net.synapticweb.cipherpass.model.CustomField
+import net.synapticweb.cipherpass.model.Entry
+import net.synapticweb.cipherpass.model.Hash
 import net.synapticweb.cipherpass.util.*
 import java.lang.Exception
 import java.lang.StringBuilder

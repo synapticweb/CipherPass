@@ -13,7 +13,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import net.synapticweb.cipherpass.CipherPassApp
 import net.synapticweb.cipherpass.R
-import net.synapticweb.cipherpass.model.Repository
+import net.synapticweb.cipherpass.data.Repository
 import net.synapticweb.cipherpass.util.*
 import java.util.*
 import javax.inject.Inject

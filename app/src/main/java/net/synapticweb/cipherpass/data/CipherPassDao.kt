@@ -4,11 +4,14 @@
  * See the LICENSE file in the project root for license terms.
  */
 
-package net.synapticweb.cipherpass.model
+package net.synapticweb.cipherpass.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
+import net.synapticweb.cipherpass.model.CustomField
+import net.synapticweb.cipherpass.model.Entry
+import net.synapticweb.cipherpass.model.Hash
 
 @Dao
 interface CipherPassDao {
@@ -40,7 +43,7 @@ interface CipherPassDao {
     suspend fun updateCustomField(field: CustomField) : Int
 
     @Delete
-    suspend fun deleteCustomField(field :  CustomField) : Int
+    suspend fun deleteCustomField(field : CustomField) : Int
 
     @Query("SELECT * FROM `custom_fields` WHERE `id`= :key")
     suspend fun getCustomField(key : Long) : CustomField

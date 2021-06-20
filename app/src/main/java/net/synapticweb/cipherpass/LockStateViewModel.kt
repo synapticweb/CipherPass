@@ -8,7 +8,7 @@ package net.synapticweb.cipherpass
 
 import android.app.Application
 import androidx.lifecycle.*
-import net.synapticweb.cipherpass.model.Repository
+import net.synapticweb.cipherpass.data.Repository
 import net.synapticweb.cipherpass.util.Event
 import net.synapticweb.cipherpass.util.PrefWrapper
 import javax.inject.Inject
