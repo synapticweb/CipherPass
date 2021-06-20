@@ -4,9 +4,11 @@
  * See the LICENSE file in the project root for license terms.
  */
 
-package net.synapticweb.cipherpass.model
+package net.synapticweb.cipherpass.data
 
 import androidx.lifecycle.LiveData
+import net.synapticweb.cipherpass.model.CustomField
+import net.synapticweb.cipherpass.model.Entry
 
 interface Repository {
     fun isUnlocked() : Boolean
@@ -41,7 +43,7 @@ interface Repository {
 
     suspend fun updateCustomField(field: CustomField) : Int
 
-    suspend fun deleteCustomField(field :  CustomField) : Int
+    suspend fun deleteCustomField(field : CustomField) : Int
 
     suspend fun getCustomField(key : Long) : CustomField
 

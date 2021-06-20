@@ -9,7 +9,7 @@ package net.synapticweb.cipherpass.autofill
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import net.synapticweb.cipherpass.model.Repository
+import net.synapticweb.cipherpass.data.Repository
 import net.synapticweb.cipherpass.util.Event
 import javax.inject.Inject
 

@@ -20,9 +20,8 @@ import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import net.synapticweb.cipherpass.APP_TAG
 import net.synapticweb.cipherpass.CipherPassApp
-import net.synapticweb.cipherpass.model.Repository
+import net.synapticweb.cipherpass.data.Repository
 import net.synapticweb.cipherpass.autofill.ClientData.NodeDescription
-import net.synapticweb.cipherpass.util.PrefWrapper
 import javax.inject.Inject
 
 const val CLIENT_DOMAIN_NAME = "client_domain_name"
