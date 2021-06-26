@@ -17,6 +17,7 @@ import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.*
 import net.synapticweb.cipherpass.CipherPassApp
+import net.synapticweb.cipherpass.R
 import net.synapticweb.cipherpass.data.Repository
 import net.synapticweb.cipherpass.data.UnencryptedDatabase
 import javax.inject.Inject
@@ -26,17 +27,19 @@ const val CLIENT_DOMAIN_NAME = "client_domain_name"
 @RequiresApi(Build.VERSION_CODES.O)
 class CipherPassService : AutofillService() {
     @Inject
-    lateinit var repository : Repository
-    lateinit var parser : Parser
+    lateinit var repository: Repository
+    private lateinit var parser: Parser
 
     override fun onCreate() {
         super.onCreate()
         (application as CipherPassApp).appComponent.autofillComponent().create().inject(this)
     }
 
-    override fun onFillRequest(request : FillRequest,
-                               cancellationSignal : CancellationSignal,
-                               callback : FillCallback) {
+    override fun onFillRequest(
+        request: FillRequest,
+        cancellationSignal: CancellationSignal,
+        callback: FillCallback
+    ) {
         val fillContext = request.fillContexts
         val structure = fillContext[fillContext.size - 1].structure
         parser = Parser(structure)
@@ -49,20 +52,54 @@ class CipherPassService : AutofillService() {
 
     }
 
-    private fun generateResponse() : FillResponse? {
+    private fun generateResponse(): FillResponse? {
         val builder = FillResponse.Builder()
         val clientData = parser.parse()
-        val userAndPasswdNodes = clientData.getUsernameAndPasswdNodes()
-        if(isClientIgnored(clientData) || userAndPasswdNodes == null)
+        if (isClientIgnored(clientData) || !clientData.hasInterestingNodes)
             return null
 
-        val authPresentation = RemoteViews(packageName, android.R.layout.simple_list_item_1).apply {
-            setTextViewText(android.R.id.text1, "requires authentication")
+        val datasets = generateDatasets(clientData)
+        for (dataset in datasets)
+            builder.addDataset(dataset)
+
+        addAuthDataset(clientData, builder)
+        return builder.build()
+    }
+
+
+    private fun isClientIgnored(clientData: ClientData): Boolean {
+        val job = Job()
+        val scope = CoroutineScope(Dispatchers.IO + job)
+        val dao = UnencryptedDatabase.getInstance(applicationContext, scope).dao
+
+        var ignoredClients: List<String>
+        runBlocking(Dispatchers.IO) {
+            ignoredClients = dao.getIgnoredClientsSync().map { it.client }
         }
+        job.cancel()
+
+        if (ignoredClients.any {
+                it == clientData.packageName || it == clientData.webDomain.toString()
+            })
+            return true
+
+        return false
+    }
+
+    private fun generateDatasets(clientData: ClientData): List<Dataset> {
+        val datasets = mutableListOf<Dataset>()
+        return datasets
+    }
+
+    private fun addAuthDataset(clientData: ClientData, builder: FillResponse.Builder) {
+        if(!clientData.hasInterestingNodes)
+            return
+
+        val authPresentation = RemoteViews(packageName, R.layout.autofill_authenticate)
         val authIntent = Intent(this, AutofillActivity::class.java).apply {
             putExtra(CLIENT_DOMAIN_NAME, clientData.webDomain.toString())
         }
-        val intentSender : IntentSender = PendingIntent.getActivity(
+        val intentSender: IntentSender = PendingIntent.getActivity(
             this,
             1001,
             authIntent,
@@ -70,33 +107,14 @@ class CipherPassService : AutofillService() {
         ).intentSender
 
         val ids = mutableListOf<AutofillId>()
-        userAndPasswdNodes.forEach {
+        clientData.interestingNodes.forEach {
             ids.add(it.autofillId)
         }
 
-        return builder.setAuthentication(ids.toTypedArray(),
-            intentSender, authPresentation)
-            .build()
+        builder.setAuthentication(
+            ids.toTypedArray(),
+            intentSender, authPresentation
+        )
     }
 
-
-    private fun isClientIgnored(clientData: ClientData) : Boolean {
-        val job = Job()
-        val scope = CoroutineScope(Dispatchers.IO + job)
-        val dao = UnencryptedDatabase.
-                getInstance(applicationContext, scope).dao
-
-        var ignoredClients : List<String>
-        runBlocking(Dispatchers.IO) {
-            ignoredClients = dao.getIgnoredClientsSync().map { it.client }
-        }
-        job.cancel()
-
-        if(ignoredClients.any {
-                it == clientData.packageName || it == clientData.webDomain.toString()
-            })
-            return true
-
-        return false
-    }
 }

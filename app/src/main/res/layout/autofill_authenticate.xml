@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2021 Eugen Rădulescu <synapticwebb@gmail.com>
+  ~ This file is part of the CipherPass project ( https://github.com/synapticweb/CipherPass ).
+  ~ See the LICENSE file in the project root for license terms.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cardview_light_background"
+    android:weightSum="10">
+
+    <TextView
+        android:textColor="#000"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/autofill_auth_title"
+        android:text="@string/autofill_auth_title"
+        android:gravity="center_vertical"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+        android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        />
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:maxWidth="28dp"
+            android:maxHeight="28dp"
+            android:adjustViewBounds="true"
+            android:layout_marginEnd="?android:attr/listPreferredItemPaddingEnd"
+            android:id="@+id/autofill_logo"
+            android:src="@mipmap/ic_launcher_round"
+            />
+
+</LinearLayout>

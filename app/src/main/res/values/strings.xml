@@ -178,4 +178,7 @@
     <string name="allow_usage_data_key">usage_data</string>
     <string name="allow_usage_data_title">Usage data</string>
     <string name="allow_usage_data_summary">When this setting is on some usage data will be anonymously sent to developer.</string>
+
+    <!-- Autofill -->
+    <string name="autofill_auth_title">Autofill with CipherPass</string>
 </resources>
