@@ -14,106 +14,152 @@ import android.view.autofill.AutofillId
 import androidx.annotation.RequiresApi
 
 class ClientData {
-    val nodes : MutableList<NodeDescription> = ArrayList()
+    val nodes: MutableList<NodeDescription> = ArrayList()
     val webDomain = StringBuilder()
-    var packageName : String? = null
+    var packageName: String? = null
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun getUsernameAndPasswdIds() : Set<AutofillId> {
-        val set = mutableSetOf<AutofillId>()
-        var previous : NodeDescription? = null
-        for(node in nodes) {
-            if(isUsername(node))
-                set.add(node.autofillId)
+    fun getUsernameAndPasswdNodes() : List<NodeDescription>? {
+        val usernames = nodes.filter { it.isUsername } as MutableList<NodeDescription>
+        val passwds = nodes.filter { it.isPassword }
 
-            if(isPassword(node)) {
-                set.add(node.autofillId)
-                if(previous != null)
-                    set.add(previous.autofillId)
-            }
-            previous = node
-        }
-        return set
-    }
+        if(usernames.size > 1 || passwds.size > 2 ||
+            (usernames.isEmpty() && passwds.isEmpty()))
+                return null
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun isPassword(node : NodeDescription) : Boolean {
-        if(node.autofillHints?.any {
-                it == View.AUTOFILL_HINT_PASSWORD
-            } == true)
-            return true
+        //dacă avem o parolă și niciun username vom considera că nodul care precede parola este username
+        if(usernames.isEmpty()) {
+            val firstPass = passwds[0]
+            val iterator = nodes.listIterator()
 
-        var pattern = Regex("password|passphrase", RegexOption.IGNORE_CASE)
-        val relevantProperties = listOf(node.hint, node.idEntry, node.contentDescription)
-
-        relevantProperties.forEach {
-            it?.let {
-                if (pattern.containsMatchIn(it)) {
-                    return true
+            while(iterator.hasNext()) {
+                val current = iterator.next()
+                if(current.autofillId == firstPass.autofillId) {
+                    //deoarece next a dus pointerul în sus apelăm previous doar ca să coborîm pointerul
+                    //la elem. curent. Apoi apelăm previousIndex pentru a obține indexul elementului
+                    //precedent, pe care îl suspectăm a fi username.
+                    iterator.previous()
+                    val previous = nodes[iterator.previousIndex()]
+                    previous.isUsername = true
+                    usernames.add(previous)
+                    break
                 }
             }
         }
 
-        if((node.inputType or InputType.TYPE_TEXT_VARIATION_PASSWORD) ==
-                node.inputType ||
-                (node.inputType or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) ==
-                node.inputType ||
-                (node.inputType or InputType.TYPE_NUMBER_VARIATION_PASSWORD) ==
-                node.inputType ||
-                node.inputType or InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD ==
-                node.inputType ) {
+        return usernames + passwds
+    }
 
-            //edittextul pentru căutare în browsere are inputtype = password...
-            pattern = Regex("search|find|query", RegexOption.IGNORE_CASE)
-            relevantProperties.forEach {
-                it?.let {
-                    if (pattern.containsMatchIn(it)) {
-                        return false
+    class NodeDescription(
+        val autofillId: AutofillId,
+        private val autofillHints: List<String>?,
+        private val hint: String?,
+        private val autofillType: Int,
+        private val inputType: Int,
+        private val idEntry: String?,
+        private val contentDescription: CharSequence?,
+        private val htmlInfo: ViewStructure.HtmlInfo?
+    ) {
+
+        private var _isUsername: Boolean? = null
+        var isUsername: Boolean
+            set(value) {
+                _isUsername = value
+            }
+            get() {
+                if (_isUsername == null) {
+                    if (this.autofillHints?.any {
+                            it == View.AUTOFILL_HINT_USERNAME ||
+                                    it == View.AUTOFILL_HINT_EMAIL_ADDRESS ||
+                                    it == View.AUTOFILL_HINT_PHONE
+                        } == true) {
+                        _isUsername = true
+                        return true
                     }
-                }
+
+                    val pattern = Regex("username|email|e-mail|phone|tel", RegexOption.IGNORE_CASE)
+                    val properties = listOf(this.hint, this.idEntry, this.contentDescription)
+
+                    properties.forEach {
+                        it?.let {
+                            if (pattern.containsMatchIn(it)) {
+                                _isUsername = true
+                                return true
+                            }
+                        }
+                    }
+
+                    _isUsername = false
+                    return false
+                } else
+                    return _isUsername as Boolean
             }
 
-            return true
-        }
-
-        if(node.htmlInfo?.attributes?.any {
-                it.first == "type" && it.second == "password"
-            } == true)
-                return true
-
-        return false
-    }
-
-    private fun isUsername(node : NodeDescription) : Boolean {
-        if(node.autofillHints?.any {
-                it == View.AUTOFILL_HINT_USERNAME ||
-                        it == View.AUTOFILL_HINT_EMAIL_ADDRESS ||
-                        it == View.AUTOFILL_HINT_PHONE
-            } == true)
-            return true
-
-        val pattern = Regex("username|email|e-mail|phone|tel", RegexOption.IGNORE_CASE)
-        val properties = listOf(node.hint, node.idEntry, node.contentDescription)
-
-        properties.forEach {
-            it?.let {
-                if (pattern.containsMatchIn(it)) {
-                    return true
-                }
+        private var _isPassword: Boolean? = null
+        var isPassword : Boolean
+            set(value) {
+                _isPassword = value
             }
-        }
+            @RequiresApi(Build.VERSION_CODES.O)
+            get() {
+                if (_isPassword == null) {
+                    if (this.autofillHints?.any {
+                            it == View.AUTOFILL_HINT_PASSWORD
+                        } == true) {
+                        _isPassword = true
+                        return true
+                    }
 
-        return false
+                    var pattern = Regex("password|passphrase", RegexOption.IGNORE_CASE)
+                    val relevantProperties =
+                        listOf(this.hint, this.idEntry, this.contentDescription)
+
+                    relevantProperties.forEach {
+                        it?.let {
+                            if (pattern.containsMatchIn(it)) {
+                                _isPassword = true
+                                return true
+                            }
+                        }
+                    }
+
+                    if ((this.inputType or InputType.TYPE_TEXT_VARIATION_PASSWORD) ==
+                        this.inputType ||
+                        (this.inputType or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) ==
+                        this.inputType ||
+                        (this.inputType or InputType.TYPE_NUMBER_VARIATION_PASSWORD) ==
+                        this.inputType ||
+                        this.inputType or InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD ==
+                        this.inputType
+                    ) {
+
+                        //edittextul pentru căutare în browsere are inputtype = password...
+                        pattern = Regex("search|find|query", RegexOption.IGNORE_CASE)
+                        relevantProperties.forEach {
+                            it?.let {
+                                if (pattern.containsMatchIn(it)) {
+                                    _isPassword = false
+                                    return false
+                                }
+                            }
+                        }
+
+                        _isPassword = true
+                        return true
+                    }
+
+                    if (this.htmlInfo?.attributes?.any {
+                            it.first == "type" && it.second == "password"
+                        } == true) {
+                        _isPassword = true
+                        return true
+                    }
+
+                    _isPassword = false
+                    return false
+                } else
+                    return _isPassword as Boolean
+            }
+
     }
 
-    data class NodeDescription(
-        val autofillId : AutofillId,
-        val autofillHints : List<String>?,
-        val hint : String?,
-        val autofillType : Int,
-        val inputType : Int,
-        val idEntry : String?,
-        val contentDescription : CharSequence?,
-        val htmlInfo: ViewStructure.HtmlInfo?
-    )
 }
