@@ -65,6 +65,7 @@ ext {
     navigationVersion = "2.3.2"
     preferenceVersion = "1.1.1"
     recyclerViewVersion = '1.0.0'
+    pslVersion = "90.0.9"
     roomVersion = "2.2.6"
     serializationVersion = "1.0.1"
     sqlcipherVersion = "4.4.2"
@@ -112,6 +113,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$archLifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$archLifecycleVersion"
 
+    implementation "org.mozilla.components:lib-publicsuffixlist:$pslVersion"
 
     //Testing:
     testImplementation 'junit:junit:4.12'

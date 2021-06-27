@@ -29,6 +29,7 @@ class Parser(private val lastStructure : AssistStructure) {
 
     fun parse() : ClientData {
         val clientData = ClientData()
+        val nodes : MutableList<NodeDescription> = mutableListOf()
         clientData.packageName = lastStructure.activityComponent.packageName
 
         val windowNodes: List<AssistStructure.WindowNode> =
@@ -39,23 +40,51 @@ class Parser(private val lastStructure : AssistStructure) {
         windowNodes.forEach { windowNode: AssistStructure.WindowNode ->
             val viewNode: ViewNode? = windowNode.rootViewNode
             viewNode?.let {
-                traverseNode(it, clientData)
+                traverseNode(it, clientData, nodes)
             }
         }
 
+        val loginIds = nodes.filter { it.isLoginId }.toMutableList()
+        val passwds = nodes.filter { it.isPassword }
+
+        if (loginIds.isEmpty() && passwds.isEmpty())
+            return clientData
+
+        if (loginIds.isEmpty()) {
+           for(passwd in passwds) {
+               val iterator = nodes.listIterator()
+               var previous : NodeDescription? = null
+
+               while(iterator.hasNext()) {
+                   val current = iterator.next()
+                   if(current.autofillId == passwd.autofillId) {
+                       if(previous != null && previous.fieldType == FieldType.UNKNOWN) {
+                           previous.fieldType = FieldType.USERNAME
+                           loginIds.add(previous)
+                       }
+                       break
+                   }
+                   previous = current
+               }
+           }
+        }
+
+        clientData.nodes = loginIds + passwds
         return clientData
     }
 
 
-    private fun traverseNode(viewNode : ViewNode, clientData : ClientData) {
+    private fun traverseNode(viewNode : ViewNode, clientData: ClientData,
+                             interestingNodes : MutableList<NodeDescription>) {
         parseWebDomain(viewNode, clientData)
+
         viewNode.autofillId?.let {
             if(shouldDescribe(viewNode)) {
-                val nodeDescription = NodeDescription(
+                val node = NodeDescription(
                     it,
                     getFieldType(viewNode)
                 )
-                clientData.nodes.add(nodeDescription)
+                interestingNodes.add(node)
             }
         }
 
@@ -65,7 +94,7 @@ class Parser(private val lastStructure : AssistStructure) {
             }
 
         children.forEach { childNode: ViewNode ->
-            traverseNode(childNode, clientData)
+            traverseNode(childNode, clientData, interestingNodes)
         }
     }
 
@@ -128,9 +157,12 @@ class Parser(private val lastStructure : AssistStructure) {
             node.inputType or InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD ==
             node.inputType
         ) {
-
             //edittextul pentru căutare în browsere are inputtype = password...
-            val pattern = Regex("search|find|query", RegexOption.IGNORE_CASE)
+            //în chrome (brave), cînd se adaugă un bookmark, cîmpul ptr url are hint=URL și inpuType
+            //conține TYPE_NUMBER_VARIATION_PASSWORD | TYPE_CLASS_TEXT.
+            //Cîmpul pentru numele bookmarkului are inputType=TYPE_TEXT_FLAG_AUTO_CORRECT
+            //| TYPE_TEXT_FLAG_CAP_SENTENCES | TYPE_CLASS_TEXT
+            val pattern = Regex("search|find|query|url", RegexOption.IGNORE_CASE)
             properties.forEach {
                 it?.let {
                     if (pattern.containsMatchIn(it))

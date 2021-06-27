@@ -16,10 +16,12 @@ import android.view.autofill.AutofillId
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.*
+import mozilla.components.lib.publicsuffixlist.PublicSuffixList
 import net.synapticweb.cipherpass.CipherPassApp
 import net.synapticweb.cipherpass.R
 import net.synapticweb.cipherpass.data.Repository
 import net.synapticweb.cipherpass.data.UnencryptedDatabase
+import net.synapticweb.cipherpass.model.Entry
 import javax.inject.Inject
 
 const val CLIENT_DOMAIN_NAME = "client_domain_name"
@@ -55,7 +57,7 @@ class CipherPassService : AutofillService() {
     private fun generateResponse(): FillResponse? {
         val builder = FillResponse.Builder()
         val clientData = parser.parse()
-        if (isClientIgnored(clientData) || !clientData.hasInterestingNodes)
+        if (isClientIgnored(clientData) || clientData.nodes.isEmpty())
             return null
 
         val datasets = generateDatasets(clientData)
@@ -91,16 +93,26 @@ class CipherPassService : AutofillService() {
         if(!repository.isUnlocked())
             return datasets
 
+        if(clientData.webDomain.isNotEmpty()) {
+           val nameToSearch = parseWebDomain(clientData.webDomain.toString())
+           var entries : List<Entry>
+           runBlocking(Dispatchers.IO) {
+               entries = repository.queryDb(listOf(nameToSearch))
+           }
 
+            for(entry in entries) {
+
+            }
+        }
 
         return  datasets
     }
 
     private fun addAuthDataset(clientData: ClientData, builder: FillResponse.Builder) {
-        if(!clientData.hasInterestingNodes)
+        if(clientData.nodes.isEmpty())
             return
 
-        val authPresentation = RemoteViews(packageName, R.layout.autofill_authenticate)
+        val authPresentation = RemoteViews(packageName, R.layout.autofill_service_list)
         val authIntent = Intent(this, AutofillActivity::class.java).apply {
             putExtra(CLIENT_DOMAIN_NAME, clientData.webDomain.toString())
         }
@@ -112,7 +124,7 @@ class CipherPassService : AutofillService() {
         ).intentSender
 
         val ids = mutableListOf<AutofillId>()
-        clientData.interestingNodes.forEach {
+        clientData.nodes.forEach {
             ids.add(it.autofillId)
         }
 
@@ -122,4 +134,18 @@ class CipherPassService : AutofillService() {
         )
     }
 
+    private fun parseWebDomain(domain : String) : String {
+        val suffixList = PublicSuffixList(applicationContext)
+        var noTld : String
+
+        runBlocking {
+            noTld = suffixList.stripPublicSuffix(domain).await()
+        }
+        val segments = noTld.split(".")
+
+        return if(segments.size > 1)
+            segments.last()
+        else
+            segments.first()
+    }
 }
