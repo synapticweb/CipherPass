@@ -13,8 +13,10 @@ class NodeDescription(
     val autofillId : AutofillId,
     var fieldType : FieldType
 ) {
-    val isUsername : Boolean
-        get() = fieldType == FieldType.USERNAME
+    val isLoginId : Boolean
+        get() = fieldType == FieldType.USERNAME ||
+                fieldType == FieldType.EMAIL ||
+                fieldType == FieldType.PHONE
 
     val isPassword : Boolean
         get() = fieldType == FieldType.PASSWORD

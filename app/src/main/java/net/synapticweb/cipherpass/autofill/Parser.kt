@@ -17,6 +17,8 @@ import net.synapticweb.cipherpass.APP_TAG
 
 enum class FieldType {
     USERNAME,
+    EMAIL,
+    PHONE,
     PASSWORD,
     UNKNOWN
 }
@@ -44,19 +46,15 @@ class Parser(private val lastStructure : AssistStructure) {
         return clientData
     }
 
+
     private fun traverseNode(viewNode : ViewNode, clientData : ClientData) {
         parseWebDomain(viewNode, clientData)
         viewNode.autofillId?.let {
             if(shouldDescribe(viewNode)) {
                 val nodeDescription = NodeDescription(
                     it,
-                    FieldType.UNKNOWN
+                    getFieldType(viewNode)
                 )
-                if(isUsername(viewNode))
-                    nodeDescription.fieldType = FieldType.USERNAME
-                if(isPassword(viewNode))
-                    nodeDescription.fieldType = FieldType.PASSWORD
-
                 clientData.nodes.add(nodeDescription)
             }
         }
@@ -88,44 +86,36 @@ class Parser(private val lastStructure : AssistStructure) {
         return node.autofillType == View.AUTOFILL_TYPE_TEXT
     }
 
-    private fun isUsername(node : ViewNode) : Boolean {
-        if (node.autofillHints?.any {
-                it == View.AUTOFILL_HINT_USERNAME ||
-                        it == View.AUTOFILL_HINT_EMAIL_ADDRESS ||
-                        it == View.AUTOFILL_HINT_PHONE
-            } == true)
-            return true
+    private fun getFieldType(node : ViewNode) : FieldType {
+        val autofillHints = mapOf(FieldType.USERNAME to View.AUTOFILL_HINT_USERNAME,
+                                FieldType.PHONE to View.AUTOFILL_HINT_PHONE,
+                                FieldType.EMAIL to View.AUTOFILL_HINT_EMAIL_ADDRESS,
+                                FieldType.PASSWORD to View.AUTOFILL_HINT_PASSWORD)
 
+        val properties = mutableListOf(node.hint, node.idEntry, node.contentDescription, node.text)
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+            properties.add(node.textIdEntry)
 
-        val pattern = Regex("user|email|e-mail|phone|tel", RegexOption.IGNORE_CASE)
-        val properties = listOf(node.hint, node.idEntry, node.contentDescription, node.text)
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+            properties.add(node.hintIdEntry)
 
-        properties.forEach {
-            it?.let {
-                if (pattern.containsMatchIn(it)) {
-                    return true
+        val patterns = mapOf(FieldType.USERNAME to Regex("username"),
+            FieldType.PHONE to Regex("phone|tel"),
+            FieldType.EMAIL to Regex("e-mail|email"),
+            FieldType.PASSWORD to Regex("password|passphrase|passwd"))
+
+        for(type in FieldType.values()) {
+            if (node.autofillHints?.any { hint ->
+                    hint == autofillHints[type]
+                } == true)
+                return type
+
+            properties.forEach {
+                it?.let {
+                    if (patterns[type]?.containsMatchIn(it) == true) { //pattern[unkown] dă null
+                        return type
+                    }
                 }
-            }
-        }
-
-        return false
-    }
-
-    private fun isPassword(node : ViewNode) : Boolean {
-        if (node.autofillHints?.any {
-                it == View.AUTOFILL_HINT_PASSWORD
-            } == true) {
-            return true
-        }
-
-        var pattern = Regex("pass", RegexOption.IGNORE_CASE)
-        val relevantProperties =
-            listOf(node.hint, node.idEntry, node.contentDescription, node.text)
-
-        relevantProperties.forEach {
-            it?.let {
-                if (pattern.containsMatchIn(it))
-                    return true
             }
         }
 
@@ -140,24 +130,22 @@ class Parser(private val lastStructure : AssistStructure) {
         ) {
 
             //edittextul pentru căutare în browsere are inputtype = password...
-            pattern = Regex("search|find|query", RegexOption.IGNORE_CASE)
-            relevantProperties.forEach {
+            val pattern = Regex("search|find|query", RegexOption.IGNORE_CASE)
+            properties.forEach {
                 it?.let {
                     if (pattern.containsMatchIn(it))
-                        return false
-
+                        return FieldType.UNKNOWN
                 }
             }
-
-            return true
+            return FieldType.PASSWORD
         }
 
         if (node.htmlInfo?.attributes?.any {
                 it.first == "type" && it.second == "password"
             } == true)
-            return true
+            return FieldType.PASSWORD
 
-        return false
+        return FieldType.UNKNOWN
     }
 
 }

@@ -17,18 +17,16 @@ class ClientData {
     private var _interestingNodes : List<NodeDescription>? = null
     val interestingNodes : List<NodeDescription>
         get() = _interestingNodes ?: run {
-            val usernames = nodes.filter { it.isUsername }.toMutableList()
+            val loginIds = nodes.filter { it.isLoginId }.toMutableList()
             val passwds = nodes.filter { it.isPassword }
 
-            if (usernames.size > 1 || passwds.size > 1 ||
-                (usernames.isEmpty() && passwds.isEmpty())
-            ) {
+            if (loginIds.isEmpty() && passwds.isEmpty()) {
                 _interestingNodes = listOf()
                 return listOf()
             }
 
             //dacă avem o parolă și niciun username vom considera că nodul care precede parola este username
-            if (usernames.isEmpty()) {
+            if (loginIds.isEmpty()) {
                 val firstPass = passwds[0]
                 val iterator = nodes.listIterator()
 
@@ -38,8 +36,8 @@ class ClientData {
 
                     if (current.autofillId == firstPass.autofillId) {
                         if (previous != null) {  //dacă parola nu e cumva primul nod...
-                            previous.fieldType = FieldType.PASSWORD
-                            usernames.add(previous)
+                            previous.fieldType = FieldType.USERNAME
+                            loginIds.add(previous)
                         }
 
                         break //cînd găsim parola ne oprim, chiar dacă sîntem la începutul listei
@@ -47,7 +45,7 @@ class ClientData {
                     previous = current
                 }
             }
-            _interestingNodes = usernames + passwds
+            _interestingNodes = loginIds + passwds
             return _interestingNodes as List<NodeDescription>
         }
 

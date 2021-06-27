@@ -88,7 +88,12 @@ class CipherPassService : AutofillService() {
 
     private fun generateDatasets(clientData: ClientData): List<Dataset> {
         val datasets = mutableListOf<Dataset>()
-        return datasets
+        if(!repository.isUnlocked())
+            return datasets
+
+
+
+        return  datasets
     }
 
     private fun addAuthDataset(clientData: ClientData, builder: FillResponse.Builder) {
