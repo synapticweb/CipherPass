@@ -128,10 +128,12 @@ class Parser(private val lastStructure : AssistStructure) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
             properties.add(node.hintIdEntry)
 
-        val patterns = mapOf(FieldType.USERNAME to Regex("username"),
-            FieldType.PHONE to Regex("phone|tel"),
-            FieldType.EMAIL to Regex("e-mail|email"),
-            FieldType.PASSWORD to Regex("password|passphrase|passwd"))
+        val patterns = mapOf(FieldType.USERNAME to Regex("username", RegexOption.IGNORE_CASE),
+            FieldType.PHONE to Regex("phone|tel", RegexOption.IGNORE_CASE),
+            FieldType.EMAIL to Regex("e-mail|email", RegexOption.IGNORE_CASE),
+            FieldType.PASSWORD to Regex("password|passphrase|passwd", RegexOption.IGNORE_CASE))
+
+        val negativePatterns = Regex("search|find|query|url|enter text", RegexOption.IGNORE_CASE)
 
         for(type in FieldType.values()) {
             if (node.autofillHints?.any { hint ->
@@ -142,7 +144,10 @@ class Parser(private val lastStructure : AssistStructure) {
             properties.forEach {
                 it?.let {
                     if (patterns[type]?.containsMatchIn(it) == true) { //pattern[unkown] dă null
-                        return type
+                        return if(!negativePatterns.containsMatchIn(it))
+                            type
+                        else
+                            FieldType.UNKNOWN
                     }
                 }
             }
@@ -162,10 +167,9 @@ class Parser(private val lastStructure : AssistStructure) {
             //conține TYPE_NUMBER_VARIATION_PASSWORD | TYPE_CLASS_TEXT.
             //Cîmpul pentru numele bookmarkului are inputType=TYPE_TEXT_FLAG_AUTO_CORRECT
             //| TYPE_TEXT_FLAG_CAP_SENTENCES | TYPE_CLASS_TEXT
-            val pattern = Regex("search|find|query|url", RegexOption.IGNORE_CASE)
             properties.forEach {
                 it?.let {
-                    if (pattern.containsMatchIn(it))
+                    if (negativePatterns.containsMatchIn(it))
                         return FieldType.UNKNOWN
                 }
             }
