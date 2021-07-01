@@ -7,7 +7,7 @@
 package net.synapticweb.cipherpass.autofill
 
 class ClientData {
-    var nodes : List<NodeDescription> = listOf()
+    var nodes : MutableList<NodeDescription> = mutableListOf()
     val webDomain = StringBuilder()
     var packageName : String? = null
 }

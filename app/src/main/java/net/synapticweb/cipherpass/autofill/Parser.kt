@@ -16,6 +16,7 @@ import androidx.annotation.RequiresApi
 import net.synapticweb.cipherpass.APP_TAG
 
 enum class FieldType {
+    GENERIC_LOGINID,
     USERNAME,
     EMAIL,
     PHONE,
@@ -29,7 +30,6 @@ class Parser(private val lastStructure : AssistStructure) {
 
     fun parse() : ClientData {
         val clientData = ClientData()
-        val nodes : MutableList<NodeDescription> = mutableListOf()
         clientData.packageName = lastStructure.activityComponent.packageName
 
         val windowNodes: List<AssistStructure.WindowNode> =
@@ -40,42 +40,16 @@ class Parser(private val lastStructure : AssistStructure) {
         windowNodes.forEach { windowNode: AssistStructure.WindowNode ->
             val viewNode: ViewNode? = windowNode.rootViewNode
             viewNode?.let {
-                traverseNode(it, clientData, nodes)
+                traverseNode(it, clientData)
             }
         }
 
-        val loginIds = nodes.filter { it.isLoginId }.toMutableList()
-        val passwds = nodes.filter { it.isPassword }
-
-        if (loginIds.isEmpty() && passwds.isEmpty())
-            return clientData
-
-        if (loginIds.isEmpty()) {
-           for(passwd in passwds) {
-               val iterator = nodes.listIterator()
-               var previous : NodeDescription? = null
-
-               while(iterator.hasNext()) {
-                   val current = iterator.next()
-                   if(current.autofillId == passwd.autofillId) {
-                       if(previous != null && previous.fieldType == FieldType.UNKNOWN) {
-                           previous.fieldType = FieldType.USERNAME
-                           loginIds.add(previous)
-                       }
-                       break
-                   }
-                   previous = current
-               }
-           }
-        }
-
-        clientData.nodes = loginIds + passwds
+        removeUnkownNodes(clientData)
         return clientData
     }
 
 
-    private fun traverseNode(viewNode : ViewNode, clientData: ClientData,
-                             interestingNodes : MutableList<NodeDescription>) {
+    private fun traverseNode(viewNode : ViewNode, clientData: ClientData) {
         parseWebDomain(viewNode, clientData)
 
         viewNode.autofillId?.let {
@@ -84,7 +58,7 @@ class Parser(private val lastStructure : AssistStructure) {
                     it,
                     getFieldType(viewNode)
                 )
-                interestingNodes.add(node)
+                clientData.nodes.add(node)
             }
         }
 
@@ -94,7 +68,7 @@ class Parser(private val lastStructure : AssistStructure) {
             }
 
         children.forEach { childNode: ViewNode ->
-            traverseNode(childNode, clientData, interestingNodes)
+            traverseNode(childNode, clientData)
         }
     }
 
@@ -184,4 +158,39 @@ class Parser(private val lastStructure : AssistStructure) {
         return FieldType.UNKNOWN
     }
 
+    private fun removeUnkownNodes(clientData: ClientData) {
+        val loginIds = clientData.nodes.filter { it.isLoginId }
+        val passwds = clientData.nodes.filter { it.isPassword }
+
+        //dacă un loginId este urmat de un cîmp care nu e parolă (inclusiv dacă e ultimul în listă)
+        //,atunci probabil că nu e loginId. Singura excepție de la această regulă este cînd există
+        // un singur nod în listă și acela e loginid.
+        if(clientData.nodes.size > 1) {
+            for (loginId in loginIds) {
+                val currentIndex = clientData.nodes.indexOf(loginId)
+                try {
+                    val next = clientData.nodes[currentIndex + 1]
+                    if(next.fieldType != FieldType.PASSWORD)
+                        clientData.nodes[currentIndex].fieldType = FieldType.UNKNOWN
+                }
+                catch (e : IndexOutOfBoundsException) { //e ultimul și deci nu e urmat de parolă
+                    clientData.nodes[currentIndex].fieldType = FieldType.UNKNOWN
+                }
+            }
+        }
+
+        //dacă o parolă e precedată de un cîmp necunoscut, atunci acela probabil e un loginId.
+        for(passwd in passwds) {
+            val currentIndex = clientData.nodes.indexOf(passwd)
+            if(currentIndex > 0) {
+                val previous = clientData.nodes[currentIndex - 1]
+                if(previous.fieldType == FieldType.UNKNOWN)
+                    previous.fieldType = FieldType.GENERIC_LOGINID
+            }
+        }
+
+       clientData.nodes = clientData.nodes.filter {
+           it.fieldType != FieldType.UNKNOWN
+       }.toMutableList()
+    }
 }

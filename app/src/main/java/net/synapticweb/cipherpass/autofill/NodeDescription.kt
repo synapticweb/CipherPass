@@ -16,7 +16,8 @@ class NodeDescription(
     val isLoginId : Boolean
         get() = fieldType == FieldType.USERNAME ||
                 fieldType == FieldType.EMAIL ||
-                fieldType == FieldType.PHONE
+                fieldType == FieldType.PHONE ||
+                fieldType == FieldType.GENERIC_LOGINID
 
     val isPassword : Boolean
         get() = fieldType == FieldType.PASSWORD

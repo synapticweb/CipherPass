@@ -57,7 +57,7 @@ class CipherPassService : AutofillService() {
     private fun generateResponse(): FillResponse? {
         val builder = FillResponse.Builder()
         val clientData = parser.parse()
-        if (isClientIgnored(clientData) || clientData.nodes.isEmpty())
+        if (!shouldGenerateResponse(clientData))
             return null
 
         val datasets = generateDatasets(clientData)
@@ -68,6 +68,18 @@ class CipherPassService : AutofillService() {
         return builder.build()
     }
 
+    private fun shouldGenerateResponse(clientData: ClientData) : Boolean {
+        if(isClientIgnored(clientData) )
+            return false
+
+//după operațiile din Parser::removeUnknownNodes, dacă găsim 1 parolă sau 1 username
+//(dacă e un username fără parolă atunci e un username izolat) putem să generăm un răspuns.
+        return clientData.nodes.any {
+            it.fieldType == FieldType.PASSWORD
+        } || clientData.nodes.any {
+            it.fieldType == FieldType.USERNAME //o idee de test: username-ul este izolat
+        }
+    }
 
     private fun isClientIgnored(clientData: ClientData): Boolean {
         val job = Job()
@@ -125,7 +137,7 @@ class CipherPassService : AutofillService() {
 
         val ids = mutableListOf<AutofillId>()
         clientData.nodes.forEach {
-            ids.add(it.autofillId)
+                ids.add(it.autofillId)
         }
 
         builder.setAuthentication(
