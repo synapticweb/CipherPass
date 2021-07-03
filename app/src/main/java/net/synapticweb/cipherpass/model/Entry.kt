@@ -64,6 +64,22 @@ data class Entry (
         val format  = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
         return format.format(date)
     }
+
+    val isUsernameEmail : Boolean
+            get() {
+                return username?. let {
+                    android.util.Patterns.EMAIL_ADDRESS.
+                            matcher(it).matches()
+                } ?: false
+            }
+
+    val isUsernamePhone : Boolean
+        get() {
+            return username?. let {
+                val phoneRegex = Regex("[ 0-9.()+]+")
+                phoneRegex.matches(it)
+            } ?: false
+        }
 }
 
 //https://sqlite.org/fts3.html

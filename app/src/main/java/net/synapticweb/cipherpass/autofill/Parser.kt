@@ -44,7 +44,7 @@ class Parser(private val lastStructure : AssistStructure) {
             }
         }
 
-        removeUnkownNodes(clientData)
+        postParsingProcess(clientData)
         return clientData
     }
 
@@ -158,9 +158,25 @@ class Parser(private val lastStructure : AssistStructure) {
         return FieldType.UNKNOWN
     }
 
-    private fun removeUnkownNodes(clientData: ClientData) {
+    private fun postParsingProcess(clientData: ClientData) {
         val loginIds = clientData.nodes.filter { it.isLoginId }
         val passwds = clientData.nodes.filter { it.isPassword }
+
+        //dacă o parolă e precedată de un cîmp necunoscut, atunci acela probabil e un loginId.
+        //dacă avem 2 parole contigue atunci probabil e o pagină de înregistrare, deci nu ar
+        //trebui autofill.
+        for(passwd in passwds) {
+            val currentIndex = clientData.nodes.indexOf(passwd)
+            if(currentIndex > 0) {
+                val previous = clientData.nodes[currentIndex - 1]
+                if(previous.fieldType == FieldType.UNKNOWN)
+                    previous.fieldType = FieldType.GENERIC_LOGINID
+                else if(previous.fieldType == FieldType.PASSWORD) {
+                    previous.fieldType = FieldType.UNKNOWN
+                    clientData.nodes[currentIndex].fieldType = FieldType.UNKNOWN
+                }
+            }
+        }
 
         //dacă un loginId este urmat de un cîmp care nu e parolă (inclusiv dacă e ultimul în listă)
         //,atunci probabil că nu e loginId. Singura excepție de la această regulă este cînd există
@@ -178,17 +194,10 @@ class Parser(private val lastStructure : AssistStructure) {
                 }
             }
         }
-
-        //dacă o parolă e precedată de un cîmp necunoscut, atunci acela probabil e un loginId.
-        for(passwd in passwds) {
-            val currentIndex = clientData.nodes.indexOf(passwd)
-            if(currentIndex > 0) {
-                val previous = clientData.nodes[currentIndex - 1]
-                if(previous.fieldType == FieldType.UNKNOWN)
-                    previous.fieldType = FieldType.GENERIC_LOGINID
-            }
-        }
-
+//la sfîrșit pot rămîne următoarele situații:
+// a. 1 user b. 1 parolă c. una sau mai multe perechi user-passwd.
+// Situația user - user - parolă este redusă în pasul 2 la user - passwd
+// Situația user - passwd - passwd este redusă la unknown - unknown - unknown.
        clientData.nodes = clientData.nodes.filter {
            it.fieldType != FieldType.UNKNOWN
        }.toMutableList()
