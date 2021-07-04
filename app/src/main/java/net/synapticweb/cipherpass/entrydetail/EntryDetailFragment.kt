@@ -25,7 +25,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.afollestad.materialdialogs.MaterialDialog
 import net.synapticweb.cipherpass.CipherPassApp
-import net.synapticweb.cipherpass.LockStateViewModel
+import net.synapticweb.cipherpass.ActivityViewModel
 import net.synapticweb.cipherpass.R
 import net.synapticweb.cipherpass.databinding.EntryDetailFragmentBinding
 import net.synapticweb.cipherpass.util.EventObserver
@@ -35,7 +35,7 @@ class EntryDetailFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory : ViewModelProvider.Factory
     private val _viewModel by viewModels<EntryDetailViewModel> { viewModelFactory }
-    private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
+    private val activityViewModel by activityViewModels<ActivityViewModel> {viewModelFactory}
     private val args : EntryDetailFragmentArgs by navArgs()
     private lateinit var binding: EntryDetailFragmentBinding
 
@@ -93,7 +93,7 @@ class EntryDetailFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        lockState.unauthorized.observe(viewLifecycleOwner,
+        activityViewModel.unauthorized.observe(viewLifecycleOwner,
             EventObserver {
                 if (it)
                     findNavController().navigate(

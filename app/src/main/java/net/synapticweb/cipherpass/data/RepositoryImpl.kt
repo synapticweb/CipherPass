@@ -11,6 +11,10 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.sqlcipher.database.SQLiteDatabase
@@ -24,14 +28,46 @@ import net.synapticweb.cipherpass.model.Hash
 import net.synapticweb.cipherpass.util.*
 import java.lang.Exception
 import java.lang.StringBuilder
+import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
 open class RepositoryImpl @Inject constructor(
     private val context: Context,
     private val fileName : String) : Repository {
-    private lateinit var database : CipherPassDatabase
+    private var database : CipherPassDatabase? = null
     private  val prefWrapper = PrefWrapper.getInstance(context)
+    private var lockId : UUID? = null
+
+    override fun scheduleLock() {
+        val prefWrapper = PrefWrapper.getInstance(context)
+        val clipboardTimeout = prefWrapper.getString(context.resources
+            .getString(R.string.clipboard_timeout_key))
+
+        clipboardTimeout?.let {
+            val timeoutDisabled = clipboardTimeout ==
+                    context.resources.getString(R.string.clipboard_timeout_disabled_value)
+            val noAuth =  prefWrapper.getString(context.resources.getString(R.string.applock_key)) ==
+                    context.resources.getString(R.string.applock_nolock_value)
+
+            if(timeoutDisabled || noAuth)
+                return
+
+            val lock = OneTimeWorkRequestBuilder<ScheduleLock>()
+                .setInitialDelay(it.toLong() + 3, TimeUnit.SECONDS)
+                .build()
+            lockId = lock.id
+            WorkManager.getInstance(context).enqueue(lock)
+        }
+    }
+
+    override fun cancelScheduledLock() {
+        lockId?.let {
+            WorkManager.getInstance(context).cancelWorkById(it)
+            lockId = null
+        }
+    }
 
     override suspend fun unlock(passphrase: ByteArray) : Boolean {
         val factory = SupportFactory(passphrase, null, false)
@@ -47,7 +83,7 @@ open class RepositoryImpl @Inject constructor(
             //inițial am încercat să verific cu isOpen, dar întoarce false chiar dacă parola a fost
             // corectă. După o interogare reușită isOpen întoarce true.
             try {
-                database.query("SELECT COUNT(*) FROM `entries`", null)
+                database!!.query("SELECT COUNT(*) FROM `entries`", null)
                 true
             } catch (e: Exception) {
                 false
@@ -82,9 +118,12 @@ open class RepositoryImpl @Inject constructor(
     }
 
     override suspend fun reKey(passphrase: CharArray) : Boolean {
+        if(database == null)
+            throw SecurityException()
+
         return withContext(Dispatchers.IO) {
             try {
-                (database.openHelper.writableDatabase as SQLiteDatabase).changePassword(passphrase)
+                (database!!.openHelper.writableDatabase as SQLiteDatabase).changePassword(passphrase)
             } catch (exc: SQLiteException) {
                 return@withContext false
             }
@@ -93,31 +132,36 @@ open class RepositoryImpl @Inject constructor(
     }
 
     override fun isUnlocked(): Boolean {
-        return if(::database.isInitialized)
-            database.isOpen
-        else
-            false
+        return database?.isOpen ?: false
     }
 
     override fun lock() {
-        if(::database.isInitialized)
-            database.close()
+        database?.close()
+        database = null
     }
 
     override suspend fun insertEntry(entry: Entry) : Long {
-        return database.dao.insertEntry(entry)
+        database?. run {
+            return database!!.dao.insertEntry(entry)
+        } ?: throw  SecurityException()
     }
 
     override suspend fun updateEntry(entry: Entry): Int {
-        return database.dao.updateEntry(entry)
+        database?. run {
+            return database!!.dao.updateEntry(entry)
+        } ?: throw  SecurityException()
     }
 
     override suspend fun deleteEntry(entry: Entry): Int {
-        return database.dao.deleteEntry(entry)
+        database?. run {
+            return database!!.dao.deleteEntry(entry)
+        } ?: throw  SecurityException()
     }
 
     override suspend fun getEntry(key: Long): Entry {
-        return database.dao.getEntry(key)
+        database?. run {
+            return database!!.dao.getEntry(key)
+        } ?: throw  SecurityException()
     }
 
     override fun getAllEntries(sortOrder: String) : LiveData<List<Entry>> {
@@ -132,31 +176,42 @@ open class RepositoryImpl @Inject constructor(
             else -> "$query`insertion_date` DESC"
         }
 
-        return database.dao.getAllEntries(SimpleSQLiteQuery(query))
+        database?. run {
+            return database!!.dao.getAllEntries(SimpleSQLiteQuery(query))
+        } ?: throw  SecurityException()
     }
 
     override suspend fun getAllEntriesSync(): List<Entry> {
-        return database.dao.getAllEntriesSync()
+        database?. run {
+            return database!!.dao.getAllEntriesSync()
+        } ?: throw  SecurityException()
     }
 
     @VisibleForTesting
     suspend fun insertHash(hash: Hash): Long {
-        return database.dao.insertHash(hash)
+        database?. run {
+            return database!!.dao.insertHash(hash)
+        } ?: throw  SecurityException()
     }
 
     @VisibleForTesting
     suspend fun getHash(): Hash? {
-        return database.dao.getHash()
+        database?.run {
+            return database!!.dao.getHash()
+        } ?: throw  SecurityException()
     }
 
     @VisibleForTesting
     suspend fun putHash(hash: String, salt: String) : Boolean {
+        if(database == null)
+            throw SecurityException()
+
        return try {
             val currentHash = getHash()
             currentHash?.let {
                 it.hash = hash
                 it.salt = salt
-                database.dao.updateHash(it)
+                database!!.dao.updateHash(it)
             } ?: run {
                 insertHash(Hash(hash, salt))
             }
@@ -202,34 +257,67 @@ open class RepositoryImpl @Inject constructor(
         sb.append("'")
 
         val query = SimpleSQLiteQuery(queryStem.format(sb.toString(), sb.toString()))
-        return database.dao.queryDb(query)
+        database?. run {
+            return database!!.dao.queryDb(query)
+        } ?: throw  SecurityException()
     }
 
     override suspend fun insertCustomField(field: CustomField): Long {
-        return database.dao.insertCustomField(field)
+        database?. run {
+            return database!!.dao.insertCustomField(field)
+        } ?: throw  SecurityException()
     }
 
     override suspend fun updateCustomField(field: CustomField): Int {
-        return database.dao.updateCustomField(field)
+        database?. run {
+            return database!!.dao.updateCustomField(field)
+        } ?: throw  SecurityException()
     }
 
     override suspend fun deleteCustomField(field: CustomField): Int {
-        return database.dao.deleteCustomField(field)
+        database?. run {
+            return database!!.dao.deleteCustomField(field)
+        } ?: throw  SecurityException()
     }
 
     override suspend fun getCustomField(key: Long): CustomField {
-       return database.dao.getCustomField(key)
+        database?. run {
+            return database!!.dao.getCustomField(key)
+        } ?: throw  SecurityException()
     }
 
     override fun getCustomFields(entry: Long): LiveData<List<CustomField>> {
-        return database.dao.getCustomFields(entry)
+        database?. run {
+            return database!!.dao.getCustomFields(entry)
+        } ?: throw  SecurityException()
     }
 
     override suspend fun getCustomFieldsSync(entry: Long): List<CustomField> {
-        return database.dao.getCustomFieldsSync(entry)
+        database?. run {
+            return database!!.dao.getCustomFieldsSync(entry)
+        } ?: throw  SecurityException()
     }
 
     override suspend fun dbContainsEntries() : Boolean {
-        return database.dao.entriesCount() > 0
+        database?. run {
+            return database!!.dao.entriesCount() > 0
+        } ?: throw  SecurityException()
+    }
+
+    //Subclasele worker nu au voie să fie inner (și nici private), deci a trebuit să recurg
+    //la dagger.
+    class ScheduleLock(appContext: Context, workerParams: WorkerParameters) :
+    Worker(appContext, workerParams) {
+        @Inject
+        lateinit var repository : Repository
+
+        init {
+            (applicationContext as CipherPassApp).appComponent.inject(this)
+        }
+
+        override fun doWork(): Result {
+            repository.lock()
+            return Result.success()
+        }
     }
 }

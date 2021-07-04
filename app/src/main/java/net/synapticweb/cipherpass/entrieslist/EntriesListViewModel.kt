@@ -45,7 +45,13 @@ class EntriesListViewModel @Inject constructor(
         val prefs = PrefWrapper.getInstance(getApplication())
         val sortOrder = prefs.getString(SORT_ORDER_KEY) ?:
             getApplication<CipherPassApp>().resources.getString(R.string.sort_creation_desc_name)
-        repository.getAllEntries(sortOrder)
+        try {
+            repository.getAllEntries(sortOrder)
+        }
+        catch (e : SecurityException) {
+            Log.e(APP_TAG, "Accessing list of entries when database locked.")
+            MutableLiveData(listOf())
+        }
     }
 
     val entries : LiveData<List<Entry>> = _entries

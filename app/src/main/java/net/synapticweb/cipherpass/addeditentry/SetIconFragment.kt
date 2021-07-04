@@ -33,7 +33,7 @@ class SetIconFragment : Fragment(){
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val _viewModel by viewModels<SetIconViewModel> {viewModelFactory}
-    private val lockState by activityViewModels<LockStateViewModel> { viewModelFactory }
+    private val activityViewModel by activityViewModels<ActivityViewModel> { viewModelFactory }
 
     private lateinit var binding : SetIconFragmentBinding
 
@@ -78,7 +78,7 @@ class SetIconFragment : Fragment(){
     }
 
     private fun setupNavigation() {
-        lockState.unauthorized.observe(viewLifecycleOwner,
+        activityViewModel.unauthorized.observe(viewLifecycleOwner,
             EventObserver {
                 if (it)
                     findNavController().navigate(

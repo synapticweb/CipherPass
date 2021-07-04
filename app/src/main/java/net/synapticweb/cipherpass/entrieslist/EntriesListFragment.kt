@@ -37,7 +37,7 @@ class EntriesListFragment : Fragment() {
     lateinit var viewModelFactory : ViewModelProvider.Factory
 
     private val _viewModel by viewModels<EntriesListViewModel> { viewModelFactory }
-    private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
+    private val activityViewModel by activityViewModels<ActivityViewModel> {viewModelFactory}
     private lateinit var binding : EntriesListFragmentBinding
     private lateinit var adapter: EntriesAdapter
     private lateinit var searchPopup : SearchPopup
@@ -105,7 +105,7 @@ class EntriesListFragment : Fragment() {
         setupNavigation()
         setupSearch()
         setupSerialize()
-        handleBackPressed(lockState)
+        handleBackPressed(activityViewModel)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -162,7 +162,7 @@ class EntriesListFragment : Fragment() {
                 false
             }
             R.id.lock -> {
-                lockState.lockAndReauth()
+                activityViewModel.lockAndReauth()
                 false
             }
             R.id.export_json -> {
@@ -201,7 +201,7 @@ class EntriesListFragment : Fragment() {
             )
         })
 
-        lockState.unauthorized.observe(viewLifecycleOwner,
+        activityViewModel.unauthorized.observe(viewLifecycleOwner,
             EventObserver {
                 if (it)
                     findNavController().navigate(

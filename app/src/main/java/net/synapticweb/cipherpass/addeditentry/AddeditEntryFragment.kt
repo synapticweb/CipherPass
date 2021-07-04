@@ -18,7 +18,6 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentResultListener
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -44,7 +43,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val _viewModel by viewModels<AddeditEntryViewModel> { viewModelFactory }
-    private val lockState by activityViewModels<LockStateViewModel> { viewModelFactory }
+    private val activityViewModel by activityViewModels<ActivityViewModel> { viewModelFactory }
 
     private val args: AddeditEntryFragmentArgs by navArgs()
     private lateinit var binding: AddeditEntryFragmentBinding
@@ -113,7 +112,7 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
     }
 
     private fun setupNavigation() {
-        lockState.unauthorized.observe(viewLifecycleOwner,
+        activityViewModel.unauthorized.observe(viewLifecycleOwner,
             EventObserver {
                 if (it)
                     findNavController().navigate(

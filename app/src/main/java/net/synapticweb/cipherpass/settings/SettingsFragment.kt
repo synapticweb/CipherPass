@@ -25,7 +25,7 @@ import net.synapticweb.cipherpass.util.EventObserver
 class SettingsFragment : PreferenceFragmentCompat() {
     @Inject
     lateinit var viewModelFactory : ViewModelProvider.Factory
-    private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
+    private val activityViewModel by activityViewModels<ActivityViewModel> {viewModelFactory}
     val viewModelFrg by viewModels<SettingsViewModel> {viewModelFactory}
 
     override fun onAttach(context: Context) {
@@ -40,7 +40,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        lockState.unauthorized.observe(viewLifecycleOwner,
+        activityViewModel.unauthorized.observe(viewLifecycleOwner,
             EventObserver {
                 findNavController().navigate(
                     SettingsFragmentDirections.actionSettingsFragmentToAuthenticateFragment()

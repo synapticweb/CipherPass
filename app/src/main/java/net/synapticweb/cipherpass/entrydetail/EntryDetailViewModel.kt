@@ -10,12 +10,14 @@ import android.app.Application
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.*
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.synapticweb.cipherpass.APP_TAG
 import net.synapticweb.cipherpass.CipherPassApp
 import net.synapticweb.cipherpass.R
 import net.synapticweb.cipherpass.model.CustomField
@@ -47,7 +49,12 @@ class EntryDetailViewModel @Inject constructor(private val repository: Repositor
 
     private fun getEntry(entryId : Long) {
         viewModelScope.launch {
-            entry.value = repository.getEntry(entryId)
+            try {
+                entry.value = repository.getEntry(entryId)
+            }
+            catch (e : SecurityException) {
+                Log.e(APP_TAG, "Accessing entry when database locked.")
+            }
         }
     }
 
