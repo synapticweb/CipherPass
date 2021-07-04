@@ -15,10 +15,11 @@ import net.synapticweb.cipherpass.addeditentry.di.AddeditEntryComponent
 import net.synapticweb.cipherpass.authenticate.di.AuthenticateComponent
 import net.synapticweb.cipherpass.entrydetail.di.EntryDetailComponent
 import net.synapticweb.cipherpass.entrieslist.di.EntriesListComponent
+import net.synapticweb.cipherpass.data.RepositoryImpl
 import net.synapticweb.cipherpass.settings.di.SettingsComponent
 import javax.inject.Singleton
 
-@Component(modules = [AppSubcomponents::class, RepositoryModule::class, LockStateModule::class,
+@Component(modules = [AppSubcomponents::class, RepositoryModule::class, ActivityViewModelModule::class,
     CipherModule::class,
     ViewModelBuilderModule::class])
 @Singleton
@@ -29,6 +30,7 @@ interface AppComponent {
     }
 
     fun inject(activity : MainActivity)
+    fun inject(scheduleLock: RepositoryImpl.ScheduleLock)
     fun entriesListComponent() : EntriesListComponent.Factory
     fun authenticateComponent() : AuthenticateComponent.Factory
     fun settingsComponent() : SettingsComponent.Factory

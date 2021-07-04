@@ -17,7 +17,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import net.synapticweb.cipherpass.CipherPassApp
-import net.synapticweb.cipherpass.LockStateViewModel
+import net.synapticweb.cipherpass.ActivityViewModel
 import net.synapticweb.cipherpass.databinding.AboutFragmentBinding
 import net.synapticweb.cipherpass.util.EventObserver
 import javax.inject.Inject
@@ -25,7 +25,7 @@ import javax.inject.Inject
 class AboutFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory : ViewModelProvider.Factory
-    private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
+    private val activityViewModel by activityViewModels<ActivityViewModel> {viewModelFactory}
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -42,7 +42,7 @@ class AboutFragment : Fragment() {
         val binding = AboutFragmentBinding.inflate(inflater, container, false)
         binding.packageInfo = requireContext().packageManager
                 .getPackageInfo(requireContext().packageName, 0)
-        lockState.unauthorized.observe(viewLifecycleOwner,
+        activityViewModel.unauthorized.observe(viewLifecycleOwner,
             EventObserver {
                 if (it)
                     findNavController().navigate(

@@ -15,6 +15,10 @@ interface Repository {
 
     fun lock()
 
+    fun scheduleLock()
+
+    fun cancelScheduledLock()
+
     suspend fun unlock(passphrase : ByteArray) : Boolean
 
     suspend fun isPassValid(passphrase: CharArray) : Boolean

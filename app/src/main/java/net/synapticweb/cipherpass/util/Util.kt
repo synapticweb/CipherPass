@@ -20,7 +20,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
 import com.google.android.material.textfield.TextInputLayout
-import net.synapticweb.cipherpass.LockStateViewModel
+import net.synapticweb.cipherpass.ActivityViewModel
 import net.synapticweb.cipherpass.R
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
@@ -33,11 +33,11 @@ import javax.crypto.spec.PBEKeySpec
 
 const val SET_ICON_COLUMN_WIDTH = 55
 
-fun Fragment.handleBackPressed(lockState: LockStateViewModel) {
+fun Fragment.handleBackPressed(activityViewModel: ActivityViewModel) {
     requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
         val currentTime = System.currentTimeMillis()
-        if(currentTime - lockState.lastBackPress > 3000) {
-            lockState.lastBackPress = currentTime
+        if(currentTime - activityViewModel.lastBackPress > 3000) {
+            activityViewModel.lastBackPress = currentTime
             Toast.makeText(requireContext(), getText(R.string.one_more_backpress), Toast.LENGTH_SHORT)
                 .show()
             return@addCallback

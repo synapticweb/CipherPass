@@ -19,13 +19,13 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var viewModelFactory : ViewModelProvider.Factory
-    private lateinit var lockState : LockStateViewModel
+    private lateinit var activityViewModel : ActivityViewModel
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         (application as CipherPassApp).appComponent.inject(this)
-        lockState = ViewModelProvider(this, viewModelFactory).get(LockStateViewModel::class.java)
-        super.onCreate(if(lockState.isDbUnlocked()) savedInstanceState else null)
+        activityViewModel = ViewModelProvider(this, viewModelFactory).get(ActivityViewModel::class.java)
+        super.onCreate(if(activityViewModel.isDbUnlocked()) savedInstanceState else null)
         //Pasăm null pentru a împiedica recrearea fragmentului entrieslist (și
         //mai multy ca sigur a altora) în onStart după ce aplicația este distrusă de sistem ca urmare
         //a inactivității. Dacă se întîmplă, avem crash în repository cu database uninitialized.
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(setOf(R.id.authenticateFragment, R.id.entriesListFragment))
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        lifecycle.addObserver(lockState)
+        lifecycle.addObserver(activityViewModel)
     }
 
     override fun onSupportNavigateUp() : Boolean {

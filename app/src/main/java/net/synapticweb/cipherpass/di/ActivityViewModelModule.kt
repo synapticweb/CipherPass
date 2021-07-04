@@ -10,14 +10,14 @@ import androidx.lifecycle.ViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
-import net.synapticweb.cipherpass.LockStateViewModel
+import net.synapticweb.cipherpass.ActivityViewModel
 import javax.inject.Singleton
 
 @Module
-abstract class LockStateModule {
+abstract class ActivityViewModelModule {
     @Binds
     @IntoMap
     @Singleton
-    @ViewModelKey(LockStateViewModel::class)
-    abstract fun bindViewModel(viewModel : LockStateViewModel) : ViewModel
+    @ViewModelKey(ActivityViewModel::class)
+    abstract fun bindViewModel(viewModel : ActivityViewModel) : ViewModel
 }

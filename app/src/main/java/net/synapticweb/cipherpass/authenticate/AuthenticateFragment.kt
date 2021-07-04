@@ -37,7 +37,7 @@ class AuthenticateFragment : Fragment() {
     lateinit var viewModelFactory : ViewModelProvider.Factory
 
     private val _viewModel by viewModels<AuthenticateViewModel> { viewModelFactory }
-    private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
+    private val activityViewModel by activityViewModels<ActivityViewModel> {viewModelFactory}
 
     private lateinit var binding : AuthenticateFragmentBinding
 
@@ -107,10 +107,10 @@ class AuthenticateFragment : Fragment() {
         //De asemenea, cînd este pornită activitatea sistem de autentificare și se revine la activitate,
         //dacă între cele 3 evenimente trece intervalul de timeout se setează unathorized; dacă nu e consumat
         //în authfrg îl consumă entrieslistfrg.
-        lockState.unauthorized.observe(viewLifecycleOwner, EventObserver {})
+        activityViewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {})
 
 
-        handleBackPressed(lockState)
+        handleBackPressed(activityViewModel)
         setupSystemAuth()
         return binding.root
     }

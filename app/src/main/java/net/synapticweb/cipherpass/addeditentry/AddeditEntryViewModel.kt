@@ -7,6 +7,7 @@
 package net.synapticweb.cipherpass.addeditentry
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import net.synapticweb.cipherpass.*
@@ -62,15 +63,20 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
             return
 
         viewModelScope.launch {  //edit
-            repository.getEntry(id). let { entry ->
-                name.value = entry.entryName
-                password.value = entry.password
-                rePassword.value = entry.password
-                username.value = entry.username
-                url.value = entry.url
-                comment.value = entry.comment
-                icon.value = entry.icon
-                savedEntry = entry
+            try {
+                repository.getEntry(id).let { entry ->
+                    name.value = entry.entryName
+                    password.value = entry.password
+                    rePassword.value = entry.password
+                    username.value = entry.username
+                    url.value = entry.url
+                    comment.value = entry.comment
+                    icon.value = entry.icon
+                    savedEntry = entry
+                }
+            }
+            catch (e : SecurityException) {
+                Log.e(APP_TAG, "Accessing entry (edit) when db locked.")
             }
             withContext(Dispatchers.IO) {
                 inMemoryFields = repository.getCustomFieldsSync(id).toMutableList()

@@ -18,7 +18,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import net.synapticweb.cipherpass.CipherPassApp
-import net.synapticweb.cipherpass.LockStateViewModel
+import net.synapticweb.cipherpass.ActivityViewModel
 import net.synapticweb.cipherpass.R
 import net.synapticweb.cipherpass.util.EventObserver
 import javax.inject.Inject
@@ -26,7 +26,7 @@ import javax.inject.Inject
 class PrivPolicyFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory : ViewModelProvider.Factory
-    private val lockState by activityViewModels<LockStateViewModel> {viewModelFactory}
+    private val activityViewModel by activityViewModels<ActivityViewModel> {viewModelFactory}
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -45,7 +45,7 @@ class PrivPolicyFragment : Fragment() {
             text = String.format(getString(R.string.priv_pol_intro, getString(R.string.app_name)))
         }
 
-        lockState.unauthorized.observe(viewLifecycleOwner,
+        activityViewModel.unauthorized.observe(viewLifecycleOwner,
             EventObserver {
                 if (it)
                     findNavController().navigate(
