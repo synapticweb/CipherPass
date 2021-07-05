@@ -102,7 +102,7 @@ class Parser(private val lastStructure : AssistStructure) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
             properties.add(node.hintIdEntry)
 
-        val patterns = mapOf(FieldType.USERNAME to Regex("username", RegexOption.IGNORE_CASE),
+        val patterns = mapOf(FieldType.USERNAME to Regex("user", RegexOption.IGNORE_CASE),
             FieldType.PHONE to Regex("phone|tel", RegexOption.IGNORE_CASE),
             FieldType.EMAIL to Regex("e-mail|email", RegexOption.IGNORE_CASE),
             FieldType.PASSWORD to Regex("password|passphrase|passwd", RegexOption.IGNORE_CASE))
@@ -155,49 +155,40 @@ class Parser(private val lastStructure : AssistStructure) {
             } == true)
             return FieldType.PASSWORD
 
+        if(node.inputType or InputType.TYPE_CLASS_PHONE == node.inputType) {
+            properties.forEach {
+                it?.let {
+                    if (negativePatterns.containsMatchIn(it))
+                        return FieldType.UNKNOWN
+                }
+            }
+            return FieldType.PHONE
+        }
+
         return FieldType.UNKNOWN
     }
 
     private fun postParsingProcess(clientData: ClientData) {
         for (index in 0 until clientData.nodes.size) {
             val current = clientData.nodes[index]
-            //dacă un loginId este urmat de un cîmp care nu e parolă (inclusiv dacă e ultimul în listă)
-            //,atunci probabil că nu e loginId. Singura excepție de la această regulă este cînd există
-            // un singur nod în listă și acela e loginid.
-            if (current.isLoginId) {
-                try {
-                    val next = clientData.nodes[index + 1]
-                    if (!next.isPassword)
-                        current.fieldType = FieldType.UNKNOWN
-                } catch (e : Exception) { //excepția este java.lang.ArrayIndexOutOfBoundsException sau poate altceva
-                    if(clientData.nodes.size > 1) //dacă e un singur loginid în listă nu facem nimic
-                        current.fieldType = FieldType.UNKNOWN //e ultimul și deci nu e urmat de parolă)
-                }
-            }
             //dacă o parolă e precedată de un cîmp necunoscut, atunci acela probabil e un loginId.
             // dacă avem 2 parole contigue atunci probabil e o pagină de înregistrare, deci nu ar
-            //trebui autofill. Codul de mai jos gestionează situația cu 1 singur nod parolă în listă.
-            else if (current.isPassword) {
+            //trebui autofill.
+            if (current.isPassword) {
                 try {
+                    val next = clientData.nodes[index + 1]
+                    if (next.isPassword) {
+                        clientData.nodes = mutableListOf()
+                        return
+                    }
                     val previous = clientData.nodes[index - 1]
                     if (previous.fieldType == FieldType.UNKNOWN)
                         previous.fieldType = FieldType.GENERIC_LOGINID
-                    else if (previous.isPassword) {
-                        previous.fieldType = FieldType.UNKNOWN
-                        current.fieldType = FieldType.UNKNOWN
-                        //dacă am descoperit 2 parole contigue, atunci ne uităm și la cîmpul de
-                        // dinainte de prima parolă. Dacă e loginid, trebuie scos și acela.
-                        val beforePrevious = clientData.nodes[index - 2]
-                        if (beforePrevious.isLoginId)
-                            beforePrevious.fieldType = FieldType.UNKNOWN
-                    }
-                }
-                catch (e : Exception) {}
+                } //excepția este java.lang.ArrayIndexOutOfBoundsException sau poate IndexOutOfBoundsException
+                catch (e: Exception) {}
             }
         }
 
-//la sfîrșit pot rămîne următoarele situații:
-// a. 1 user b. 1 parolă c. una sau mai multe perechi intercalate user-passwd
        clientData.nodes = clientData.nodes.filter {
            it.fieldType != FieldType.UNKNOWN
        }.toMutableList()

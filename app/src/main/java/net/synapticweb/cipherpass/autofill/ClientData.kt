@@ -10,18 +10,4 @@ class ClientData {
     var nodes : MutableList<NodeDescription> = mutableListOf()
     val webDomain = StringBuilder()
     var packageName : String = ""
-
-    val loginIdType : FieldType?
-        get() {
-            val loginIds = nodes.filter { it.isLoginId }
-            var previousType : FieldType? = null
-            for(loginId in loginIds) {
-                previousType?. let {
-                    if (loginId.fieldType != it)
-                        return null
-                }
-                previousType = loginId.fieldType
-            }
-            return previousType
-        }
 }

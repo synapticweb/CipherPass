@@ -12,14 +12,11 @@ import android.content.IntentSender
 import android.os.Build
 import android.os.CancellationSignal
 import android.service.autofill.*
-import android.util.Log
-import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.*
 import mozilla.components.lib.publicsuffixlist.PublicSuffixList
-import net.synapticweb.cipherpass.APP_TAG
 import net.synapticweb.cipherpass.CipherPassApp
 import net.synapticweb.cipherpass.R
 import net.synapticweb.cipherpass.data.Repository
@@ -75,7 +72,7 @@ class CipherPassService : AutofillService() {
             return false
 
 //după operațiile din Parser::postParsingProcess, dacă găsim 1 parolă sau 1 username
-//(dacă e un username fără parolă atunci e un username izolat) putem să generăm un răspuns.
+// putem să generăm un răspuns.
         return clientData.nodes.any {
             it.fieldType == FieldType.PASSWORD
         } || clientData.nodes.any {
@@ -104,18 +101,10 @@ class CipherPassService : AutofillService() {
 
     private fun generateDatasets(clientData: ClientData): List<Dataset> {
         val datasets = mutableListOf<Dataset>()
-        val loginIdType = clientData.loginIdType
-        //idee de test: nr de loginIds = nr parole
         val loginIds = clientData.nodes.filter { it.isLoginId }
         val passwds = clientData.nodes.filter { it.isPassword }
 
-        if((loginIds.size > 1 || passwds.size > 1) &&
-            loginIds.size != passwds.size) {
-            Log.e(APP_TAG, "Number of loginIds is not equal with number of passwds.")
-            return datasets
-        }
-
-        if(!repository.isUnlocked() || loginIdType == null)
+        if(!repository.isUnlocked() )
             return datasets
 
         fun entriesToDatasets(searchToken : String) {
@@ -126,10 +115,6 @@ class CipherPassService : AutofillService() {
             for(entry in entries) {
                 if(entry.username == null && entry.password == null)
                     continue
-                if(loginIdType == FieldType.EMAIL && !entry.isUsernameEmail)
-                    continue
-                if(loginIdType == FieldType.PHONE && !entry.isUsernamePhone)
-                    continue
 
                 val presentation = RemoteViews(packageName, R.layout.autofill_service_list)
                 presentation.setTextViewText(R.id.autofill_dataset_title, entry.entryName)
@@ -137,6 +122,11 @@ class CipherPassService : AutofillService() {
 
                 for(loginId in loginIds)
                     entry.username?.let {
+                        if(loginId.fieldType == FieldType.EMAIL && !entry.isUsernameEmail
+                            ||
+                            loginId.fieldType == FieldType.PHONE && !entry.isUsernamePhone)
+                                return@let
+
                         builder.setValue(
                             loginId.autofillId,
                             AutofillValue.forText(it),
@@ -201,10 +191,7 @@ class CipherPassService : AutofillService() {
         }
         val segments = noTld.split(".")
 
-        return if(segments.size > 1)
-            segments.last()
-        else
-            segments.first()
+        return segments.last()
     }
 
     private fun parsePackageName(packageName : String) : String {
@@ -221,10 +208,7 @@ class CipherPassService : AutofillService() {
         }
         segments = noTld.split(".")
 
-        return if(segments.size > 1)
-            segments.last()
-        else
-            segments.first()
+        return segments.last()
     }
 
 }
