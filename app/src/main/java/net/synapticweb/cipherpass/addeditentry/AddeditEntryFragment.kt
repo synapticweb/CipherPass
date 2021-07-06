@@ -120,6 +120,13 @@ class AddeditEntryFragment : Fragment(), CustomFieldsEditFragment {
                     )
             })
 
+        _viewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {
+            if (it)
+                findNavController().navigate(
+                    AddeditEntryFragmentDirections.actionAddeditEntryFragmentToAuthenticateFragment()
+                )
+        })
+
         _viewModel.saveResult.observe(viewLifecycleOwner, EventObserver {
             val imm: InputMethodManager =
                 requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager

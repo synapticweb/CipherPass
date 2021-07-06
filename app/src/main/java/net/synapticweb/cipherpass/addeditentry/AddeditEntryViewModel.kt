@@ -30,7 +30,7 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
     AndroidViewModel(application) {
 
     val username = MutableLiveData<String?>()
-
+    val unauthorized = MutableLiveData<Event<Boolean>>()
     private var inMemoryFields = mutableListOf<CustomField>()
     val customFields = MutableLiveData<MutableList<CustomField>>()
 
@@ -77,9 +77,18 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
             }
             catch (e : SecurityException) {
                 Log.e(APP_TAG, "Accessing entry (edit) when db locked.")
+                unauthorized.value = Event(true)
             }
             withContext(Dispatchers.IO) {
-                inMemoryFields = repository.getCustomFieldsSync(id).toMutableList()
+                try {
+                    inMemoryFields = repository.getCustomFieldsSync(id).toMutableList()
+                }
+                catch (e : SecurityException) {
+                    withContext(Dispatchers.Main) {
+                        Log.e(APP_TAG, "Accessing custom fields (edit) when db locked.")
+                        unauthorized.value = Event(true)
+                    }
+                }
             }
             customFields.value = inMemoryFields
         }
@@ -108,43 +117,47 @@ class AddeditEntryViewModel @Inject constructor(private val repository: Reposito
         wrapEspressoIdlingResource {
             viewModelScope.launch {
                 var newEntryRowId = 0L
-
-                if (isEdit()) {
-                    if (repository.updateEntry(entry) == -1) {
-                        toastMessages.value = Event(R.string.addedit_save_error)
-                        return@launch
-                    }
-                } else {
-                    newEntryRowId = repository.insertEntry(entry)
-                    if (newEntryRowId.toInt() == -1) {
-                        toastMessages.value = Event(R.string.addedit_save_error)
-                        return@launch
-                    }
-                }
-
-                for (field in inMemoryFields) {
-                    if (field.inMemoryState == NEW_FIELD) {
-                        field.entry = if (isEdit()) entry.id else newEntryRowId
-
-                        val cfRowId = repository.insertCustomField(field)
-                        if (cfRowId.toInt() == -1) {
+                try {
+                    if (isEdit()) {
+                        if (repository.updateEntry(entry) == -1) {
                             toastMessages.value = Event(R.string.addedit_save_error)
                             return@launch
                         }
-                    } else if (field.inMemoryState == DIRTY_FIELD) {
-                        val rowsUpdated = repository.updateCustomField(field)
-                        if (rowsUpdated != 1) {
+                    } else {
+                        newEntryRowId = repository.insertEntry(entry)
+                        if (newEntryRowId.toInt() == -1) {
                             toastMessages.value = Event(R.string.addedit_save_error)
                             return@launch
                         }
                     }
-                }
 
-                for (field in deletedFields) {
-                    if (repository.deleteCustomField(field) != 1) {
-                        toastMessages.value = Event(R.string.addedit_save_error)
-                        return@launch
+                    for (field in inMemoryFields) {
+                        if (field.inMemoryState == NEW_FIELD) {
+                            field.entry = if (isEdit()) entry.id else newEntryRowId
+
+                            val cfRowId = repository.insertCustomField(field)
+                            if (cfRowId.toInt() == -1) {
+                                toastMessages.value = Event(R.string.addedit_save_error)
+                                return@launch
+                            }
+                        } else if (field.inMemoryState == DIRTY_FIELD) {
+                            val rowsUpdated = repository.updateCustomField(field)
+                            if (rowsUpdated != 1) {
+                                toastMessages.value = Event(R.string.addedit_save_error)
+                                return@launch
+                            }
+                        }
                     }
+
+                    for (field in deletedFields) {
+                        if (repository.deleteCustomField(field) != 1) {
+                            toastMessages.value = Event(R.string.addedit_save_error)
+                            return@launch
+                        }
+                    }
+                } catch (e : SecurityException) {
+                    Log.e(APP_TAG, "Saving entry when db locked.")
+                    unauthorized.value = Event(true)
                 }
 
                 if (isEdit()) {

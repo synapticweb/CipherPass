@@ -50,7 +50,7 @@ class EntryDetailFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
        val root = inflater.inflate(R.layout.entry_detail_fragment, container, false)
         binding = EntryDetailFragmentBinding.bind(root).apply {
             viewModel = _viewModel
@@ -100,6 +100,13 @@ class EntryDetailFragment : Fragment() {
                         EntryDetailFragmentDirections.actionEntryDetailFragmentToAuthenticateFragment()
                     )
             })
+
+        _viewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {
+            if (it)
+                findNavController().navigate(
+                    EntryDetailFragmentDirections.actionEntryDetailFragmentToAuthenticateFragment()
+                )
+        })
 
         _viewModel.finishDeletion.observe(viewLifecycleOwner, EventObserver {
             Toast.makeText(requireContext(), getString(R.string.deletion_ok), Toast.LENGTH_SHORT).show()

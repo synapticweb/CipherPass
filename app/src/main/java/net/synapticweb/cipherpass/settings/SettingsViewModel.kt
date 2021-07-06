@@ -7,10 +7,12 @@
 package net.synapticweb.cipherpass.settings
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import net.synapticweb.cipherpass.APP_TAG
 import net.synapticweb.cipherpass.CipherPassApp
 import net.synapticweb.cipherpass.R
 import net.synapticweb.cipherpass.data.Repository
@@ -29,6 +31,7 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
     val writeSettingsFail = MutableLiveData<Event<Boolean>>()
     private val res = getApplication<CipherPassApp>().resources
     private val prefWrapper = PrefWrapper.getInstance(getApplication())
+    val unauthorized = MutableLiveData<Event<Boolean>>()
 
     fun hasEncryptedPass() : Boolean {
         return prefWrapper.getString(ENCRYPTED_PASS_KEY) != null
@@ -47,10 +50,15 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
         viewModelScope.launch {
             working.value = true
             wrapEspressoIdlingResource {
-                if(!repository.isPassValid(actualPass)) {
-                    passInvalid.value = Event(true)
-                    working.value = false
-                    return@launch
+                try {
+                    if (!repository.isPassValid(actualPass)) {
+                        passInvalid.value = Event(true)
+                        working.value = false
+                        return@launch
+                    }
+                } catch (e : SecurityException) {
+                    Log.e(APP_TAG, "isPassValid when db locked.")
+                    unauthorized.value = Event(true)
                 }
 
                 //introducem în setări parola criptată doar dacă avem weak auth. Dacă scrierea
@@ -64,19 +72,34 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
                     return@launch
                 }
 
-                if(!repository.createPassHash(newPass, null)) {
-                    if(hasEncryptedPass()) {
-                        prefWrapper.setPref(res.getString(R.string.applock_key),
-                            res.getString(R.string.applock_passwd_value))
-                        deleteEncryptedPass()
+                try {
+                    if (!repository.createPassHash(newPass, null)) {
+                        if (hasEncryptedPass()) {
+                            prefWrapper.setPref(
+                                res.getString(R.string.applock_key),
+                                res.getString(R.string.applock_passwd_value)
+                            )
+                            deleteEncryptedPass()
+                        }
+                        finish.value = Event(false)
+                        working.value = false
+                        return@launch
                     }
-                    finish.value = Event(false)
-                    working.value = false
-                    return@launch
+                } catch (e : SecurityException) {
+                    Log.e(APP_TAG, "createPassHash when db locked.")
+                    unauthorized.value = Event(true)
                 }
             }
 
-            finish.value = Event(repository.reKey(newPass))
+            finish.value =
+                try {
+                    Event(repository.reKey(newPass))
+                }
+                catch (e : SecurityException) {
+                    Log.e(APP_TAG, "rekey when db locked.")
+                    unauthorized.value = Event(true)
+                    Event(false)
+                }
             working.value = false
             Arrays.fill(actualPass, 0.toChar())
             Arrays.fill(newPass, 0.toChar())
@@ -87,16 +110,21 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
         viewModelScope .launch {
             working.value = true
             wrapEspressoIdlingResource {
-                if(!repository.isPassValid(password)) {
-                    passInvalid.value = Event(true)
-                    working.value = false
-                    return@launch
-                }
+                try {
+                    if (!repository.isPassValid(password)) {
+                        passInvalid.value = Event(true)
+                        working.value = false
+                        return@launch
+                    }
 
-                if(!repository.createPassHash(password, hashType)) {
-                    finish.value = Event(false)
-                    working.value = false
-                    return@launch
+                    if (!repository.createPassHash(password, hashType)) {
+                        finish.value = Event(false)
+                        working.value = false
+                        return@launch
+                    }
+                } catch (e : SecurityException) {
+                    Log.e(APP_TAG, "isPassValid or createPassHash when db locked.")
+                    unauthorized.value = Event(true)
                 }
             }
             finish.value = Event(true)
@@ -109,7 +137,14 @@ class SettingsViewModel @Inject constructor(private val repository: Repository,
         viewModelScope.launch {
             working.value = true
             val result = wrapEspressoIdlingResource {
-                repository.isPassValid(passphrase)
+                try {
+                    repository.isPassValid(passphrase)
+                }
+                catch (e : SecurityException) {
+                    Log.e(APP_TAG, "isPassValid when db locked.")
+                    unauthorized.value = Event(true)
+                    false
+                }
             }
 
             if (!result) {

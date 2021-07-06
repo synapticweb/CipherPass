@@ -40,6 +40,7 @@ class EntriesListViewModel @Inject constructor(
     AndroidViewModel(application) {
 
     private val _refresh = MutableLiveData(false)
+    val unauthorized = MutableLiveData<Event<Boolean>>()
 
     private val _entries : LiveData<List<Entry>> = _refresh.switchMap {
         val prefs = PrefWrapper.getInstance(getApplication())
@@ -50,6 +51,7 @@ class EntriesListViewModel @Inject constructor(
         }
         catch (e : SecurityException) {
             Log.e(APP_TAG, "Accessing list of entries when database locked.")
+            unauthorized.value = Event(true)
             MutableLiveData(listOf())
         }
     }
@@ -95,12 +97,18 @@ class EntriesListViewModel @Inject constructor(
             if(elem.isNotBlank())
                 finalElems.add(elem)
 
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.queryDb(finalElems). let {
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                repository.queryDb(finalElems).let {
                     withContext(Dispatchers.Main) {
                         _searchResults.value = Event(it)
                     }
+                }
             }
+        }
+        catch (e : SecurityException) {
+            Log.d(APP_TAG, "Manual search query while db is locked. ")
+            unauthorized.value = Event(true)
         }
     }
 
@@ -110,9 +118,17 @@ class EntriesListViewModel @Inject constructor(
 
     fun exportJson(fileUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
-            val entries = repository.getAllEntriesSync()
-            for(entry in entries)
-                entry.customFields = repository.getCustomFieldsSync(entry.id)
+            try {
+                val entries = repository.getAllEntriesSync()
+                for (entry in entries)
+                    entry.customFields = repository.getCustomFieldsSync(entry.id)
+            }
+            catch (e : SecurityException) {
+                withContext(Dispatchers.Main) {
+                    Log.d(APP_TAG, "Export json while db is locked. ")
+                    unauthorized.value = Event(true)
+                }
+            }
 
             val contentResolver = getApplication<CipherPassApp>().contentResolver
             try {
@@ -177,7 +193,17 @@ class EntriesListViewModel @Inject constructor(
                 return@launch
             }
 
-            if(repository.dbContainsEntries())
+            var containsEntries = false
+            try {
+                containsEntries = repository.dbContainsEntries()
+            }
+            catch (e : SecurityException) {
+                withContext(Dispatchers.Main) {
+                    Log.d(APP_TAG, "Read json data while db is locked. ")
+                    unauthorized.value = Event(true)
+                }
+            }
+            if(containsEntries)
                 withContext(Dispatchers.Main) {
                     _hasEntries.value = Event(true)
                 }
@@ -191,13 +217,21 @@ class EntriesListViewModel @Inject constructor(
             if(replace)
                 emptyDb()
 
-            for(entry in jsonData) {
-               val entryId = repository.insertEntry(entry)
-                entry.customFields?.let {
-                    for(field in it) {
-                        field.entry = entryId
-                        repository.insertCustomField(field)
+            try {
+                for (entry in jsonData) {
+                    val entryId = repository.insertEntry(entry)
+                    entry.customFields?.let {
+                        for (field in it) {
+                            field.entry = entryId
+                            repository.insertCustomField(field)
+                        }
                     }
+                }
+            }
+            catch (e : SecurityException) {
+                withContext(Dispatchers.Main) {
+                    Log.d(APP_TAG, "Import entries while db is locked. ")
+                    unauthorized.value = Event(true)
                 }
             }
             withContext(Dispatchers.Main) {
@@ -208,17 +242,30 @@ class EntriesListViewModel @Inject constructor(
 
     @VisibleForTesting
     suspend fun emptyDb() {
-        val entries = repository.getAllEntriesSync()
-        for (entry in entries) {
-            val fields = repository.getCustomFieldsSync(entry.id)
-            for (field in fields)
-                repository.deleteCustomField(field)
-            repository.deleteEntry(entry)
+        try {
+            val entries = repository.getAllEntriesSync()
+            for (entry in entries) {
+                val fields = repository.getCustomFieldsSync(entry.id)
+                for (field in fields)
+                    repository.deleteCustomField(field)
+                repository.deleteEntry(entry)
+            }
+        }
+        catch (e : SecurityException) {
+            withContext(Dispatchers.Main) {
+                Log.d(APP_TAG, "Empty dp while db is locked. ")
+                unauthorized.value = Event(true)
+            }
         }
     }
 
     fun getIconRes(iconName : String) : Int {
         val context = getApplication<CipherPassApp>()
         return context.resources.getIdentifier(iconName, "drawable", context.packageName)
+    }
+
+    fun lockAndReauth() {
+        repository.lock()
+        unauthorized.value = Event(true)
     }
 }
