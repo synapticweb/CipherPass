@@ -97,4 +97,8 @@ class AuthenticateViewModel @Inject constructor(private val repository: Reposito
                     KEY_STORAGE_SOFTWARE)
         }
     }
+
+    fun isAuthenticated() : Boolean {
+        return repository.isUnlocked()
+    }
 }

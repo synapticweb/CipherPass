@@ -22,7 +22,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.cipherpass.*
 import net.synapticweb.cipherpass.databinding.AuthenticateFragmentBinding
@@ -38,6 +37,7 @@ class AuthenticateFragment : Fragment() {
 
     private val _viewModel by viewModels<AuthenticateViewModel> { viewModelFactory }
     private val activityViewModel by activityViewModels<ActivityViewModel> {viewModelFactory}
+    private val lastBackPress = LastBackPress()
 
     private lateinit var binding : AuthenticateFragmentBinding
 
@@ -52,13 +52,16 @@ class AuthenticateFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val fragment = this
         binding = AuthenticateFragmentBinding.inflate(inflater, container, false).apply {
             viewModel = _viewModel
             lifecycleOwner = fragment
         }
         setupSendPass()
+        setupSystemAuth()
+        setupPasswordFields(binding.passLayout, arrayOf(binding.passphrase,
+            binding.passphraseRetype))
 
         when(_viewModel.getApplockPref()) {
             getString(R.string.applock_system_value) -> showSystemAuthDialog()
@@ -70,7 +73,7 @@ class AuthenticateFragment : Fragment() {
             }
         }
 
-        _viewModel.passwd.observe(viewLifecycleOwner, Observer {
+        _viewModel.passwd.observe(viewLifecycleOwner, {
             if(it != null)
                 _viewModel.authenticate(it)
             else
@@ -79,8 +82,6 @@ class AuthenticateFragment : Fragment() {
                     Snackbar.LENGTH_LONG).show()
         })
 
-        setupPasswordFields(binding.passLayout, arrayOf(binding.passphrase,
-            binding.passphraseRetype))
 
         _viewModel.authResult.observe(viewLifecycleOwner, EventObserver {
             when(it) {
@@ -100,18 +101,13 @@ class AuthenticateFragment : Fragment() {
             }
         })
 
-        //dacă aplicația este trimisă în background în timp ce authfrg este activ și stă mai mult de 30 de
-        //sec, cînd se întoarce lockstate setează flagul unauthorized. Deoarece authfrg nu îl observă flagul
-        //rămîne activ și este consumat de entrieslistfrg, ceea ce face ca activitatea să se întoarcă la
-        //authfrg.
-        //De asemenea, cînd este pornită activitatea sistem de autentificare și se revine la activitate,
-        //dacă între cele 3 evenimente trece intervalul de timeout se setează unathorized; dacă nu e consumat
-        //în authfrg îl consumă entrieslistfrg.
+//  dacă aplicația este trimisă în background în timp ce authfrg este activ și stă mai mult de 30 de
+//  sec, cînd se întoarce lockstate setează flagul unauthorized. Deoarece authfrg nu îl observă flagul
+//  rămîne activ și este consumat de entrieslistfrg, ceea ce face ca activitatea să se întoarcă la
+//  authfrg.
         activityViewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {})
 
-
-        handleBackPressed(activityViewModel)
-        setupSystemAuth()
+        handleBackPressed(lastBackPress)
         return binding.root
     }
 
