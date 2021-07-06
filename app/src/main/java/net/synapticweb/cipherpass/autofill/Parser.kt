@@ -175,17 +175,19 @@ class Parser(private val lastStructure : AssistStructure) {
             // dacă avem 2 parole contigue atunci probabil e o pagină de înregistrare, deci nu ar
             //trebui autofill.
             if (current.isPassword) {
-                try {
+                if(index + 1 < clientData.nodes.size) {
                     val next = clientData.nodes[index + 1]
                     if (next.isPassword) {
                         clientData.nodes = mutableListOf()
                         return
                     }
+                }
+
+                if(index - 1 >= 0) {
                     val previous = clientData.nodes[index - 1]
                     if (previous.fieldType == FieldType.UNKNOWN)
                         previous.fieldType = FieldType.GENERIC_LOGINID
-                } //excepția este java.lang.ArrayIndexOutOfBoundsException sau poate IndexOutOfBoundsException
-                catch (e: Exception) {}
+                }
             }
         }
 
