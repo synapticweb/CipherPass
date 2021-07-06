@@ -43,7 +43,7 @@ open class RepositoryImpl @Inject constructor(
     override fun scheduleLock() {
         val prefWrapper = PrefWrapper.getInstance(context)
         val clipboardTimeout = prefWrapper.getString(context.resources
-            .getString(R.string.clipboard_timeout_key))
+            .getString(R.string.background_timeout_key))
 
         clipboardTimeout?.let {
             val timeoutDisabled = clipboardTimeout ==

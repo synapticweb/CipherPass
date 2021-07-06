@@ -56,6 +56,8 @@ class MatchedEntriesFragment : Fragment() {
             authFragment.arguments = args
             (activity as AutofillActivity).insertFragment(authFragment)
         })
+
+        activityViewModel.authorized.observe(viewLifecycleOwner, EventObserver {})
         return binding.root
     }
 }

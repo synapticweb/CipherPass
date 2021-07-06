@@ -108,6 +108,8 @@ class EntryDetailFragment : Fragment() {
                 )
         })
 
+        activityViewModel.authorized.observe(viewLifecycleOwner, EventObserver {})
+
         _viewModel.finishDeletion.observe(viewLifecycleOwner, EventObserver {
             Toast.makeText(requireContext(), getString(R.string.deletion_ok), Toast.LENGTH_SHORT).show()
             val action = EntryDetailFragmentDirections.actionEntryDetailFragmentToEntriesListFragment()

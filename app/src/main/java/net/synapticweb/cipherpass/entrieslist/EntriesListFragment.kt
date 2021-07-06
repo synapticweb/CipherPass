@@ -211,6 +211,8 @@ class EntriesListFragment : Fragment() {
                     )
             })
 
+        activityViewModel.authorized.observe(viewLifecycleOwner, EventObserver {})
+
         _viewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {
             if (it)
                 findNavController().navigate(

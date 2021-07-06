@@ -18,6 +18,10 @@ class ActivityViewModel @Inject constructor(private val repository: Repository, 
     : AndroidViewModel(application), LifecycleObserver {
 
     val unauthorized = MutableLiveData<Event<Boolean>>()
+    //necesar pentru situația cînd baza de date este autentificată de autofill activity și
+    //aplicația principală are activ authfragment (e neautentificată). Logic este să se miște
+    //spre entrieslist. Toate celelalte fragmente observă auhorized fără ca să facă nimic.
+    val authorized = MutableLiveData<Event<Boolean>>()
 
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -33,6 +37,8 @@ class ActivityViewModel @Inject constructor(private val repository: Repository, 
     fun onAppForegrounded() {
         if(!repository.isUnlocked() )
             unauthorized.value = Event(true)
+        else
+            authorized.value = Event(true)
 
         repository.cancelScheduledLock()
         Log.d(APP_TAG, "App started")

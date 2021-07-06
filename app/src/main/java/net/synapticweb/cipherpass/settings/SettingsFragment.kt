@@ -52,6 +52,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 SettingsFragmentDirections.actionSettingsFragmentToAuthenticateFragment()
             )
         })
+        activityViewModel.authorized.observe(viewLifecycleOwner, EventObserver {})
 
         return super.onCreateView(inflater, container, savedInstanceState)
     }

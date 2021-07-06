@@ -114,7 +114,9 @@ class AuthenticateFragment : Fragment() {
 //  rămîne activ și este consumat de entrieslistfrg, ceea ce face ca activitatea să se întoarcă la
 //  authfrg.
         activityViewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {})
-
+        activityViewModel.authorized.observe(viewLifecycleOwner, EventObserver {
+            navigateAway()
+        })
 
         if(!isFromAutofill())
             handleBackPressed(lastBackPress)
