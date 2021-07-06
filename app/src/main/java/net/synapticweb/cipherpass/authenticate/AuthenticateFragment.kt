@@ -22,7 +22,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import net.synapticweb.cipherpass.*
 import net.synapticweb.cipherpass.autofill.AutofillActivity
@@ -41,6 +40,7 @@ class AuthenticateFragment : Fragment() {
 
     private val _viewModel by viewModels<AuthenticateViewModel> { viewModelFactory }
     private val activityViewModel by activityViewModels<ActivityViewModel> {viewModelFactory}
+    private val lastBackPress = LastBackPress()
 
     private lateinit var binding : AuthenticateFragmentBinding
 
@@ -55,13 +55,23 @@ class AuthenticateFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val fragment = this
         binding = AuthenticateFragmentBinding.inflate(inflater, container, false).apply {
             viewModel = _viewModel
             lifecycleOwner = fragment
         }
         setupSendPass()
+        setupSystemAuth()
+        setupPasswordFields(binding.passLayout, arrayOf(binding.passphrase,
+            binding.passphraseRetype))
+
+        //dacă de exemplu userul s-a autentificat în activitatea autofill și apoi accesează main app
+        //imediat nu mai are nevoie de autentificare.
+        if(_viewModel.isAuthenticated()) {
+            navigateAway()
+            return binding.root
+        }
 
         when(_viewModel.getApplockPref()) {
             getString(R.string.applock_system_value) -> showSystemAuthDialog()
@@ -73,7 +83,7 @@ class AuthenticateFragment : Fragment() {
             }
         }
 
-        _viewModel.passwd.observe(viewLifecycleOwner, Observer {
+        _viewModel.passwd.observe(viewLifecycleOwner, {
             if(it != null)
                 _viewModel.authenticate(it)
             else
@@ -82,21 +92,13 @@ class AuthenticateFragment : Fragment() {
                     Snackbar.LENGTH_LONG).show()
         })
 
-        setupPasswordFields(binding.passLayout, arrayOf(binding.passphrase,
-            binding.passphraseRetype))
 
         _viewModel.authResult.observe(viewLifecycleOwner, EventObserver {
             when(it) {
                 AUTH_OK -> {
                     binding.passphrase.text!!.clear()
                     binding.passphraseRetype.text.clear()
-                    if(isFromAutofill())
-                        (activity as AutofillActivity).insertFragment(MatchedEntriesFragment())
-                    else
-                        findNavController().navigate(
-                            AuthenticateFragmentDirections.
-                               actionAuthenticateFragmentToEntriesListFragment()
-                    )
+                    navigateAway()
                 }
 
                 R.string.pass_incorect ->
@@ -107,19 +109,15 @@ class AuthenticateFragment : Fragment() {
             }
         })
 
-        //dacă aplicația este trimisă în background în timp ce authfrg este activ și stă mai mult de 30 de
-        //sec, cînd se întoarce lockstate setează flagul unauthorized. Deoarece authfrg nu îl observă flagul
-        //rămîne activ și este consumat de entrieslistfrg, ceea ce face ca activitatea să se întoarcă la
-        //authfrg.
-        //De asemenea, cînd este pornită activitatea sistem de autentificare și se revine la activitate,
-        //dacă între cele 3 evenimente trece intervalul de timeout se setează unathorized; dacă nu e consumat
-        //în authfrg îl consumă entrieslistfrg.
+//  dacă aplicația este trimisă în background în timp ce authfrg este activ și stă mai mult de 30 de
+//  sec, cînd se întoarce lockstate setează flagul unauthorized. Deoarece authfrg nu îl observă flagul
+//  rămîne activ și este consumat de entrieslistfrg, ceea ce face ca activitatea să se întoarcă la
+//  authfrg.
         activityViewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {})
 
 
         if(!isFromAutofill())
-            handleBackPressed(activityViewModel)
-        setupSystemAuth()
+            handleBackPressed(lastBackPress)
         return binding.root
     }
 
@@ -201,5 +199,15 @@ class AuthenticateFragment : Fragment() {
             R.id.autofill_toolbar
         else
             R.id.app_toolbar
+    }
+
+    private fun navigateAway() {
+        if(isFromAutofill())
+            (activity as AutofillActivity).insertFragment(MatchedEntriesFragment())
+        else
+            findNavController().navigate(
+                AuthenticateFragmentDirections.
+                actionAuthenticateFragmentToEntriesListFragment()
+            )
     }
 }

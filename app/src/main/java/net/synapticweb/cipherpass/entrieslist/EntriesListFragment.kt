@@ -27,6 +27,7 @@ import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import net.synapticweb.cipherpass.*
 import net.synapticweb.cipherpass.databinding.EntriesListFragmentBinding
 import net.synapticweb.cipherpass.util.EventObserver
+import net.synapticweb.cipherpass.util.LastBackPress
 import net.synapticweb.cipherpass.util.PrefWrapper
 import net.synapticweb.cipherpass.util.handleBackPressed
 import org.matomo.sdk.extra.TrackHelper
@@ -43,6 +44,7 @@ class EntriesListFragment : Fragment() {
     private lateinit var searchPopup : SearchPopup
     private lateinit var createJsonFileLauncher : ActivityResultLauncher<Intent>
     private lateinit var openJsonFileLauncher: ActivityResultLauncher<Intent>
+    private val lastBackPress = LastBackPress()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -76,7 +78,7 @@ class EntriesListFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = EntriesListFragmentBinding.inflate(inflater, container, false)
 
         _viewModel.entries.observe(viewLifecycleOwner, {
@@ -105,7 +107,7 @@ class EntriesListFragment : Fragment() {
         setupNavigation()
         setupSearch()
         setupSerialize()
-        handleBackPressed(activityViewModel)
+        handleBackPressed(lastBackPress)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -162,7 +164,7 @@ class EntriesListFragment : Fragment() {
                 false
             }
             R.id.lock -> {
-                activityViewModel.lockAndReauth()
+               _viewModel.lockAndReauth()
                 false
             }
             R.id.export_json -> {

@@ -7,15 +7,24 @@
 package net.synapticweb.cipherpass.autofill
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import net.synapticweb.cipherpass.ActivityViewModel
+import net.synapticweb.cipherpass.CipherPassApp
 import net.synapticweb.cipherpass.R
+import javax.inject.Inject
 
 class AutofillActivity : AppCompatActivity() {
+    @Inject
+    lateinit var viewModelFactory : ViewModelProvider.Factory
+    private lateinit var activityViewModel : ActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        (application as CipherPassApp).appComponent.inject(this)
+        activityViewModel = ViewModelProvider(this, viewModelFactory).get(ActivityViewModel::class.java)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.autofill_activity)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)

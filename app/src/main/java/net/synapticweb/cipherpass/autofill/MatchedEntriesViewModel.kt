@@ -7,21 +7,20 @@
 package net.synapticweb.cipherpass.autofill
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import net.synapticweb.cipherpass.data.Repository
-import net.synapticweb.cipherpass.util.Event
 import javax.inject.Inject
 
 class MatchedEntriesViewModel @Inject constructor(
     private val repository: Repository,
     application: Application
-): AndroidViewModel(application) {
+): AndroidViewModel(application), LifecycleObserver {
 
-    val unauthorized = MutableLiveData<Event<Boolean>>()
+    init {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+    }
 
     fun checkDomainExists(webDomain : String) {
-        if(!repository.isUnlocked())
-            unauthorized.value = Event(true)
+
     }
 }

@@ -7,6 +7,7 @@
 package net.synapticweb.cipherpass
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import net.synapticweb.cipherpass.data.Repository
 import net.synapticweb.cipherpass.util.Event
@@ -16,27 +17,25 @@ import javax.inject.Inject
 class ActivityViewModel @Inject constructor(private val repository: Repository, application: Application)
     : AndroidViewModel(application), LifecycleObserver {
 
-    var lastBackPress : Long = 0L
     val unauthorized = MutableLiveData<Event<Boolean>>()
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun onActivityPause() {
+    init {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onAppBackgrounded() {
         repository.scheduleLock()
+        Log.d(APP_TAG, "App stopped")
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun onActivityResume() {
-        if(!repository.isUnlocked())
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onAppForegrounded() {
+        if(!repository.isUnlocked() )
             unauthorized.value = Event(true)
+
         repository.cancelScheduledLock()
+        Log.d(APP_TAG, "App started")
     }
 
-    fun isDbUnlocked() : Boolean {
-        return repository.isUnlocked()
-    }
-
-    fun lockAndReauth() {
-        repository.lock()
-        unauthorized.value = Event(true)
-    }
 }

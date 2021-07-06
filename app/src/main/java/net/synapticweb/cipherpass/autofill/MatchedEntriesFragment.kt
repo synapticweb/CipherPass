@@ -15,7 +15,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.activityViewModels
+import net.synapticweb.cipherpass.ActivityViewModel
 import net.synapticweb.cipherpass.CipherPassApp
 import net.synapticweb.cipherpass.authenticate.AuthenticateFragment
 import net.synapticweb.cipherpass.databinding.MatchedEntriesFragmentBinding
@@ -28,6 +29,7 @@ class MatchedEntriesFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private val viewModel by viewModels<MatchedEntriesViewModel> {viewModelFactory}
+    private val activityViewModel by activityViewModels<ActivityViewModel> { viewModelFactory }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -47,7 +49,7 @@ class MatchedEntriesFragment : Fragment() {
             viewModel.checkDomainExists(clientDomain)
         }
 
-        viewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {
+        activityViewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {
             val authFragment = AuthenticateFragment()
             val args = Bundle()
             args.putBoolean(INSERTED_BY_AUTOFILL, true)
