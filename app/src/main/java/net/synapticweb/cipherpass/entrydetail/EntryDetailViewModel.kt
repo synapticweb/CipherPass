@@ -34,12 +34,20 @@ class EntryDetailViewModel @Inject constructor(private val repository: Repositor
                                                application: Application
 ) : AndroidViewModel(application) {
 
+    val unauthorized = MutableLiveData<Event<Boolean>>()
     val entry = MutableLiveData<Entry>()
     val finishDeletion = MutableLiveData<Event<Boolean>>()
     val finishCopy = MutableLiveData<Event<String>>()
     val entryId = MutableLiveData<Long>()
     val customFields : LiveData<List<CustomField>> = entryId.switchMap {
-        repository.getCustomFields(it)
+        try {
+            repository.getCustomFields(it)
+        }
+        catch (e : SecurityException) {
+            unauthorized.value =  Event(true)
+            Log.e(APP_TAG, "Accessing custom fields (detail) when db locked.")
+            MutableLiveData(listOf())
+        }
     }
 
     fun load(id: Long) {
@@ -53,7 +61,8 @@ class EntryDetailViewModel @Inject constructor(private val repository: Repositor
                 entry.value = repository.getEntry(entryId)
             }
             catch (e : SecurityException) {
-                Log.e(APP_TAG, "Accessing entry when database locked.")
+                Log.e(APP_TAG, "Accessing entry (detail) when database locked.")
+                unauthorized.value =  Event(true)
             }
         }
     }
@@ -61,13 +70,19 @@ class EntryDetailViewModel @Inject constructor(private val repository: Repositor
     fun deleteEntry() { //todo: error handling
         entry.value?.let {
             viewModelScope.launch(Dispatchers.IO) {
-                val customFields = repository.getCustomFieldsSync(it.id)
-                for(field in customFields)
-                    repository.deleteCustomField(field)
-                repository.deleteEntry(it)
+                try {
+                    val customFields = repository.getCustomFieldsSync(it.id)
+                    for (field in customFields)
+                        repository.deleteCustomField(field)
+                    repository.deleteEntry(it)
 
-                withContext(Dispatchers.Main) {
-                    finishDeletion.value = Event(true)
+                    withContext(Dispatchers.Main) {
+                        finishDeletion.value = Event(true)
+                    }
+                }
+                catch (e : SecurityException) {
+                    Log.e(APP_TAG, "Deleting entry when db locked.")
+                    unauthorized.value =  Event(true)
                 }
             }
         }

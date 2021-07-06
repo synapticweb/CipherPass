@@ -47,6 +47,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 )
             })
 
+        viewModelFrg.unauthorized.observe(viewLifecycleOwner, EventObserver {
+            findNavController().navigate(
+                SettingsFragmentDirections.actionSettingsFragmentToAuthenticateFragment()
+            )
+        })
+
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 

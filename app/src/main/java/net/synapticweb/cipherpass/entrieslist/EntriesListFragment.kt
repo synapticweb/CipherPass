@@ -208,7 +208,15 @@ class EntriesListFragment : Fragment() {
                         EntriesListFragmentDirections.actionEntriesListFragmentToAuthenticateFragment()
                     )
             })
+
+        _viewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {
+            if (it)
+                findNavController().navigate(
+                    EntriesListFragmentDirections.actionEntriesListFragmentToAuthenticateFragment()
+                )
+        })
     }
+
 
     private fun setupFab() {
        binding.addEntry.let {
