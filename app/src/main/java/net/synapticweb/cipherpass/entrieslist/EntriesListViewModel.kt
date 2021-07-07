@@ -118,14 +118,15 @@ class EntriesListViewModel @Inject constructor(
 
     fun exportJson(fileUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
+            var entries : List<Entry> = listOf()
             try {
-                val entries = repository.getAllEntriesSync()
+                entries = repository.getAllEntriesSync()
                 for (entry in entries)
                     entry.customFields = repository.getCustomFieldsSync(entry.id)
             }
             catch (e : SecurityException) {
                 withContext(Dispatchers.Main) {
-                    Log.d(APP_TAG, "Export json while db is locked. ")
+                    Log.e(APP_TAG, "Export json while db is locked. ")
                     unauthorized.value = Event(true)
                 }
             }
@@ -193,9 +194,13 @@ class EntriesListViewModel @Inject constructor(
                 return@launch
             }
 
-            var containsEntries = false
             try {
-                containsEntries = repository.dbContainsEntries()
+                if (repository.dbContainsEntries()) {
+                    withContext(Dispatchers.Main) {
+                        _hasEntries.value = Event(true)
+                    }
+                    return@launch
+                }
             }
             catch (e : SecurityException) {
                 withContext(Dispatchers.Main) {
@@ -203,12 +208,8 @@ class EntriesListViewModel @Inject constructor(
                     unauthorized.value = Event(true)
                 }
             }
-            if(containsEntries)
-                withContext(Dispatchers.Main) {
-                    _hasEntries.value = Event(true)
-                }
-            else
-                importEntries(false)
+
+            importEntries(false)
         }
     }
 
