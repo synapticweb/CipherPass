@@ -14,7 +14,7 @@ import net.synapticweb.cipherpass.data.Repository
 import net.synapticweb.cipherpass.util.CPCipher
 import javax.inject.Singleton
 
-@Component(modules = [AppSubcomponents::class, TestRepositoryModule::class, ActivityViewModelModule::class,
+@Component(modules = [AppSubcomponents::class, TestRepositoryModule::class, TestActivityViewModelModule::class,
     TestCipherModule::class,
     ViewModelBuilderModule::class])
 @Singleton
