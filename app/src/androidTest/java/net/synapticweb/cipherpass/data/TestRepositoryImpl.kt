@@ -4,7 +4,7 @@
  * See the LICENSE file in the project root for license terms.
  */
 
-package net.synapticweb.cipherpass.model
+package net.synapticweb.cipherpass.data
 
 import android.content.Context
 import net.synapticweb.cipherpass.data.RepositoryImpl

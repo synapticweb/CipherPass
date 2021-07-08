@@ -105,7 +105,12 @@ class AuthenticateFragment : Fragment() {
 //  sec, cînd se întoarce lockstate setează flagul unauthorized. Deoarece authfrg nu îl observă flagul
 //  rămîne activ și este consumat de entrieslistfrg, ceea ce face ca activitatea să se întoarcă la
 //  authfrg.
-        activityViewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {})
+        activityViewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {
+            if(!it)
+                findNavController().navigate(
+                    AuthenticateFragmentDirections.actionAuthenticateFragmentToEntriesListFragment()
+                )
+        })
 
         handleBackPressed(lastBackPress)
         return binding.root

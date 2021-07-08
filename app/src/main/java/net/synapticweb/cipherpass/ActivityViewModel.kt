@@ -7,7 +7,6 @@
 package net.synapticweb.cipherpass
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import net.synapticweb.cipherpass.data.Repository
 import net.synapticweb.cipherpass.util.Event
@@ -17,6 +16,9 @@ import javax.inject.Inject
 open class ActivityViewModel @Inject constructor(private val repository: Repository, application: Application)
     : AndroidViewModel(application), LifecycleObserver {
 
+    //Poate fi setat true (cînd la start detectează că baza de date e încuiată) sau
+    //false (cînd la start baza de date e deschisă - spre exemplu pentru că a fost
+    //descuiată în activitatea autofill.
     val unauthorized = MutableLiveData<Event<Boolean>>()
 
     init {
@@ -26,16 +28,11 @@ open class ActivityViewModel @Inject constructor(private val repository: Reposit
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     open fun onAppBackgrounded() {
         repository.scheduleLock()
-        Log.d(APP_TAG, "App stopped")
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     open fun onAppForegrounded() {
-        if(!repository.isUnlocked() )
-            unauthorized.value = Event(true)
-
+        unauthorized.value = Event(!repository.isUnlocked())
         repository.cancelScheduledLock()
-        Log.d(APP_TAG, "App started")
     }
-
 }

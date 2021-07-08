@@ -42,11 +42,12 @@ open class RepositoryImpl @Inject constructor(
 
     override fun scheduleLock() {
         val prefWrapper = PrefWrapper.getInstance(context)
-        val clipboardTimeout = prefWrapper.getString(context.resources
-            .getString(R.string.clipboard_timeout_key))
 
-        clipboardTimeout?.let {
-            val timeoutDisabled = clipboardTimeout ==
+        val backgroundTimeout = prefWrapper.getString(context.resources
+            .getString(R.string.background_timeout_key))
+
+        backgroundTimeout?.let {
+            val timeoutDisabled = backgroundTimeout ==
                     context.resources.getString(R.string.clipboard_timeout_disabled_value)
             val noAuth =  prefWrapper.getString(context.resources.getString(R.string.applock_key)) ==
                     context.resources.getString(R.string.applock_nolock_value)
@@ -55,7 +56,7 @@ open class RepositoryImpl @Inject constructor(
                 return
 
             val lock = OneTimeWorkRequestBuilder<ScheduleLock>()
-                .setInitialDelay(it.toLong() + 3, TimeUnit.SECONDS)
+                .setInitialDelay(it.toLong(), TimeUnit.SECONDS)
                 .build()
             lockId = lock.id
             WorkManager.getInstance(context).enqueue(lock)
@@ -305,7 +306,7 @@ open class RepositoryImpl @Inject constructor(
     }
 
     //Subclasele worker nu au voie să fie inner (și nici private), deci a trebuit să recurg
-    //la dagger.
+    //la dagger ca să am acces la repository.
     class ScheduleLock(appContext: Context, workerParams: WorkerParameters) :
     Worker(appContext, workerParams) {
         @Inject

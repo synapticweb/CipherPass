@@ -13,7 +13,6 @@ import dagger.Component
 import net.synapticweb.cipherpass.MainActivity
 import net.synapticweb.cipherpass.addeditentry.di.AddeditEntryComponent
 import net.synapticweb.cipherpass.authenticate.di.AuthenticateComponent
-import net.synapticweb.cipherpass.autofill.AutofillActivity
 import net.synapticweb.cipherpass.entrydetail.di.EntryDetailComponent
 import net.synapticweb.cipherpass.entrieslist.di.EntriesListComponent
 import net.synapticweb.cipherpass.data.RepositoryImpl
@@ -32,7 +31,6 @@ interface AppComponent {
 
     fun inject(activity : MainActivity)
     fun inject(scheduleLock: RepositoryImpl.ScheduleLock)
-    fun inject(activity : AutofillActivity)
     fun entriesListComponent() : EntriesListComponent.Factory
     fun authenticateComponent() : AuthenticateComponent.Factory
     fun settingsComponent() : SettingsComponent.Factory

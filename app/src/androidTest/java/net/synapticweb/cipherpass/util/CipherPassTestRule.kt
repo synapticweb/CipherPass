@@ -12,7 +12,7 @@ import kotlinx.coroutines.runBlocking
 import net.synapticweb.cipherpass.*
 import net.synapticweb.cipherpass.di.TestAppComponent
 import net.synapticweb.cipherpass.model.Hash
-import net.synapticweb.cipherpass.model.TestRepositoryImpl
+import net.synapticweb.cipherpass.data.TestRepositoryImpl
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
