@@ -53,8 +53,6 @@ class PrivPolicyFragment : Fragment() {
                     )
             }
         )
-        activityViewModel.authorized.observe(viewLifecycleOwner, EventObserver {})
-
         return root
     }
 }

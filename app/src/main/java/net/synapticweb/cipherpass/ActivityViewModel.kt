@@ -7,7 +7,6 @@
 package net.synapticweb.cipherpass
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import net.synapticweb.cipherpass.data.Repository
 import net.synapticweb.cipherpass.util.Event
@@ -17,11 +16,10 @@ import javax.inject.Inject
 open class ActivityViewModel @Inject constructor(private val repository: Repository, application: Application)
     : AndroidViewModel(application), LifecycleObserver {
 
+    //Poate fi setat true (cînd la start detectează că baza de date e încuiată) sau
+    //false (cînd la start baza de date e deschisă - spre exemplu pentru că a fost
+    //descuiată în activitatea autofill.
     val unauthorized = MutableLiveData<Event<Boolean>>()
-    //necesar pentru situația cînd baza de date este autentificată de autofill activity și
-    //aplicația principală are activ authfragment (e neautentificată). Logic este să se miște
-    //spre entrieslist. Toate celelalte fragmente observă auhorized fără ca să facă nimic.
-    val authorized = MutableLiveData<Event<Boolean>>()
 
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -30,18 +28,11 @@ open class ActivityViewModel @Inject constructor(private val repository: Reposit
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     open fun onAppBackgrounded() {
         repository.scheduleLock()
-        Log.d(APP_TAG, "App stopped")
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     open fun onAppForegrounded() {
-        if(!repository.isUnlocked() )
-            unauthorized.value = Event(true)
-        else
-            authorized.value = Event(true)
-
+        unauthorized.value = Event(!repository.isUnlocked())
         repository.cancelScheduledLock()
-        Log.d(APP_TAG, "App started")
     }
-
 }

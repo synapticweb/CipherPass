@@ -50,14 +50,15 @@ class MatchedEntriesFragment : Fragment() {
         }
 
         activityViewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {
-            val authFragment = AuthenticateFragment()
-            val args = Bundle()
-            args.putBoolean(INSERTED_BY_AUTOFILL, true)
-            authFragment.arguments = args
-            (activity as AutofillActivity).insertFragment(authFragment)
+            if(it) {
+                val authFragment = AuthenticateFragment()
+                val args = Bundle()
+                args.putBoolean(INSERTED_BY_AUTOFILL, true)
+                authFragment.arguments = args
+                (activity as AutofillActivity).insertFragment(authFragment)
+            }
         })
 
-        activityViewModel.authorized.observe(viewLifecycleOwner, EventObserver {})
         return binding.root
     }
 }

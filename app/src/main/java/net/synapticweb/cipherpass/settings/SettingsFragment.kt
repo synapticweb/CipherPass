@@ -48,11 +48,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
             })
 
         viewModelFrg.unauthorized.observe(viewLifecycleOwner, EventObserver {
-            findNavController().navigate(
-                SettingsFragmentDirections.actionSettingsFragmentToAuthenticateFragment()
-            )
+            if(it) {
+                findNavController().navigate(
+                    SettingsFragmentDirections.actionSettingsFragmentToAuthenticateFragment()
+                )
+            }
         })
-        activityViewModel.authorized.observe(viewLifecycleOwner, EventObserver {})
 
         return super.onCreateView(inflater, container, savedInstanceState)
     }

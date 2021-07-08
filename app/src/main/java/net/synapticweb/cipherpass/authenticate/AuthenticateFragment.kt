@@ -66,13 +66,6 @@ class AuthenticateFragment : Fragment() {
         setupPasswordFields(binding.passLayout, arrayOf(binding.passphrase,
             binding.passphraseRetype))
 
-        //dacă de exemplu userul s-a autentificat în activitatea autofill și apoi accesează main app
-        //imediat nu mai are nevoie de autentificare.
-        if(_viewModel.isAuthenticated()) {
-            navigateAway()
-            return binding.root
-        }
-
         when(_viewModel.getApplockPref()) {
             getString(R.string.applock_system_value) -> showSystemAuthDialog()
 
@@ -113,9 +106,9 @@ class AuthenticateFragment : Fragment() {
 //  sec, cînd se întoarce lockstate setează flagul unauthorized. Deoarece authfrg nu îl observă flagul
 //  rămîne activ și este consumat de entrieslistfrg, ceea ce face ca activitatea să se întoarcă la
 //  authfrg.
-        activityViewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {})
-        activityViewModel.authorized.observe(viewLifecycleOwner, EventObserver {
-            navigateAway()
+        activityViewModel.unauthorized.observe(viewLifecycleOwner, EventObserver {
+            if(!it)
+                navigateAway()
         })
 
         if(!isFromAutofill())

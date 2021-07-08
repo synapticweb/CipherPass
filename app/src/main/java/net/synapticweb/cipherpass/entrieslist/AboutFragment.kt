@@ -49,7 +49,6 @@ class AboutFragment : Fragment() {
                         AboutFragmentDirections.actionAboutFragmentToAuthenticateFragment()
                     )
             })
-        activityViewModel.authorized.observe(viewLifecycleOwner, EventObserver {})
         return binding.root
     }
 }

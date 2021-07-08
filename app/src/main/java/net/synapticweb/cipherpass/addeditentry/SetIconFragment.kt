@@ -85,6 +85,5 @@ class SetIconFragment : Fragment(){
                         SetIconFragmentDirections.actionSetIconFragmentToAuthenticateFragment()
                     )
             })
-        activityViewModel.authorized.observe(viewLifecycleOwner, EventObserver {})
     }
 }
